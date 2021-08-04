@@ -1,0 +1,25 @@
+.wrapper {
+  display: flex;
+  height: 100vh;
+  main {
+    flex: 1;
+  }
+}
+
+.button {
+  margin-bottom: 1rem;
+  background-color: rgb(5, 155, 50);
+  color: #fff;
+  border-color: transparent;
+  border-radius: 25px;
+
+  &:hover {
+    background-color: rgb(5, 155, 50);
+    color: #fff;
+  }
+
+  &:focus {
+    background-color: rgb(5, 155, 50);
+    color: #fff;
+  }
+}

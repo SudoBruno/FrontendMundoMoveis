@@ -1,0 +1,37 @@
+.tag {
+  min-width: 50%;
+  max-width: 50%;
+  height: 100%;
+
+  hr {
+    margin: 15px 0px;
+  }
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(1fr, 4);
+  text-align: start;
+  b {
+    font-size: 1.1rem;
+  }
+  p {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
+.insCode {
+  text-align: center;
+  color: black;
+}
+
+.operations {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  color: black;
+}
+
+.barcode {
+  text-align: center;
+}
