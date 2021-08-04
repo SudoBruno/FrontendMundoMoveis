@@ -320,7 +320,7 @@ export default function User({ tenant }: IProp) {
                   style={{ cursor: 'pointer', fontSize: '16px' }}
                   onClick={() => handleEdit(record)}
                 /> */}
-                {/* onClick={() => handleEdit(record)} */}
+                {/* onClick={() => handleE dit(record)} */}
                 <Popconfirm
                   title="Confirmar remoção?"
                   onConfirm={() => handleDelete(record.id)}
@@ -455,13 +455,12 @@ export default function User({ tenant }: IProp) {
             style={{ width: 400 }}
             value={tenantName}
             onChange={(e) => {
-              setTenantId(e[0]);
-              setTenantName(e[1]);
+              setTenantId(e);
             }}
           >
             {tenants.map((item) => (
               <>
-                <Option key={item.id} value={[item.id, item.name]}>
+                <Option key={item.id} value={item.id}>
                   {item.name}
                 </Option>
               </>
@@ -508,6 +507,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
     const { data } = await apiClient.get('/tenant');
+    console.log(data);
 
     return {
       props: {

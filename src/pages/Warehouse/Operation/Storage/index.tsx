@@ -213,13 +213,16 @@ export default function Storage({
     setRawMaterialsAdded(newArray);
   }
 
-  function handleChangeRawMaterial(value, index) {
+  function handleChangeRawMaterial(value: string, index: number) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].raw_material_id = value[0];
+    const rawMaterial = rawMaterials.find(
+      (rawMaterial) => rawMaterial.id === value
+    );
+    newArray[index].raw_material_id = value;
     newArray[
       index
-    ].rawMaterialName = `${value[3]} | ${value[1]} / (${value[2]})`;
+    ].rawMaterialName = `${rawMaterial.code} | ${rawMaterial.name} / (${rawMaterial.unit_measurement_name})`;
 
     setRawMaterialsAdded(newArray);
   }
@@ -238,19 +241,20 @@ export default function Storage({
   function handleChangeReceipt(value, index) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].raw_material_receipt_id = value[4];
-    newArray[index].receiptName = value[2];
+    const receipt = receipts.find((receipt) => receipt.id === value);
+    newArray[index].raw_material_receipt_id = receipt.id;
+    newArray[index].receiptName = receipt.warehouse_receipt_description;
 
-    let maxQuantity: number = Number(value[3]);
+    let maxQuantity: number = Number(receipt.quantity);
 
     rawMaterialsAdded.forEach((item) => {
-      if (item.raw_material_receipt_id === value[4]) {
+      if (item.raw_material_receipt_id === receipt.id) {
         maxQuantity -= Number(item.quantity);
       }
     });
 
     newArray[index].maxQuantity = maxQuantity;
-    newArray[index].quantityHasToStorage = value[3];
+    newArray[index].quantityHasToStorage = receipt.quantity;
 
     setRawMaterialsAdded(newArray);
   }
@@ -258,8 +262,10 @@ export default function Storage({
   async function handleChangeWarehouse(value, index) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].warehouse_id = value[0];
-    newArray[index].warehouseName = value[1];
+    const warehouse = warehouses.find((warehouse) => warehouse.id === value);
+
+    newArray[index].warehouse_id = warehouse.id;
+    newArray[index].warehouseName = warehouse.name;
 
     newArray[index].position_id = '';
     newArray[index].positionName = '';
@@ -315,19 +321,13 @@ export default function Storage({
     setRawMaterialsAdded(newArray);
   }
 
-  function calculateQuanityPerAddedRawMaterial(index, array, rawMaterialId) {
-    const equalValues = array.filter((iten) => {
-      if (iten.raw_material_id === rawMaterialId) {
-        return iten;
-      }
-    });
-  }
-
-  function handleChangePosition(value, index) {
+  function handleChangePosition(value: string, index) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].position_id = value[0];
-    newArray[index].positionName = value[1];
+    const position = positions.find((position) => position.id === value);
+
+    newArray[index].position_id = position.id;
+    newArray[index].positionName = position.name;
 
     setRawMaterialsAdded(newArray);
   }
@@ -575,15 +575,7 @@ export default function Storage({
                   >
                     {rawMaterials.map((item) => (
                       <>
-                        <Option
-                          key={item.id}
-                          value={[
-                            item.id,
-                            item.name,
-                            item.unit_measurement_name,
-                            item.code,
-                          ]}
-                        >
+                        <Option key={item.id} value={item.id}>
                           {`${item.code} |
                             ${item.name} / 
                             (${item.unit_measurement_name})`}
@@ -622,16 +614,7 @@ export default function Storage({
                   >
                     {receipts.map((item) => (
                       <>
-                        <Option
-                          key={item.receipt_id}
-                          value={[
-                            item.receipt_id,
-                            item.warehouse_raw_material_name,
-                            item.warehouse_receipt_description,
-                            item.quantity,
-                            item.id,
-                          ]}
-                        >
+                        <Option key={item.id} value={item.id}>
                           {item.warehouse_receipt_description}
                         </Option>
                       </>
@@ -663,7 +646,7 @@ export default function Storage({
                   >
                     {warehouses.map((item) => (
                       <>
-                        <Option key={item.id} value={[item.id, item.name]}>
+                        <Option key={item.id} value={item.id}>
                           {item.name}
                         </Option>
                       </>
@@ -694,7 +677,7 @@ export default function Storage({
                   >
                     {positions.map((item) => (
                       <>
-                        <Option key={item.id} value={[item.id, item.name]}>
+                        <Option key={item.id} value={item.id}>
                           {item.name}
                         </Option>
                       </>
