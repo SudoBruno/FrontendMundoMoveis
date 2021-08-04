@@ -193,7 +193,6 @@ export default function Stock({ stock }: IProp) {
           title: 'Operação',
           colSpan: 2,
           dataIndex: 'operacao',
-          align: 'center',
 
           render: (record, stock: IStock) => {
             return (

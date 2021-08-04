@@ -221,7 +221,7 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
     newArray[
       index
     ].rawMaterialName = `${rawMaterial.code} | ${rawMaterial.name} / (${rawMaterial.unit_measurement_name})`;
-    newArray[index].coefficient = value[4];
+    newArray[index].coefficient = Number(rawMaterial.coefficient);
 
     setRawMaterialsAdded(newArray);
   }
@@ -453,7 +453,6 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
               <Input
                 key="receivedName"
                 size="large"
-                placeholder="Digite o código INS, ex: "
                 value={description}
                 onChange={(e) => {
                   setDescription(e.target.value);

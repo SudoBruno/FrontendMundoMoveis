@@ -128,12 +128,11 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       });
       handleClose();
     } catch (error) {
-      console.error(error.response);
       setLoading(false);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível efetuar a saída',
+        description: `${error.response.data.message}`,
       });
     }
   }
@@ -263,8 +262,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
     const cargoFind = cargo.find((cargoFind) => cargoFind.id === value);
 
     const cargoName = cargoFind.cargo;
-
-    console.log(value);
 
     if (cargoName === 'Genérico') {
       newArray[index].maxQuantity = cargoFind.quantity;
