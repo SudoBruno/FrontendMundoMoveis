@@ -316,10 +316,10 @@ export default function User({ tenant }: IProp) {
           render: (record) => {
             return (
               <>
-                <EditFilled
+                {/* <EditFilled
                   style={{ cursor: 'pointer', fontSize: '16px' }}
                   onClick={() => handleEdit(record)}
-                />
+                /> */}
                 {/* onClick={() => handleEdit(record)} */}
                 <Popconfirm
                   title="Confirmar remoção?"
