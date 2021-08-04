@@ -169,7 +169,7 @@ export default function categories({ categorie, notFound }: IProps) {
       searchText: '',
       searchedColumn: '',
     };
-
+    searchInput: Input;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
