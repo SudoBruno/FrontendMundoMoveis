@@ -128,12 +128,11 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       });
       handleClose();
     } catch (error) {
-      console.error(error.response);
       setLoading(false);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível efetuar a saída',
+        description: `${error.response.data.message}`,
       });
     }
   }
@@ -141,8 +140,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   async function handleChangeWarehouse(value, index) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].warehouse_id = value[0];
-    newArray[index].warehouseName = value[1];
+    const warehouse = warehouses.find((warehouse) => warehouse.id === value);
+
+    newArray[index].warehouse_id = warehouse.id;
+    newArray[index].warehouseName = warehouse.name;
 
     newArray[index].position_id = '';
     newArray[index].positionName = '';
@@ -159,8 +160,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   function handleChangePosition(value, index) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].position_id = value[0];
-    newArray[index].positionName = value[1];
+    const position = positions.find((position) => position.id === value);
+
+    newArray[index].position_id = position.id;
+    newArray[index].positionName = position.name;
 
     setRawMaterialsAdded(newArray);
   }
@@ -211,11 +214,14 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
   function handleChangeRawMaterial(value, index: number) {
     let newArray = [...rawMaterialsAdded];
+    const rawMaterial = rawMaterials.find(
+      (rawMaterial) => rawMaterial.raw_material_id === value
+    );
 
-    newArray[index].raw_material_id = value[0];
+    newArray[index].raw_material_id = rawMaterial.raw_material_id;
     newArray[
       index
-    ].rawMaterialName = `${value[3]} | ${value[1]} / (${value[2]})`;
+    ].rawMaterialName = `${rawMaterial.raw_material_code} | ${rawMaterial.raw_material_name} / (${rawMaterial.unit_of_measurement_abbreviation})`;
 
     setRawMaterialsAdded(newArray);
   }
@@ -252,16 +258,19 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
   function handleChangeCargo(value, index) {
     let newArray = [...rawMaterialsAdded];
-    const cargoName = value[1];
+
+    const cargoFind = cargo.find((cargoFind) => cargoFind.id === value);
+
+    const cargoName = cargoFind.cargo;
 
     if (cargoName === 'Genérico') {
-      newArray[index].maxQuantity = value[2];
+      newArray[index].maxQuantity = cargoFind.quantity;
       newArray[index].cargo = '';
       setRawMaterialsAdded(newArray);
     }
 
-    newArray[index].maxQuantity = value[2];
-    newArray[index].cargo = value[1];
+    newArray[index].maxQuantity = cargoFind.quantity;
+    newArray[index].cargo = cargoFind.cargo;
     setRawMaterialsAdded(newArray);
   }
 
@@ -540,12 +549,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       <>
                         <Option
                           key={item.raw_material_id}
-                          value={[
-                            item.raw_material_id,
-                            item.raw_material_name,
-                            item.unit_of_measurement_abbreviation,
-                            item.raw_material_code,
-                          ]}
+                          value={item.raw_material_id}
                         >
                           {`${item.raw_material_code} |
                           ${item.raw_material_name} / 
@@ -580,7 +584,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                   >
                     {warehouses.map((item) => (
                       <>
-                        <Option key={item.id} value={[item.id, item.name]}>
+                        <Option key={item.id} value={item.id}>
                           {item.name}
                         </Option>
                       </>
@@ -611,7 +615,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                   >
                     {positions.map((item) => (
                       <>
-                        <Option key={item.id} value={[item.id, item.name]}>
+                        <Option key={item.id} value={item.id}>
                           {item.name}
                         </Option>
                       </>
@@ -641,10 +645,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                   >
                     {cargo.map((item) => (
                       <>
-                        <Option
-                          key={item.id}
-                          value={[item.id, item.cargo, item.quantity]}
-                        >
+                        <Option key={item.id} value={item.id}>
                           {item.cargo === ''
                             ? (item.cargo = 'Genérico')
                             : item.cargo}

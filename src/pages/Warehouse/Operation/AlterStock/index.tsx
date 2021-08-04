@@ -150,7 +150,12 @@ export default function AlterSotock({
     setPositions(response.data);
   }
 
-  async function handleChangeOldPosition(position_id) {
+  async function handleChangeOldPosition(position_id: string) {
+    const position = positions.find((position) => position.id === position_id);
+
+    setOldPositionId(position.id);
+    setOldPositionName(position.name);
+
     const response = await api.get('/warehouse/stock', {
       params: {
         raw_material_id: rawMaterialId,
@@ -172,6 +177,27 @@ export default function AlterSotock({
     }
 
     setMaxQuantity(response.data[0].quantity);
+  }
+
+  function handleChangeOldWarehousePosition(value) {
+    const warehouse = warehouses.find((warehouse) => warehouse.id === value);
+
+    setWarehouseOldPositionId(warehouse.id);
+    setWarehouseOldPositionName(warehouse.name);
+  }
+
+  function handleChangeNewPosition(value: string) {
+    const position = positions.find((position) => position.id === value);
+
+    setNewPositionId(position.id);
+    setNewPositionName(position.name);
+  }
+
+  function handleChangeNewWarehousePosition(value) {
+    const warehouse = warehouses.find((warehouse) => warehouse.id === value);
+
+    setWarehouseNewPositionId(warehouse.id);
+    setWarehouseNewPositionName(warehouse.name);
   }
 
   function handleChangeQuantity(quantity: number) {
@@ -196,6 +222,17 @@ export default function AlterSotock({
     }
 
     setMovedQuantity(quantity);
+  }
+
+  function handleChangeRawMaterial(value: string) {
+    const rawMaterial = rawMaterials.find(
+      (rawMaterial) => rawMaterial.raw_material_id === value
+    );
+
+    setRawMaterialId(rawMaterial.raw_material_id);
+    setRawMaterialName(
+      `${rawMaterial.raw_material_code} | ${rawMaterial.raw_material_name} / ${rawMaterial.unit_of_measurement_abbreviation}`
+    );
   }
 
   async function handleClickCargo() {
@@ -432,10 +469,7 @@ export default function AlterSotock({
                 optionFilterProp="children"
                 value={rawMaterialName}
                 onChange={(e) => {
-                  setRawMaterialId(e[0]);
-                  setRawMaterialName(`${e[3]} |
-                  ${e[1]} / 
-                  (${e[2]})`);
+                  handleChangeRawMaterial(e);
 
                   clearInputsWhenSelectdRawMaterial();
                 }}
@@ -444,12 +478,7 @@ export default function AlterSotock({
                   <>
                     <Option
                       key={item.raw_material_id}
-                      value={[
-                        item.raw_material_id,
-                        item.raw_material_name,
-                        item.unit_of_measurement_abbreviation,
-                        item.raw_material_code,
-                      ]}
+                      value={item.raw_material_id}
                     >
                       {`${item.raw_material_code} |
                           ${item.raw_material_name} / 
@@ -513,8 +542,7 @@ export default function AlterSotock({
                 optionFilterProp="children"
                 value={warehouseOldPositionName}
                 onChange={(e) => {
-                  setWarehouseOldPositionId(e[0]);
-                  setWarehouseOldPositionName(e[1]);
+                  handleChangeOldWarehousePosition(e);
                   setOldPositionId('');
                   setOldPositionName('');
                   setMaxQuantity(0);
@@ -522,7 +550,7 @@ export default function AlterSotock({
               >
                 {warehouses.map((item) => (
                   <>
-                    <Option key={item.id} value={[item.id, item.name]}>
+                    <Option key={item.id} value={item.id}>
                       {item.name}
                     </Option>
                   </>
@@ -556,12 +584,12 @@ export default function AlterSotock({
                 onChange={(e) => {
                   setOldPositionId(e[0]);
                   setOldPositionName(e[1]);
-                  handleChangeOldPosition(e[0]);
+                  handleChangeOldPosition(e);
                 }}
               >
                 {positions.map((item) => (
                   <>
-                    <Option key={item.id} value={[item.id, item.name]}>
+                    <Option key={item.id} value={item.id}>
                       {item.name}
                     </Option>
                   </>
@@ -629,15 +657,14 @@ export default function AlterSotock({
                 optionFilterProp="children"
                 value={warehouseNewPositionName}
                 onChange={(e) => {
-                  setWarehouseNewPositionId(e[0]);
-                  setWarehouseNewPositionName(e[1]);
+                  handleChangeNewWarehousePosition(e);
                   setNewPositionId('');
                   setNewPositionName('');
                 }}
               >
                 {warehouses.map((item) => (
                   <>
-                    <Option key={item.id} value={[item.id, item.name]}>
+                    <Option key={item.id} value={item.id}>
                       {item.name}
                     </Option>
                   </>
@@ -670,13 +697,12 @@ export default function AlterSotock({
                 }}
                 //disabled={isLockInsChange}
                 onChange={(e) => {
-                  setNewPositionId(e[0]);
-                  setNewPositionName(e[1]);
+                  handleChangeNewPosition(e);
                 }}
               >
                 {positions.map((item) => (
                   <>
-                    <Option key={item.id} value={[item.id, item.name]}>
+                    <Option key={item.id} value={item.id}>
                       {item.name}
                     </Option>
                   </>
