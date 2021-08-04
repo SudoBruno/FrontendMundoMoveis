@@ -213,10 +213,14 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
   function handleChangeRawMaterial(value, index: number) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].id = value[0];
+    const rawMaterial = rawMaterials.find(
+      (rawMaterial) => rawMaterial.id === value
+    );
+
+    newArray[index].id = rawMaterial.id;
     newArray[
       index
-    ].rawMaterialName = `${value[3]} | ${value[1]} / (${value[2]})`;
+    ].rawMaterialName = `${rawMaterial.code} | ${rawMaterial.name} / (${rawMaterial.unit_measurement_name})`;
     newArray[index].coefficient = value[4];
 
     setRawMaterialsAdded(newArray);
@@ -526,16 +530,7 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
                   >
                     {rawMaterials.map((item) => (
                       <>
-                        <Option
-                          key={item.id}
-                          value={[
-                            item.id,
-                            item.name,
-                            item.unit_measurement_name,
-                            item.code,
-                            item.coefficient,
-                          ]}
-                        >
+                        <Option key={item.id} value={item.id}>
                           {`${item.code} |
                             ${item.name} / 
                             (${item.unit_measurement_name})`}

@@ -161,8 +161,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   function handleChangePosition(value, index) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].position_id = value[0];
-    newArray[index].positionName = value[1];
+    const position = positions.find((position) => position.id === value);
+
+    newArray[index].position_id = position.id;
+    newArray[index].positionName = position.name;
 
     setRawMaterialsAdded(newArray);
   }
@@ -257,16 +259,21 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
   function handleChangeCargo(value, index) {
     let newArray = [...rawMaterialsAdded];
-    const cargoName = value[1];
+
+    const cargoFind = cargo.find((cargoFind) => cargoFind.id === value);
+
+    const cargoName = cargoFind.cargo;
+
+    console.log(value);
 
     if (cargoName === 'Genérico') {
-      newArray[index].maxQuantity = value[2];
+      newArray[index].maxQuantity = cargoFind.quantity;
       newArray[index].cargo = '';
       setRawMaterialsAdded(newArray);
     }
 
-    newArray[index].maxQuantity = value[2];
-    newArray[index].cargo = value[1];
+    newArray[index].maxQuantity = cargoFind.quantity;
+    newArray[index].cargo = cargoFind.cargo;
     setRawMaterialsAdded(newArray);
   }
 
@@ -641,10 +648,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                   >
                     {cargo.map((item) => (
                       <>
-                        <Option
-                          key={item.id}
-                          value={[item.id, item.cargo, item.quantity]}
-                        >
+                        <Option key={item.id} value={item.id}>
                           {item.cargo === ''
                             ? (item.cargo = 'Genérico')
                             : item.cargo}
