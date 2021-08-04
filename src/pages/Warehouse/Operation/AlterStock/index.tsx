@@ -253,7 +253,7 @@ export default function AlterSotock({
       searchText: '',
       searchedColumn: '',
     };
-
+    searchInput: Input;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,

@@ -173,7 +173,7 @@ export default function index({ itens }: props) {
       searchText: '',
       searchedColumn: '',
     };
-
+    searchInput: Input;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,

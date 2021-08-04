@@ -336,7 +336,7 @@ export default function Storage({
       searchText: '',
       searchedColumn: '',
     };
-
+    searchInput: Input;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,

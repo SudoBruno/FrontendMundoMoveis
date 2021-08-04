@@ -261,7 +261,7 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-
+    searchInput: Input;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,

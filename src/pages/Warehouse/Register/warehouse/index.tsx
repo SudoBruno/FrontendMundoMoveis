@@ -180,7 +180,7 @@ export default function warehouse({ warehouse }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-
+    searchInput: Input;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,

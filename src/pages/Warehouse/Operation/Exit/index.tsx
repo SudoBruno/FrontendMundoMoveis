@@ -314,7 +314,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-
+    searchInput: Input;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
