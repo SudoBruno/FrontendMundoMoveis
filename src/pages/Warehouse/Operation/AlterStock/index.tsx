@@ -25,7 +25,7 @@ import {
 
 import Highlighter from 'react-highlight-words';
 import styles from '../../../../styles/app.module.scss';
-
+import BarcodeReader from 'react-barcode-reader';
 import { Notification } from '../../../../components/Notification';
 import { api } from '../../../../services/api';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -285,6 +285,21 @@ export default function AlterSotock({
     setMaxQuantity(0);
   }
 
+  async function findBarcodeOnStock(barcode) {
+    console.log('cai qui', typeof barcode);
+
+    const response = await api.get(`/warehouse/stock/barcode`, {
+      params: {
+        bar_code: '0a13942a',
+      },
+    });
+
+    if (!response.data) {
+      console.log('tem nada');
+    }
+
+    console.log('tem sim:', response.data);
+  }
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -582,8 +597,6 @@ export default function AlterSotock({
                   handleClickPosition();
                 }}
                 onChange={(e) => {
-                  setOldPositionId(e[0]);
-                  setOldPositionName(e[1]);
                   handleChangeOldPosition(e);
                 }}
               >
@@ -733,6 +746,7 @@ export default function AlterSotock({
             </Form.Item>
           </Col>
         </Row>
+        {isModalOpen == true && <BarcodeReader onScan={findBarcodeOnStock} />}
       </Modal>
     </>
   );

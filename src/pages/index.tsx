@@ -34,7 +34,7 @@ export default function login() {
       });
       router.push('/Profile');
     } catch (error) {
-      console.error(error);
+      console.error(error.response);
       setLoading(false);
       Notification({
         type: 'error',

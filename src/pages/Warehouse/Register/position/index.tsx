@@ -284,11 +284,11 @@ export default function position({
         },
         {
           title: 'Almoxarifado',
-          dataIndex: 'warehouseName',
-          key: 'warehouseName',
+          dataIndex: 'warehouse_name',
+          key: 'warehouse_name',
           width: '30%',
-          ...this.getColumnSearchProps('warehouseName'),
-          sorter: (a, b) => a.warehouseName.length - b.warehouseName.length,
+          ...this.getColumnSearchProps('warehouse_name'),
+          sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
         },
         {
           title: 'Criado Em',
