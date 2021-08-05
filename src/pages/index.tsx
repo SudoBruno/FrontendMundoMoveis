@@ -18,7 +18,6 @@ export default function login() {
         email: email,
         password: password,
       };
-      console.log(data);
 
       setLoading(true);
       const response = await api.post('/sessions', data);
