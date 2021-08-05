@@ -1,37 +1,48 @@
-.tag {
-  min-width: 50%;
-  max-width: 50%;
-  height: 100%;
-
-  hr {
-    margin: 15px 0px;
-  }
+.body {
+  display: grid;
+  grid-template-columns: 1.4fr 0.6fr;
 }
 
 .body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(1fr, 4);
-  text-align: start;
-  b {
-    font-size: 1.1rem;
-  }
-  p {
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
+  padding-left: 6%;
 }
-.insCode {
-  text-align: center;
-  color: black;
+
+.body b {
+  font-size: 1rem;
+}
+
+.body p {
+  height: 30px;
+  margin: 0;
 }
 
 .operations {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  color: black;
+  padding: 2%;
 }
 
-.barcode {
-  text-align: center;
+.barCode {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.tag {
+  position: relative;
+  width: 100%;
+  max-height: 100%;
+  border: 1px solid black;
+  /* para os spans pegarem o width */
+  display: inline-block;
+}
+
+.operations p {
+  margin: 6px;
+}
+
+@media screen and (min-width: 500px) {
+  .tag {
+    min-width: 33.33%;
+  }
 }
