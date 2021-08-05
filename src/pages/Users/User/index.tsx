@@ -49,9 +49,7 @@ export default function User({ tenant }: IProp) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [tenantId, setTenantId] = useState(
-    '2d751a65-3920-46fe-8181-cd31b293ca43'
-  );
+  const [tenantId, setTenantId] = useState('');
   const [tenantName, setTenantName] = useState('');
   const [phone, setPhone] = useState('');
   const [accessLevel, setAccessLevel] = useState(0);
@@ -61,6 +59,11 @@ export default function User({ tenant }: IProp) {
     setName('');
     setEmail('');
     setPassword('');
+    setTenantId('');
+    setTenantName('');
+    setPhone('');
+    setAccessLevel(0);
+    setLoading(false);
 
     setIsModalOpen(false);
   }
@@ -128,7 +131,7 @@ export default function User({ tenant }: IProp) {
           email: email,
           password: password,
           phone: phone,
-          tenant_id: '2d751a65-3920-46fe-8181-cd31b293ca43',
+          tenant_id: tenantId,
           access_level: accessLevel,
         };
 
@@ -146,15 +149,22 @@ export default function User({ tenant }: IProp) {
           description: 'Usuário Criado com sucesso',
         });
       } catch (error) {
-        console.error(error);
+        console.error(error.response.data);
         setLoading(false);
         return Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível cadastrar o Usuário',
+          description: `${error.response.data.message}`,
         });
       }
     }
+  }
+
+  function handleChangeTenant(value) {
+    const tenant = tenants.find((tenant) => tenant.id === value);
+
+    setTenantId(tenant.id);
+    setTenantName(tenant.name);
   }
 
   async function handleDelete(id: string) {
@@ -455,7 +465,7 @@ export default function User({ tenant }: IProp) {
             style={{ width: 400 }}
             value={tenantName}
             onChange={(e) => {
-              setTenantId(e);
+              handleChangeTenant(e);
             }}
           >
             {tenants.map((item) => (
@@ -507,8 +517,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
     const { data } = await apiClient.get('/tenant');
-    console.log(data);
-
     return {
       props: {
         tenant: data,
