@@ -1,8 +1,8 @@
+import { Divider } from 'antd';
 import { GetServerSideProps } from 'next';
-import styles from '../../../../styles/warehouse/tag.module.scss';
 import BarCode from 'react-barcode';
-import { api } from '../../../../services/api';
 import { getAPIClient } from '../../../../services/axios';
+import styles from '../../../../styles/warehouse/tag.module.scss'
 
 interface IStock {
   id: string;
@@ -22,58 +22,66 @@ interface ITagProps {
 
 export default function WarehouseTag({ stock }: ITagProps) {
   return (
-    <>
-      <div className={styles.tag}>
-        <div className={styles.header}>
-          <img width={180} height={60} src="/logo.png"></img>
-        </div>
-        <hr />
-        <div className={styles.body}>
+    <div className={styles.tag}>
+
+      <img src='/logo.png' style={{ height: '45px' }} />
+
+      <Divider />
+      <div className={styles.body}>
+        <div >
           <b>Almoxarifado</b>
-          <b>Posição</b>
-
           <p>{stock.warehouse_name}</p>
-          <p>{stock.position_name}</p>
-
           <b>Insumo</b>
-          <b>Quantidade</b>
-
           <p>{stock.raw_material_name}</p>
+        </div>
+        <div >
+          <b>Posição</b>
+          <p>{stock.position_name}</p>
+          <b>quantidade</b>
           <p>{stock.quantity}</p>
         </div>
-        <h3 className={styles.insCode}> {stock.raw_material_code}</h3>
-        <hr />
-
-        <div className={styles.operations}>
-          <b>QTD. ATUAL</b>
-          <b>QTD. SAIDA</b>
-          <b>RESULTADO</b>
-          <p>___________ -</p>
-          <p>___________ =</p>
-          <p>___________</p>
-          <p>___________ -</p>
-          <p>___________ =</p>
-          <p>___________</p>
-          <p>___________ -</p>
-          <p>___________ =</p>
-          <p>___________</p>
-          <p>___________ -</p>
-          <p>___________ =</p>
-          <p>___________</p>
-        </div>
-
-        <hr />
-
-        <div className={styles.barcode}>
-          <BarCode
-            value={stock.bar_code}
-            width={1.2}
-            height={40}
-            fontSize={20}
-          />
-        </div>
       </div>
-    </>
+      <Divider />
+
+      <div className={styles.operations}>
+        <p>QTDE ATUAL</p>
+        <p>QTDE SAÍDA</p>
+        <p>RESULTADO</p>
+        <p>__________ - </p>
+        <p>__________ =</p>
+        <p>________</p>
+
+        <p>__________ - </p>
+        <p>__________ =</p>
+        <p>________</p>
+
+        <p>__________ - </p>
+        <p>__________ =</p>
+        <p>________</p>
+
+        <p>__________ - </p>
+        <p>__________ =</p>
+        <p>________</p>
+
+        <p>__________ - </p>
+        <p>__________ =</p>
+        <p>________</p>
+
+
+      </div>
+      <Divider />
+
+      <div className={styles.barCode}>
+        <BarCode
+          value={stock.bar_code}
+          width={1}
+          height={30}
+          fontSize={20}
+        />
+      </div>
+
+    </div>
+
   );
 }
 
