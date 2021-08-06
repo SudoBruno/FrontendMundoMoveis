@@ -25,7 +25,7 @@ import {
 
 import Highlighter from 'react-highlight-words';
 import styles from '../../../../styles/app.module.scss';
-
+import BarcodeReader from 'react-barcode-reader';
 import { Notification } from '../../../../components/Notification';
 import { api } from '../../../../services/api';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -318,6 +318,45 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
         description: 'Não foi possível deletar a saída',
       });
     }
+  }
+
+  function setDataOfStockSearchedForAPI(data, index) {
+    let newArray = [...rawMaterialsAdded];
+
+    console.log('daquii', data.raw_material_id);
+
+    newArray[index].raw_material_id = data.raw_material_id;
+    newArray[index].warehouseName = data.warehouse_name;
+    newArray[index].position_id = data.position_id;
+    newArray[index].positionName = data.position_name;
+    newArray[index].maxQuantity = data.quantity;
+    newArray[
+      index
+    ].rawMaterialName = `${data.raw_material_code} | ${data.raw_material_name} / (${data.unit_of_measurement_abbreviation})`;
+    newArray[index].cargo = data.cargo;
+
+    setRawMaterialsAdded(newArray);
+  }
+
+  async function findBarcodeOnStock(barcode, index) {
+    const response = await api.get(`/warehouse/stock/barcode`, {
+      params: {
+        bar_code: '9eb5037e',
+      },
+    });
+
+    if (!response.data) {
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: `Código não encontrado`,
+      });
+      return;
+    }
+
+    console.log(response.data);
+
+    setDataOfStockSearchedForAPI(response.data, index);
   }
   class SearchTable extends React.Component {
     state = {
@@ -771,9 +810,15 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                 Nova Saída
               </Button>
             )}
+            {isModalOpen == true && (
+              <BarcodeReader onScan={(e) => findBarcodeOnStock(e, index)} />
+            )}
           </>
         ))}
       </Modal>
+      <Modal key={2} open={isModalOpen}>
+        {' '}
+      </Modal>{' '}
     </div>
   );
 }
