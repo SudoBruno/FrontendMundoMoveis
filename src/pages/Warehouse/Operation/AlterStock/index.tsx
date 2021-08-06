@@ -264,7 +264,7 @@ export default function AlterSotock({
     setOldPositionName('');
     setWarehouseOldPositionId('');
     setWarehouseOldPositionName('');
-    setMovedQuantity(0);
+    setMovedQuantity('');
     setMaxQuantity(0);
     setReason('');
 
@@ -281,7 +281,7 @@ export default function AlterSotock({
     setOldPositionName('');
     setWarehouseOldPositionId('');
     setWarehouseOldPositionName('');
-    setMovedQuantity(0);
+    setMovedQuantity('');
     setMaxQuantity(0);
   }
 
