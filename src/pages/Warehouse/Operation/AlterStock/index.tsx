@@ -285,20 +285,40 @@ export default function AlterSotock({
     setMaxQuantity(0);
   }
 
-  async function findBarcodeOnStock(barcode) {
-    console.log('cai qui', typeof barcode);
+  function setDataOfStockSearchedForAPI(data) {
+    setCargo(data.cargo);
+    setRawMaterialId(data.raw_material_id);
+    setRawMaterialName(data.raw_material_name);
+    setWarehouseOldPositionId(data.position_id);
+    setWarehouseOldPositionName(data.warehouse_name);
+    setOldPositionId(data.position_id);
+    setOldPositionName(data.position_name);
+    setMaxQuantity(data.quantity);
+  }
 
+  async function findBarcodeOnStock(barcode) {
     const response = await api.get(`/warehouse/stock/barcode`, {
       params: {
-        bar_code: '0a13942a',
+        bar_code: barcode,
       },
     });
 
     if (!response.data) {
-      console.log('tem nada');
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: `Código não encontrado`,
+      });
+      return;
     }
 
-    console.log('tem sim:', response.data);
+    setDataOfStockSearchedForAPI(response.data);
+
+    Notification({
+      type: 'success',
+      title: 'Encontrado',
+      description: `Modal Preenchido`,
+    });
   }
   class SearchTable extends React.Component {
     state = {

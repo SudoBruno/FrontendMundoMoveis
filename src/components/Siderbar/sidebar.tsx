@@ -1,5 +1,10 @@
 import {
-  DashboardOutlined, FileExcelOutlined, PlusOutlined, RightSquareOutlined, SearchOutlined, ShoppingCartOutlined
+  DashboardOutlined,
+  FileExcelOutlined,
+  PlusOutlined,
+  RightSquareOutlined,
+  SearchOutlined,
+  ShoppingCartOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Result } from 'antd';
 import 'antd/dist/antd.css';
@@ -7,7 +12,7 @@ import Link from 'next/link';
 import React, { ReactNode } from 'react';
 import { FiPackage } from 'react-icons/fi';
 import { Header } from '../Header';
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 
 const { Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -113,7 +118,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
 
                   <Menu.Item key="relat-saida" icon={<FileExcelOutlined />}>
-                    <Link href="/wmsRawExit/Resume">Rel. Saídas</Link>
+                    <Link href="/Warehouse/Consult/Exit">Rel. Saídas</Link>
                   </Menu.Item>
                   <Menu.Item key="Rel.entrada" icon={<FileExcelOutlined />}>
                     <Link href="/wmsRawMaterial/Search/entry">
@@ -130,9 +135,9 @@ export default function Sidebar({ screen, display }: SidebarProps) {
           </Sider>
 
           <Layout>
-            {router.pathname !== '/Warehouse/Consult/Stock/[barcode]' &&
+            {router.pathname !== '/Warehouse/Consult/Stock/[barcode]' && (
               <Header />
-            }
+            )}
             {screen && (
               <Content style={{ margin: '20px 16px 0' }}>
                 <div>{screen}</div>
