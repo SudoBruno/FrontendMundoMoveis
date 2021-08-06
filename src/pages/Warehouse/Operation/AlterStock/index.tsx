@@ -68,7 +68,7 @@ export default function AlterSotock({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cargo, setCargo] = useState('');
   const [cargos, setCargos] = useState([]);
-  const [movedQuantity, setMovedQuantity] = useState(0);
+  const [movedQuantity, setMovedQuantity] = useState('');
   const [newPositionId, setNewPositionId] = useState('');
   const [newPositionName, setNewPositionName] = useState('');
   const [oldPositionId, setOldPositionId] = useState('');
@@ -92,7 +92,7 @@ export default function AlterSotock({
 
     try {
       if (
-        movedQuantity === 0 ||
+        movedQuantity === '' ||
         newPositionId === '' ||
         oldPositionId === '' ||
         rawMaterialId === ''
@@ -200,24 +200,24 @@ export default function AlterSotock({
     setWarehouseNewPositionName(warehouse.name);
   }
 
-  function handleChangeQuantity(quantity: number) {
-    if (quantity > Number(maxQuantity)) {
+  function handleChangeQuantity(quantity) {
+    if (Number(quantity) > Number(maxQuantity)) {
       Notification({
         type: 'error',
         title: 'Erro',
         description: 'valor maior que o esperado',
       });
-      setMovedQuantity(0);
+      setMovedQuantity('');
       return;
     }
 
-    if (quantity < 0) {
+    if (Number(quantity) < 0) {
       Notification({
         type: 'error',
         title: 'Erro',
         description: 'Valor negativo ou 0',
       });
-      setMovedQuantity(0);
+      setMovedQuantity('');
       return;
     }
 
@@ -662,7 +662,7 @@ export default function AlterSotock({
                 placeholder="Digite aqui a quantidade"
                 value={movedQuantity}
                 onChange={(e) => {
-                  handleChangeQuantity(Number(e.target.value));
+                  handleChangeQuantity(e.target.value.replaceAll(',', '.'));
                 }}
               />
             </Form.Item>

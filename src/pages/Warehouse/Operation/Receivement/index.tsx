@@ -238,7 +238,7 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
 
   function handleChangeQuantity(value, index) {
     let newArray = [...rawMaterialsAdded];
-    newArray[index].quantity = value;
+    newArray[index].quantity = value.replaceAll(',', '.');
 
     setRawMaterialsAdded(newArray);
   }
@@ -415,7 +415,7 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
               onClick={() => setIsModalOpen(true)}
             >
-              Cadastrar Recebimento
+              Cadastrar Entrada
             </Button>
           </Col>
         </Row>

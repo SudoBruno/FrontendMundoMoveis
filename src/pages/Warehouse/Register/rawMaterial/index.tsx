@@ -219,6 +219,10 @@ export default function rawMaterial({
     setIsModalOpen(true);
   }
 
+  function handleChangeCoefficient(value: string) {
+    setCoefficient(value.replaceAll(',', '.'));
+  }
+  console.log(coefficient);
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -554,7 +558,7 @@ export default function rawMaterial({
               placeholder="Digite o Fator"
               value={coefficient}
               onChange={(e) => {
-                setCoefficient(e.target.value);
+                handleChangeCoefficient(e.target.value);
               }}
               pattern="[0-9]+$"
             />

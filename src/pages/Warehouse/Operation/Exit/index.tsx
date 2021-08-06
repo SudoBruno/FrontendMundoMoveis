@@ -251,9 +251,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       return;
     }
 
-    newArray[index].quantity = value;
+    newArray[index].quantity = value.replaceAll(',', '.');
 
     setRawMaterialsAdded(newArray);
+    console.log(newArray[index].quantity);
   }
 
   function handleChangeCargo(value, index) {
@@ -667,6 +668,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                     size="large"
                     style={{ width: '100%' }}
                     optionFilterProp="children"
+                    disabled={selectedIten.positionName !== '' ? false : true}
                     value={selectedIten.cargo}
                     onClick={(e) => handleClickCargo(e, index)}
                     onChange={(e) => {
