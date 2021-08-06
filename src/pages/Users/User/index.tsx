@@ -467,6 +467,14 @@ export default function User({ tenant }: IProp) {
             onChange={(e) => {
               handleChangeTenant(e);
             }}
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
           >
             {tenants.map((item) => (
               <>

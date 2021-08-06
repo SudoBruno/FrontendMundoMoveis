@@ -572,6 +572,16 @@ export default function Storage({
                     onChange={(e) => {
                       handleChangeRawMaterial(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {rawMaterials.map((item) => (
                       <>
@@ -611,6 +621,16 @@ export default function Storage({
                     onChange={(e) => {
                       handleChangeReceipt(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {receipts.map((item) => (
                       <>
@@ -643,6 +663,16 @@ export default function Storage({
                     onChange={(e) => {
                       handleChangeWarehouse(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {warehouses.map((item) => (
                       <>
@@ -674,6 +704,16 @@ export default function Storage({
                     onChange={(e) => {
                       handleChangePosition(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {positions.map((item) => (
                       <>

@@ -544,6 +544,16 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                     onChange={(e) => {
                       handleChangeRawMaterial(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {rawMaterials.map((item) => (
                       <>
@@ -581,6 +591,16 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                     onChange={(e) => {
                       handleChangeWarehouse(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {warehouses.map((item) => (
                       <>
@@ -612,6 +632,16 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                     onChange={(e) => {
                       handleChangePosition(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {positions.map((item) => (
                       <>
@@ -642,6 +672,16 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                     onChange={(e) => {
                       handleChangeCargo(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {cargo.map((item) => (
                       <>

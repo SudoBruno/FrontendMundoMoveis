@@ -526,6 +526,16 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
                     onChange={(e) => {
                       handleChangeRawMaterial(e, index);
                     }}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    filterSort={(optionA, optionB) =>
+                      optionA.children
+                        .toLowerCase()
+                        .localeCompare(optionB.children.toLowerCase())
+                    }
                   >
                     {rawMaterials.map((item) => (
                       <>

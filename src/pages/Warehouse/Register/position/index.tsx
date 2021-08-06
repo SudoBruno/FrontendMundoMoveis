@@ -398,6 +398,14 @@ export default function position({
             onChange={(e) => {
               setWarehouseId(e.toString());
             }}
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+            filterSort={(optionA, optionB) =>
+              optionA.children
+                .toLowerCase()
+                .localeCompare(optionB.children.toLowerCase())
+            }
           >
             {warehouses.map((warehouse) => (
               <>

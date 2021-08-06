@@ -380,6 +380,7 @@ export default function rawMaterial({
       );
     }
   }
+
   return (
     <div>
       <Layout>
@@ -479,6 +480,15 @@ export default function rawMaterial({
                 onChange={(e) => {
                   setIdCategory(e.toString());
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {categories.map((categorie) => (
                   <>
@@ -509,6 +519,15 @@ export default function rawMaterial({
                 onChange={(e) => {
                   setIdUnitMeasure(e.toString());
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {unitMeasures.map((unit) => (
                   <>

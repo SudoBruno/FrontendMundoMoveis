@@ -488,6 +488,15 @@ export default function AlterSotock({
 
                   clearInputsWhenSelectdRawMaterial();
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {rawMaterials.map((item) => (
                   <>
@@ -524,6 +533,15 @@ export default function AlterSotock({
                 onChange={(e) => {
                   setCargo(e);
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {cargos.map((item, index) => (
                   <>
@@ -562,6 +580,15 @@ export default function AlterSotock({
                   setOldPositionName('');
                   setMaxQuantity(0);
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {warehouses.map((item) => (
                   <>
@@ -599,6 +626,15 @@ export default function AlterSotock({
                 onChange={(e) => {
                   handleChangeOldPosition(e);
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {positions.map((item) => (
                   <>
@@ -674,6 +710,15 @@ export default function AlterSotock({
                   setNewPositionId('');
                   setNewPositionName('');
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {warehouses.map((item) => (
                   <>
@@ -712,6 +757,15 @@ export default function AlterSotock({
                 onChange={(e) => {
                   handleChangeNewPosition(e);
                 }}
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                filterSort={(optionA, optionB) =>
+                  optionA.children
+                    .toLowerCase()
+                    .localeCompare(optionB.children.toLowerCase())
+                }
               >
                 {positions.map((item) => (
                   <>
