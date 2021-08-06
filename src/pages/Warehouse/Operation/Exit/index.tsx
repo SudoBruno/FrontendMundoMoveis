@@ -816,9 +816,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
           </>
         ))}
       </Modal>
-      <Modal key={2} open={isModalOpen}>
-        {' '}
-      </Modal>{' '}
     </div>
   );
 }
