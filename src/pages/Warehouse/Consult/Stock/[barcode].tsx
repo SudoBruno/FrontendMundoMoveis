@@ -74,8 +74,8 @@ export default function WarehouseTag({ stock }: ITagProps) {
       <div className={styles.barCode}>
         <BarCode
           value={stock.bar_code}
-          width={1}
-          height={30}
+          width={1.5}
+          height={50}
           fontSize={20}
         />
       </div>
