@@ -24,7 +24,7 @@ export default function WarehouseTag({ stock }: ITagProps) {
   return (
     <div className={styles.tag}>
 
-      <img src='/logo.png' style={{ height: '45px' }} />
+      <img src='/logo.png' style={{ height: '35px', marginTop: '2%' }} />
 
       <Divider />
       <div className={styles.body}>
