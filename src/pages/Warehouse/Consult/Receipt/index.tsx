@@ -24,7 +24,7 @@ interface IProps {
 
 export default function categories({ receipt }: IProps) {
   const [receipts, setReceipts] = useState(receipt);
-  const [loading, setLoading] = useState(false);
+
   const [headers, setHeaders] = useState([
     { label: 'Usuário', key: 'users_name' },
     { label: 'Descrição', key: 'description' },
