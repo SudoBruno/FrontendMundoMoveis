@@ -92,9 +92,9 @@ export default function Stock({ stock }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -126,7 +126,6 @@ export default function Stock({ stock }: IProp) {
       clearFilters();
       this.setState({ searchText: '' });
     };
-
     render() {
       const columns = [
         {
@@ -135,8 +134,8 @@ export default function Stock({ stock }: IProp) {
           key: 'raw_material_code',
           width: '15%',
           ...this.getColumnSearchProps('raw_material_code'),
-          sorter: (a, b) =>
-            a.raw_material_code.length - b.raw_material_code.length,
+          sorter: (a, b) => a.raw_material_code.length - b.raw_material_code.length,
+
         },
         {
           title: 'Insumo',
@@ -162,7 +161,7 @@ export default function Stock({ stock }: IProp) {
           dataIndex: 'warehouse_name',
           key: ' warehouse_name',
           width: '40%',
-          ...this.getColumnSearchProps(' warehouse_name'),
+          ...this.getColumnSearchProps('warehouse_name'),
           sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
         },
         {
@@ -170,7 +169,7 @@ export default function Stock({ stock }: IProp) {
           dataIndex: 'position_name',
           key: ' position_name',
           width: '10%',
-          ...this.getColumnSearchProps(' position_name'),
+          ...this.getColumnSearchProps('position_name'),
           sorter: (a, b) => a.position_name.length - b.position_name.length,
         },
         {

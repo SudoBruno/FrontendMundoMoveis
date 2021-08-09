@@ -24,9 +24,9 @@ export default function WarehouseTag({ stock }: ITagProps) {
   return (
     <div className={styles.tag}>
 
-      <img src='/logo.png' style={{ height: '45px' }} />
+      {/* <img src='/logo.png' style={{ height: '35px', marginTop: '2%' }} /> */}
 
-      <Divider />
+      {/* <Divider/> */}
       <div className={styles.body}>
         <div >
           <b>Almoxarifado</b>
@@ -40,10 +40,11 @@ export default function WarehouseTag({ stock }: ITagProps) {
           <b>quantidade</b>
           <p>{stock.quantity}</p>
         </div>
+        <h3>{stock.raw_material_code}</h3>
       </div>
       <Divider />
 
-      <div className={styles.operations}>
+      {/* <div className={styles.operations}>
         <p>QTDE ATUAL</p>
         <p>QTDE SAÍDA</p>
         <p>RESULTADO</p>
@@ -69,13 +70,13 @@ export default function WarehouseTag({ stock }: ITagProps) {
 
 
       </div>
-      <Divider />
+      <Divider /> */}
 
       <div className={styles.barCode}>
         <BarCode
           value={stock.bar_code}
-          width={1}
-          height={30}
+          width={1.5}
+          height={50}
           fontSize={20}
         />
       </div>
