@@ -9,7 +9,7 @@ import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../../services/axios';
 import { format } from 'date-fns';
 
-interface IExit {
+interface IReceipt {
   id: string;
   name: string;
   created_at: Date;
@@ -19,12 +19,11 @@ interface IExit {
 }
 
 interface IProps {
-  exit: IExit[];
-  notFound: boolean;
+  receipt: IReceipt[];
 }
 
-export default function categories({ exit }: IProps) {
-  const [exits, setexits] = useState(exit);
+export default function categories({ receipt }: IProps) {
+  const [receipts, setReceipts] = useState(receipt);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [headers, setHeaders] = useState([
@@ -127,21 +126,28 @@ export default function categories({ exit }: IProps) {
     render() {
       const columns = [
         {
-          title: 'Usuário',
-          dataIndex: 'users_name',
-          key: 'users_name',
-          width: '40%',
-          ...this.getColumnSearchProps('users_name'),
-          sorter: (a, b) => a.users_name.length - b.users_name.length,
-        },
-
-        {
           title: 'Descrição',
           dataIndex: 'description',
           key: 'description',
           width: '40%',
           ...this.getColumnSearchProps('description'),
           sorter: (a, b) => a.description.length - b.description.length,
+        },
+        {
+          title: 'Chave Fiscal',
+          dataIndex: 'fiscal_key',
+          key: 'fiscal_key',
+          width: '40%',
+          ...this.getColumnSearchProps('fiscal_key'),
+          sorter: (a, b) => a.fiscal_key.length - b.fiscal_key.length,
+        },
+        {
+          title: 'Número da Nota',
+          dataIndex: 'fiscal_number',
+          key: 'fiscal_number',
+          width: '40%',
+          ...this.getColumnSearchProps('fiscal_number'),
+          sorter: (a, b) => a.fiscal_number.length - b.fiscal_number.length,
         },
         {
           title: 'Criado Em',
@@ -154,7 +160,7 @@ export default function categories({ exit }: IProps) {
       ];
       return (
         <>
-          <Table columns={columns} dataSource={exits} />
+          <Table columns={columns} dataSource={receipts} />
         </>
       );
     }
@@ -165,7 +171,7 @@ export default function categories({ exit }: IProps) {
       <Row justify="end">
         <Col>
           <CSVLink
-            data={exits}
+            data={receipts}
             style={{ color: 'white' }}
             filename={`Saída-${format(new Date(), 'dd-MM-yyyy')}.csv`}
             headers={headers}
@@ -188,18 +194,18 @@ export default function categories({ exit }: IProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
-    const { data } = await apiClient.get('/warehouse/exit');
+    const { data } = await apiClient.get('/warehouse/receipt');
 
     return {
       props: {
-        exit: data,
+        receipt: data,
       },
     };
   } catch (error) {
     console.error(error);
     return {
       props: {
-        categorie: [],
+        receipt: [],
       },
     };
   }
