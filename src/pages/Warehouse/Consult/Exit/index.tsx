@@ -1,32 +1,12 @@
 import React, { FormEvent, useState } from 'react';
-import {
-  DeleteOutlined,
-  EditFilled,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Layout,
-  Modal,
-  Popconfirm,
-  Row,
-  Select,
-  Space,
-  Table,
-} from 'antd';
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Col, Input, Layout, Row, Space, Table } from 'antd';
 import Highlighter from 'react-highlight-words';
 import styles from '../../../../styles/app.module.scss';
 import { CSVLink } from 'react-csv';
 import { Notification } from '../../../../components/Notification';
-import { api } from '../../../../services/api';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../../services/axios';
-
-const { Option } = Select;
 
 interface IExit {
   id: string;
@@ -141,14 +121,22 @@ export default function categories({ exit }: IProps) {
     render() {
       const columns = [
         {
-          title: 'Nome da Categoria',
-          dataIndex: 'name',
-          key: 'name',
+          title: 'Usuário',
+          dataIndex: 'users_name',
+          key: 'users_name',
           width: '40%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          ...this.getColumnSearchProps('users_name'),
+          sorter: (a, b) => a.users_name.length - b.users_name.length,
         },
 
+        {
+          title: 'Descrição',
+          dataIndex: 'description',
+          key: 'description',
+          width: '40%',
+          ...this.getColumnSearchProps('description'),
+          sorter: (a, b) => a.description.length - b.description.length,
+        },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
@@ -173,10 +161,10 @@ export default function categories({ exit }: IProps) {
           <Button
             size={'large'}
             className={styles.button}
-            icon={<PlusOutlined style={{ fontSize: '16px' }} />}
+            icon={<DownloadOutlined style={{ fontSize: '16px' }} />}
             onClick={() => setIsModalOpen(true)}
           >
-            Cadastrar Categoria
+            Baixar Relatório
           </Button>
         </Col>
       </Row>

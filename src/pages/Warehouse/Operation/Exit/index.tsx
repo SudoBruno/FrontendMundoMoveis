@@ -341,7 +341,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   async function findBarcodeOnStock(barcode, index) {
     const response = await api.get(`/warehouse/stock/barcode`, {
       params: {
-        bar_code: '9eb5037e',
+        bar_code: barcode,
       },
     });
 
