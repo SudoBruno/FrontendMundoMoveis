@@ -1,4 +1,8 @@
-import { BarcodeOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  BarcodeOutlined,
+  SearchOutlined,
+  DownloadOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Col,
@@ -12,9 +16,12 @@ import {
 import { GetServerSideProps } from 'next';
 import React, { useState } from 'react';
 import Highlighter from 'react-highlight-words';
+import styles from '../../../../styles/app.module.scss';
 import { api } from '../../../../services/api';
 import Link from 'next/link';
 import { getAPIClient } from '../../../../services/axios';
+import { CSVLink } from 'react-csv';
+import { format } from 'date-fns';
 
 interface IStock {
   id: string;
@@ -35,6 +42,15 @@ const { Title } = Typography;
 
 export default function Stock({ stock }: IProp) {
   const [stocks, setStocks] = useState(stock);
+  const [headers, setHeaders] = useState([
+    { label: 'Usuário', key: 'user_name' },
+    { label: 'Cod. INS', key: 'raw_material_code' },
+    { label: 'Insumo', key: 'raw_material_name' },
+    { label: 'Almoxarifado', key: 'warehouse_name' },
+    { label: 'Posição', key: 'position_name' },
+    { label: 'Quantidade', key: 'quantity' },
+    { label: 'Criado Em', key: 'created_at' },
+  ]);
 
   class SearchTable extends React.Component {
     state = {
@@ -92,9 +108,9 @@ export default function Stock({ stock }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -134,8 +150,8 @@ export default function Stock({ stock }: IProp) {
           key: 'raw_material_code',
           width: '15%',
           ...this.getColumnSearchProps('raw_material_code'),
-          sorter: (a, b) => a.raw_material_code.length - b.raw_material_code.length,
-
+          sorter: (a, b) =>
+            a.raw_material_code.length - b.raw_material_code.length,
         },
         {
           title: 'Insumo',
@@ -208,9 +224,26 @@ export default function Stock({ stock }: IProp) {
 
   return (
     <Layout>
-      <Row justify="center">
-        <Col>
+      <Row justify="end">
+        <Col span={8}>
           <Title level={4}>CONSULTAR ESTOQUE</Title>
+        </Col>
+
+        <Col span={4} offset={3}>
+          <Button
+            size={'large'}
+            className={styles.button}
+            icon={<DownloadOutlined style={{ fontSize: '16px' }} />}
+          >
+            <CSVLink
+              data={stocks}
+              style={{ color: 'white', marginLeft: '4px' }}
+              filename={`Estoque-${format(new Date(), 'dd-MM-yyyy')}.csv`}
+              headers={headers}
+            >
+              Baixar Relatório
+            </CSVLink>
+          </Button>
         </Col>
       </Row>
       <SearchTable />
