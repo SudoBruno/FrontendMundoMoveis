@@ -28,15 +28,18 @@ export default function categories({ exit }: IProps) {
   const [csvData, setCsvData] = useState([]);
   const [exits, setexits] = useState(exit);
   const [headers, setHeaders] = useState([
-    { label: 'Usuário', key: 'users_name' },
-    { label: 'Descrição', key: 'description' },
-    { label: 'Criado Em', key: 'created_at' },
+    { label: 'USUÁRIO', key: 'users_name' },
+    { label: 'INSUMO', key: 'raw_material_name' },
+    { label: 'POSIÇÃO', key: 'description' },
+    { label: 'QUANTIDADE', key: 'quantity' },
+    { label: 'CRIADO EM', key: 'created_at' },
   ]);
 
   async function handleClickCsvLink(receipt_id) {
     const response = await api.get(`/warehouse/exit/${receipt_id}`);
 
     setCsvData(response.data);
+    console.log(receipt_id, response.data);
   }
   class SearchTable extends React.Component {
     state = {
