@@ -8,6 +8,7 @@ import { Notification } from '../../../../components/Notification';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../../services/axios';
 import { format } from 'date-fns';
+import { api } from '../../../../services/api';
 
 interface IReceipt {
   id: string;
@@ -23,14 +24,23 @@ interface IProps {
 }
 
 export default function categories({ receipt }: IProps) {
+  const [csvData, setCsvData] = useState([]);
   const [receipts, setReceipts] = useState(receipt);
-
   const [headers, setHeaders] = useState([
-    { label: 'Usuário', key: 'users_name' },
-    { label: 'Descrição', key: 'description' },
+    { label: 'Nome da Entrada', key: 'warehouse_receipt_description' },
+    { label: 'Insumo', key: 'warehouse_raw_material_name' },
+    { label: 'Quantidade', key: 'Quantity' },
     { label: 'Criado Em', key: 'created_at' },
   ]);
 
+  async function handleClickCsvLink(receipt_id) {
+    const response = await api.get('/warehouse/receipt/raw-material', {
+      params: { receipt_id: receipt_id },
+    });
+
+    setCsvData(response.data);
+  }
+  console.log(csvData);
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -128,7 +138,7 @@ export default function categories({ receipt }: IProps) {
           title: 'Descrição',
           dataIndex: 'description',
           key: 'description',
-          width: '40%',
+          width: '30%',
           ...this.getColumnSearchProps('description'),
           sorter: (a, b) => a.description.length - b.description.length,
         },
@@ -136,7 +146,7 @@ export default function categories({ receipt }: IProps) {
           title: 'Chave Fiscal',
           dataIndex: 'fiscal_key',
           key: 'fiscal_key',
-          width: '40%',
+          width: '20%',
           ...this.getColumnSearchProps('fiscal_key'),
           sorter: (a, b) => a.fiscal_key.length - b.fiscal_key.length,
         },
@@ -144,7 +154,7 @@ export default function categories({ receipt }: IProps) {
           title: 'Número da Nota',
           dataIndex: 'fiscal_number',
           key: 'fiscal_number',
-          width: '40%',
+          width: '20%',
           ...this.getColumnSearchProps('fiscal_number'),
           sorter: (a, b) => a.fiscal_number.length - b.fiscal_number.length,
         },
@@ -155,6 +165,60 @@ export default function categories({ receipt }: IProps) {
           width: '40%',
           ...this.getColumnSearchProps('created_at'),
           sorter: (a, b) => a.created_at.length - b.created_at.length,
+        },
+        {
+          title: 'Operação',
+          key: 'aaa',
+          width: '30%',
+          render: (record) => {
+            return (
+              <>
+                {csvData.length < 1 && (
+                  <Button
+                    className={styles.button}
+                    style={{
+                      borderRadius: '26px',
+                      marginTop: '10px',
+                      marginLeft: '10px',
+                      backgroundColor: '#1c3030',
+                    }}
+                    onClick={() => {
+                      handleClickCsvLink(record.id);
+                    }}
+                  >
+                    <DownloadOutlined style={{ fontSize: '16px' }} />
+                  </Button>
+                )}
+
+                {csvData.length > 0 && (
+                  <Button
+                    className={styles.button}
+                    style={{
+                      borderRadius: '26px',
+                      marginTop: '10px',
+                      marginLeft: '10px',
+                      backgroundColor: '#2F4F4F',
+                    }}
+                    onClick={() => {
+                      handleClickCsvLink(record.id);
+                    }}
+                  >
+                    <CSVLink
+                      data={csvData}
+                      style={{ color: 'white' }}
+                      filename={`Entrada-${format(
+                        new Date(),
+                        'dd-MM-yyyy'
+                      )}.csv`}
+                      headers={headers}
+                    >
+                      <DownloadOutlined style={{ fontSize: '16px' }} />
+                    </CSVLink>
+                  </Button>
+                )}
+              </>
+            );
+          },
         },
       ];
       return (
@@ -168,23 +232,9 @@ export default function categories({ receipt }: IProps) {
   return (
     <Layout>
       <Row justify="end">
-        <Col>
-          <CSVLink
-            data={receipts}
-            style={{ color: 'white' }}
-            filename={`Saída-${format(new Date(), 'dd-MM-yyyy')}.csv`}
-            headers={headers}
-          >
-            <Button
-              size={'large'}
-              className={styles.button}
-              icon={<DownloadOutlined style={{ fontSize: '16px' }} />}
-            >
-              Baixar Relatório
-            </Button>
-          </CSVLink>
-        </Col>
+        <Col></Col>
       </Row>
+
       <SearchTable />
     </Layout>
   );

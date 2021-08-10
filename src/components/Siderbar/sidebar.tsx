@@ -123,10 +123,6 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   <Menu.Item key="Rel.entrada" icon={<FileExcelOutlined />}>
                     <Link href="/Warehouse/Consult/Receipt">Rel. entrada</Link>
                   </Menu.Item>
-
-                  <Menu.Item key="PCP's" icon={<FileExcelOutlined />}>
-                    <Link href="/wmsRawMaterial/pcp">PCP's</Link>
-                  </Menu.Item>
                 </SubMenu>
               </SubMenu>
             </Menu>
