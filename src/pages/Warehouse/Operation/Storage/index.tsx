@@ -107,7 +107,7 @@ export default function Storage({
 
     if (storageId) {
       try {
-      } catch (error) {}
+      } catch (error) { }
     } else {
       try {
         const storagesForAdd = {
@@ -203,7 +203,7 @@ export default function Storage({
     setRawMaterialsAdded(newArray);
   }
 
-  function handleEdit(data: IStorage) {}
+  function handleEdit(data: IStorage) { }
 
   function handleChangeCargo(value, index) {
     let newArray = [...rawMaterialsAdded];
@@ -230,7 +230,7 @@ export default function Storage({
   async function handleClickReceipt(index) {
     const newArray = [...rawMaterialsAdded];
     setLoadingReceipt(true);
-    const response = await api.get(`/warehouse/receipt/raw-material`, {
+    const response = await api.get(`/warehouse/receipt/raw-material/to-storage`, {
       params: { raw_material_id: newArray[index].raw_material_id },
     });
 
@@ -309,7 +309,7 @@ export default function Storage({
     rawMaterialsAdded.forEach((item, itemIndex) => {
       if (
         item.raw_material_receipt_id ===
-          newArray[index].raw_material_receipt_id &&
+        newArray[index].raw_material_receipt_id &&
         itemIndex !== index
       ) {
         maxQuantity -= Number(item.quantity);
@@ -387,9 +387,9 @@ export default function Storage({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
