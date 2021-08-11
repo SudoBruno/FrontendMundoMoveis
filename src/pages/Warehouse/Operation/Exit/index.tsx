@@ -253,7 +253,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
     newArray[index].quantity = value.replaceAll(',', '.');
 
     setRawMaterialsAdded(newArray);
-    console.log(newArray[index].quantity);
   }
 
   function handleChangeCargo(value, index) {
@@ -322,8 +321,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   function setDataOfStockSearchedForAPI(data, index) {
     let newArray = [...rawMaterialsAdded];
 
-    console.log('daquii', data.raw_material_id);
-
     newArray[index].raw_material_id = data.raw_material_id;
     newArray[index].warehouseName = data.warehouse_name;
     newArray[index].position_id = data.position_id;
@@ -352,8 +349,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       });
       return;
     }
-
-    console.log(response.data);
 
     setDataOfStockSearchedForAPI(response.data, index);
   }

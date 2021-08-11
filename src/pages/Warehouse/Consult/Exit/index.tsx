@@ -39,7 +39,6 @@ export default function categories({ exit }: IProps) {
     const response = await api.get(`/warehouse/exit/${receipt_id}`);
 
     setCsvData(response.data);
-    console.log(receipt_id, response.data);
   }
   class SearchTable extends React.Component {
     state = {

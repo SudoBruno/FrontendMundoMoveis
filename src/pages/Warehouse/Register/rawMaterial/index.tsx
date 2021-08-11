@@ -222,7 +222,7 @@ export default function rawMaterial({
   function handleChangeCoefficient(value: string) {
     setCoefficient(value.replaceAll(',', '.'));
   }
-  console.log(coefficient);
+
   class SearchTable extends React.Component {
     state = {
       searchText: '',

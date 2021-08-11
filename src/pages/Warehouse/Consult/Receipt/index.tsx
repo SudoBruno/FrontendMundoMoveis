@@ -40,7 +40,6 @@ export default function categories({ receipt }: IProps) {
 
     setCsvData(response.data);
   }
-  console.log(csvData);
   class SearchTable extends React.Component {
     state = {
       searchText: '',
