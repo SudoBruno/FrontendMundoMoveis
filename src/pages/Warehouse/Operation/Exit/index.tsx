@@ -183,7 +183,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       },
     ]);
     setId('');
-    setDescription('');
     setIsModalOpen(false);
     setLoading(false);
   }
@@ -339,7 +338,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   }
 
   async function findBarcodeOnStock(barcode, index) {
-
     const response = await api.get(`/warehouse/stock/barcode`, {
       params: {
         bar_code: barcode,
@@ -415,9 +413,9 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
