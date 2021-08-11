@@ -7,6 +7,7 @@ import {
   SearchOutlined,
   MinusCircleOutlined,
 } from '@ant-design/icons';
+
 import {
   Button,
   Col,
@@ -83,6 +84,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       warehouseName: '',
       positionName: '',
       rawMaterialName: '',
+      stillRemains: 0,
     },
   ]);
 
@@ -151,7 +153,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
     setRawMaterialsAdded(newArray);
 
     const response = await api.get(`/warehouse/position`, {
-      params: { warehouse_id: newArray[index].warehouse_id },
+      params: {
+        warehouse_id: newArray[index].warehouse_id,
+        raw_material_id: newArray[index].raw_material_id,
+      },
     });
 
     setPositions(response.data);
@@ -180,6 +185,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
         warehouseName: '',
         positionName: '',
         rawMaterialName: '',
+        stillRemains: 0,
       },
     ]);
     setId('');
@@ -245,11 +251,21 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
         title: 'Erro',
         description: 'Valor negativo ou 0',
       });
-      newArray[index].quantity = '';
+      newArray[index].maxQuantity = 0;
       setRawMaterialsAdded(newArray);
       return;
     }
 
+    if (value === '' || value === undefined || value === null) {
+      newArray[index].stillRemains = Number(newArray[index].maxQuantity);
+      Number(newArray[index].maxQuantity) - Number(value);
+      newArray[index].quantity = value.replaceAll(',', '.');
+      setRawMaterialsAdded(newArray);
+      return;
+    }
+
+    newArray[index].stillRemains =
+      Number(newArray[index].maxQuantity) - Number(value);
     newArray[index].quantity = value.replaceAll(',', '.');
 
     setRawMaterialsAdded(newArray);
@@ -757,10 +773,11 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                   />
                 </Form.Item>
               </Col>
+
               <Col span={5}>
                 <Form.Item
                   key="formTotalValue"
-                  labelCol={{ span: 23 }}
+                  labelCol={{ span: 20 }}
                   label="Falta Armazenar: "
                   labelAlign={'left'}
                   style={{
@@ -783,6 +800,27 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       onClick={() => removeExit(index)}
                     />
                   )}
+                </Form.Item>
+              </Col>
+              <Col span={5}>
+                <Form.Item
+                  key="formStillRemains"
+                  labelCol={{ span: 23 }}
+                  label="Ainda Resta: "
+                  labelAlign={'left'}
+                  style={{
+                    backgroundColor: 'white',
+                    fontWeight: 'bold',
+                  }}
+                  required
+                >
+                  <Input
+                    type="number"
+                    key="quantiyKey"
+                    size="large"
+                    value={selectedIten.stillRemains}
+                    disabled={true}
+                  />
                 </Form.Item>
               </Col>
             </Row>
