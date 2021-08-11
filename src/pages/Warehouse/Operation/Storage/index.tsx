@@ -99,6 +99,7 @@ export default function Storage({
       warehouseName: '',
       positionName: '',
       quantityHasToStorage: '',
+      stillRemains: '',
     },
   ]);
 
@@ -158,6 +159,7 @@ export default function Storage({
         warehouseName: '',
         positionName: '',
         quantityHasToStorage: '',
+        stillRemains: '',
       },
     ];
     setRawMaterialsAdded(newArray);
@@ -191,6 +193,7 @@ export default function Storage({
         warehouseName: '',
         positionName: '',
         quantityHasToStorage: '',
+        stillRemains: '',
       },
     ]);
     setLoading(false);

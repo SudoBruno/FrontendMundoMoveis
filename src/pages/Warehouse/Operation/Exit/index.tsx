@@ -206,6 +206,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
         warehouseName: '',
         positionName: '',
         rawMaterialName: '',
+        stillRemains: '',
       },
     ];
     setRawMaterialsAdded(newArray);
