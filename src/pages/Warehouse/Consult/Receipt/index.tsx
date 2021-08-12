@@ -8,6 +8,7 @@ import { Notification } from '../../../../components/Notification';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../../services/axios';
 import { format } from 'date-fns';
+import { pt } from 'date-fns/locale';
 import { api } from '../../../../services/api';
 
 interface IReceipt {
@@ -247,7 +248,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     data.forEach((receipt) => {
       receipt.created_at = format(
         new Date(receipt.created_at),
-        'dd/MM/yyyy HH:mm'
+        'dd/MM/yyyy HH:mm',
+        { locale: pt }
       );
     });
 
