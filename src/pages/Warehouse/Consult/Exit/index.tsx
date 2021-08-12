@@ -199,10 +199,7 @@ export default function categories({ exit }: IProps) {
                     <CSVLink
                       data={csvData}
                       style={{ color: 'white' }}
-                      filename={`Entrada-${format(
-                        new Date(),
-                        'dd-MM-yyyy'
-                      )}.csv`}
+                      filename={`Saída-${format(new Date(), 'dd-MM-yyyy')}.csv`}
                       headers={headers}
                     >
                       <DownloadOutlined style={{ fontSize: '16px' }} />
@@ -232,13 +229,16 @@ export default function categories({ exit }: IProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
+  const timeZone = { locale: pt };
   try {
     const { data } = await apiClient.get('/warehouse/exit');
 
     data.forEach((exit) => {
-      exit.created_at = format(new Date(exit.created_at), 'dd/MM/yyyy HH:mm', {
-        locale: pt,
-      });
+      exit.created_at = format(
+        new Date(exit.created_at),
+        'dd/MM/yyyy HH:mm',
+        timeZone
+      );
     });
     return {
       props: {
