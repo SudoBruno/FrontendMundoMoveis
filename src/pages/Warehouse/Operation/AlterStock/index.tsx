@@ -142,8 +142,6 @@ export default function AlterSotock({
       },
     });
 
-    console.log(rawMaterialId);
-
     setPositions(response.data);
   }
 
@@ -246,7 +244,7 @@ export default function AlterSotock({
   async function handleClickCargo() {
     try {
       const response = await api.get('/warehouse/stock', {
-        params: { raw_material_id: rawMaterialId },
+        params: { raw_material_id: rawMaterialId, position_id: oldPositionId },
       });
 
       setCargos(response.data);

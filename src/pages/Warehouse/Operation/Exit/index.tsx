@@ -71,7 +71,9 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   const [exits, setExits] = useState(exit);
   const [rawMaterials, setRawMaterials] = useState(rawMaterial);
   const [warehouses, setWarehouses] = useState(warehouse);
-  const [positions, setPositions] = useState([{ id: '', name: '' }]);
+  const [positions, setPositions] = useState([
+    { id: '', name: '', created_at: '' },
+  ]);
   const [cargo, setCargo] = useState([]);
   const [rawMaterialsAdded, setRawMaterialsAdded] = useState([
     {
@@ -139,7 +141,16 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
     }
   }
 
-  async function handleChangeWarehouse(value, index) {
+  function handleClickWarehouse(index) {
+    let newArray = [...rawMaterialsAdded];
+
+    newArray[index].position_id = '';
+    newArray[index].positionName = '';
+    setPositions([]);
+    setRawMaterialsAdded(newArray);
+  }
+
+  function handleChangeWarehouse(value, index) {
     let newArray = [...rawMaterialsAdded];
 
     const warehouse = warehouses.find((warehouse) => warehouse.id === value);
@@ -152,6 +163,13 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
     setRawMaterialsAdded(newArray);
 
+    setPositions([]);
+    clickPosition(index);
+  }
+
+  async function clickPosition(index) {
+    let newArray = [...rawMaterialsAdded];
+
     const response = await api.get(`/warehouse/position`, {
       params: {
         warehouse_id: newArray[index].warehouse_id,
@@ -159,7 +177,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       },
     });
 
-    console.log(newArray[index].raw_material_id);
     setPositions(response.data);
   }
 
@@ -168,8 +185,11 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
     const position = positions.find((position) => position.id === value);
 
+    console.log('change pos;', position);
+
     newArray[index].position_id = position.id;
     newArray[index].positionName = position.name;
+    newArray[index].cargo = '';
 
     setRawMaterialsAdded(newArray);
   }
@@ -229,6 +249,14 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
     newArray[
       index
     ].rawMaterialName = `${rawMaterial.raw_material_code} | ${rawMaterial.raw_material_name} / (${rawMaterial.unit_of_measurement_abbreviation})`;
+
+    newArray[index].warehouse_id = '';
+    newArray[index].warehouseName = '';
+    newArray[index].position_id = '';
+    newArray[index].positionName = '';
+
+    newArray[index].quantity = '';
+    newArray[index].maxQuantity = 0;
 
     setRawMaterialsAdded(newArray);
   }
@@ -295,7 +323,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
     let newArray = [...rawMaterialsAdded];
 
     const response = await api.get(`/warehouse/stock`, {
-      params: { position_id: newArray[index].position_id },
+      params: {
+        position_id: newArray[index].position_id,
+        raw_material_id: newArray[index].raw_material_id,
+      },
     });
 
     setCargo(response.data);
@@ -640,6 +671,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                     optionFilterProp="children"
                     disabled={selectedIten.rawMaterialName != '' ? false : true}
                     value={selectedIten.warehouseName}
+                    onClick={() => handleClickWarehouse(index)}
                     onChange={(e) => {
                       handleChangeWarehouse(e, index);
                     }}
@@ -695,9 +727,9 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                         .localeCompare(optionB.children.toLowerCase())
                     }
                   >
-                    {positions.map((item) => (
+                    {positions.map((item, index) => (
                       <>
-                        <Option key={item.id} value={item.id}>
+                        <Option key={index} value={item.id}>
                           {item.name}
                         </Option>
                       </>
