@@ -136,15 +136,23 @@ export default function AlterSotock({
 
   async function handleClickPosition() {
     const response = await api.get(`/warehouse/position`, {
-      params: { warehouse_id: warehouseOldPositionId },
+      params: {
+        warehouse_id: warehouseOldPositionId,
+        raw_material_id: rawMaterialId,
+      },
     });
+
+    console.log(rawMaterialId);
 
     setPositions(response.data);
   }
 
   async function handleClickNewPosition() {
     const response = await api.get(`/warehouse/position`, {
-      params: { warehouse_id: warehouseNewPositionId },
+      params: {
+        warehouse_id: warehouseNewPositionId,
+        raw_material_id: rawMaterialId,
+      },
     });
 
     setPositions(response.data);

@@ -159,6 +159,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       },
     });
 
+    console.log(newArray[index].raw_material_id);
     setPositions(response.data);
   }
 
@@ -206,7 +207,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
         warehouseName: '',
         positionName: '',
         rawMaterialName: '',
-        stillRemains: '',
+        stillRemains: 0,
       },
     ];
     setRawMaterialsAdded(newArray);

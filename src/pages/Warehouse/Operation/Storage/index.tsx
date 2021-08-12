@@ -23,6 +23,8 @@ import {
   Tooltip,
 } from 'antd';
 
+import { format } from 'date-fns';
+import p from 'date-fns/locale/pt';
 import Highlighter from 'react-highlight-words';
 import styles from '../../../../styles/app.module.scss';
 
@@ -30,6 +32,7 @@ import { Notification } from '../../../../components/Notification';
 import { api } from '../../../../services/api';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getAPIClient } from '../../../../services/axios';
+import pt from 'date-fns/locale/pt';
 
 const { Option } = Select;
 
@@ -46,6 +49,7 @@ interface IStorage {
   position_name: string;
   position_id: string;
   raw_material_name: string;
+  created_at: string;
 }
 
 interface IWarehouse {
@@ -825,6 +829,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const storageData = storageResponse.data;
     const warehouseData = warehouseResponse.data;
 
+    storageData.forEach((storage) => {
+      storage.created_at = format(
+        new Date(storage.created_at),
+        'dd/MM/yyyy HH:mm',
+        {
+          pt,
+        }
+      );
+    });
+
     return {
       props: {
         rawMaterial: rawMaterialData,
@@ -836,9 +850,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error(error);
     return {
       props: {
-        rawMaterial: [{}],
-        storage: [{}],
-        warehouse: [{}],
+        rawMaterial: [],
+        storage: [],
+        warehouse: [],
       },
     };
   }
