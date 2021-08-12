@@ -234,6 +234,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const { data } = await apiClient.get('/warehouse/exit');
 
+    data.forEach((exit) => {
+      exit.created_at = format(new Date(exit.created_at), 'dd/MM/yyyy HH:mm');
+    });
     return {
       props: {
         exit: data,

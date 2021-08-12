@@ -244,6 +244,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const { data } = await apiClient.get('/warehouse/receipt');
 
+    data.forEach((receipt) => {
+      receipt.created_at = format(
+        new Date(receipt.created_at),
+        'dd/MM/yyyy HH:mm'
+      );
+    });
+
     return {
       props: {
         receipt: data,

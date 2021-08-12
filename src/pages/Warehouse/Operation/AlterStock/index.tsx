@@ -31,6 +31,7 @@ import { api } from '../../../../services/api';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import TextArea from 'antd/lib/input/TextArea';
 import { getAPIClient } from '../../../../services/axios';
+import { format } from 'date-fns';
 
 const { Option } = Select;
 
@@ -847,6 +848,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const positionData = positionResesponse.data;
     const alteredItenData = alteredDataResponse.data;
     const warehouseData = warehouseResponse.data;
+
+    alteredItenData.forEach((alteredIten) => {
+      alteredIten.created_at = format(
+        new Date(alteredIten.created_at),
+        'dd/MM/yyyy HH:mm'
+      );
+    });
 
     return {
       props: {

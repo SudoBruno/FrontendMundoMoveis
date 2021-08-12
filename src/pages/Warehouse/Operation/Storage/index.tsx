@@ -832,10 +832,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     storageData.forEach((storage) => {
       storage.created_at = format(
         new Date(storage.created_at),
-        'dd/MM/yyyy HH:mm',
-        {
-          pt,
-        }
+        'dd/MM/yyyy HH:mm'
       );
     });
 

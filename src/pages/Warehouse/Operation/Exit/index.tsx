@@ -31,6 +31,7 @@ import { Notification } from '../../../../components/Notification';
 import { api } from '../../../../services/api';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getAPIClient } from '../../../../services/axios';
+import { format } from 'date-fns';
 
 const { Option } = Select;
 
@@ -898,6 +899,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const rawMaterialData = rawMaterialResponse.data;
     const exitData = exitResponse.data;
     const warehouseData = warehouseResponse.data;
+
+    exitData.forEach((exit) => {
+      exit.created_at = format(new Date(exit.created_at), 'dd/MM/yyyy HH:mm');
+    });
 
     return {
       props: {
