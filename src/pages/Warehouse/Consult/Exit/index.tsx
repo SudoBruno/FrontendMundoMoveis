@@ -9,6 +9,7 @@ import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../../services/axios';
 import { format } from 'date-fns';
 import { api } from '../../../../services/api';
+import pt from 'date-fns/locale/pt';
 
 interface IExit {
   id: string;
@@ -235,7 +236,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { data } = await apiClient.get('/warehouse/exit');
 
     data.forEach((exit) => {
-      exit.created_at = format(new Date(exit.created_at), 'dd/MM/yyyy HH:mm');
+      exit.created_at = format(new Date(exit.created_at), 'dd/MM/yyyy HH:mm', {
+        locale: pt,
+      });
     });
     return {
       props: {
