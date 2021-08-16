@@ -14,7 +14,6 @@ import { getAPIClient } from '../../../../services/axios';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { api } from '../../../../services/api';
-import formatRelativeWithOptions from 'date-fns/fp/formatRelativeWithOptions';
 
 interface IReceipt {
   id: string;
@@ -42,13 +41,9 @@ export default function categories({ receipt }: IProps) {
   ]);
 
   async function handleClickCsvLink(receipt_id) {
-    console.log(receipt_id);
-
     const response = await api.get('/warehouse/receipt/raw-material', {
       params: { id: receipt_id },
     });
-
-    console.log(response.data);
 
     setCsvData(response.data);
   }
