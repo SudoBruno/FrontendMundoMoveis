@@ -186,8 +186,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
     const position = positions.find((position) => position.id === value);
 
-    console.log('change pos;', position);
-
     newArray[index].position_id = position.id;
     newArray[index].positionName = position.name;
     newArray[index].cargo = '';
