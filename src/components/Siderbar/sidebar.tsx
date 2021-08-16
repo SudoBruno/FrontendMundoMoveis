@@ -5,6 +5,7 @@ import {
   RightSquareOutlined,
   SearchOutlined,
   ShoppingCartOutlined,
+  ExportOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, Result } from 'antd';
 import 'antd/dist/antd.css';
@@ -38,6 +39,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
               <Menu.Item key="Dashboard" icon={<DashboardOutlined />}>
                 <Link href="/Profile">Dashboard</Link>
               </Menu.Item>
+
               <SubMenu
                 key="WnsInsumos"
                 title="Almoxarifado"
@@ -125,6 +127,9 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
                 </SubMenu>
               </SubMenu>
+              <Menu.Item key="Exit" icon={<ExportOutlined />}>
+                <Link href="/">Sair</Link>
+              </Menu.Item>
             </Menu>
           </Sider>
 

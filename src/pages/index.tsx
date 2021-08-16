@@ -10,6 +10,8 @@ export default function login() {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
 
+  setCookie(undefined, 'token', '');
+
   async function handleLogin(e) {
     e.preventDefault();
 
