@@ -874,7 +874,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
               </Button>
             )}
             {isModalOpen == true && (
-              <BarcodeReader onScan={(e) => findBarcodeOnStock(e, index)} />
+              <BarcodeReader onScan={(e) => findBarcodeOnStock(e)} />
             )}
           </>
         ))}
