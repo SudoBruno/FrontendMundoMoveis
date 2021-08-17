@@ -31,7 +31,6 @@ import { Notification } from '../../../../components/Notification';
 import { api } from '../../../../services/api';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getAPIClient } from '../../../../services/axios';
-import { format } from 'date-fns';
 
 const { Option } = Select;
 
@@ -72,9 +71,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
   const [exits, setExits] = useState(exit);
   const [rawMaterials, setRawMaterials] = useState(rawMaterial);
   const [warehouses, setWarehouses] = useState(warehouse);
-  const [positions, setPositions] = useState([
-    { id: '', name: '', created_at: '' },
-  ]);
+  const [positions, setPositions] = useState([{ id: '', name: '' }]);
   const [cargo, setCargo] = useState([]);
   const [rawMaterialsAdded, setRawMaterialsAdded] = useState([
     {
@@ -147,7 +144,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
     newArray[index].position_id = '';
     newArray[index].positionName = '';
-    setPositions([]);
+    setPositions([{ id: '', name: '' }]);
     setRawMaterialsAdded(newArray);
   }
 
@@ -164,7 +161,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
     setRawMaterialsAdded(newArray);
 
-    setPositions([]);
+    setPositions;
     clickPosition(index);
   }
 
@@ -180,7 +177,6 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
 
     setPositions(response.data);
   }
-
   function handleChangePosition(value, index) {
     let newArray = [...rawMaterialsAdded];
 
@@ -366,23 +362,25 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
     }
   }
 
-  function setDataOfStockSearchedForAPI(data, index) {
+  function setDataOfStockSearchedForAPI(data) {
     let newArray = [...rawMaterialsAdded];
 
-    newArray[index].raw_material_id = data.raw_material_id;
-    newArray[index].warehouseName = data.warehouse_name;
-    newArray[index].position_id = data.position_id;
-    newArray[index].positionName = data.position_name;
-    newArray[index].maxQuantity = data.quantity;
+    const lastItemOfArray = newArray.length - 1;
+
+    newArray[lastItemOfArray].raw_material_id = data.raw_material_id;
+    newArray[lastItemOfArray].warehouseName = data.warehouse_name;
+    newArray[lastItemOfArray].position_id = data.position_id;
+    newArray[lastItemOfArray].positionName = data.position_name;
+    newArray[lastItemOfArray].maxQuantity = data.quantity;
     newArray[
-      index
+      lastItemOfArray
     ].rawMaterialName = `${data.raw_material_code} | ${data.raw_material_name} / (${data.unit_of_measurement_abbreviation})`;
-    newArray[index].cargo = data.cargo;
+    newArray[lastItemOfArray].cargo = data.cargo;
 
     setRawMaterialsAdded(newArray);
   }
 
-  async function findBarcodeOnStock(barcode, index) {
+  async function findBarcodeOnStock(barcode) {
     const response = await api.get(`/warehouse/stock/barcode`, {
       params: {
         bar_code: barcode,
@@ -398,7 +396,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       return;
     }
 
-    setDataOfStockSearchedForAPI(response.data, index);
+    setDataOfStockSearchedForAPI(response.data);
   }
   class SearchTable extends React.Component {
     state = {
@@ -726,9 +724,9 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                         .localeCompare(optionB.children.toLowerCase())
                     }
                   >
-                    {positions.map((item, index) => (
+                    {positions.map((item) => (
                       <>
-                        <Option key={index} value={item.id}>
+                        <Option key={item.id} value={item.id}>
                           {item.name}
                         </Option>
                       </>
@@ -897,10 +895,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const rawMaterialData = rawMaterialResponse.data;
     const exitData = exitResponse.data;
     const warehouseData = warehouseResponse.data;
-
-    exitData.forEach((exit) => {
-      exit.created_at = format(new Date(exit.created_at), 'dd/MM/yyyy HH:mm');
-    });
 
     return {
       props: {
