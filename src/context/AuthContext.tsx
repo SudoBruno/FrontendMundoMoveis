@@ -1,9 +1,14 @@
-import { createContext, ReactNode } from 'react';
+import { createContext, ReactNode, useState } from 'react';
 import { setCookie } from 'nookies';
 import { api } from '../services/api';
 import { Notification } from '../components/Notification';
 import router from 'next/router';
 
+interface User {
+  email: string;
+  permissions: string[];
+  roles: string[];
+}
 interface signInCredentials {
   email: string;
   password: string;
@@ -12,6 +17,7 @@ interface signInCredentials {
 interface AuthContextData {
   signIn(credentials: signInCredentials): Promise<void>;
   isAuthenticated: boolean;
+  user: User;
 }
 
 interface AuthProviderProps {
@@ -21,7 +27,8 @@ interface AuthProviderProps {
 export const AuthContext = createContext({} as AuthContextData);
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const isAuthenticated = false;
+  const [user, setUser] = useState<User>();
+  const isAuthenticated = !!user;
 
   async function signIn({ email, password }: signInCredentials) {
     try {
@@ -31,11 +38,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
       };
 
       const response = await api.post('/sessions', data);
+      console.log(response.data);
 
       setCookie(undefined, 'token', response.data.token, {
         maxAge: 60 * 60 * 24, //24 horas
       });
 
+      const { permissions, roles, user } = response.data;
+
+      setUser({
+        email,
+        permissions,
+        roles,
+      });
       Notification({
         type: 'success',
         title: 'Logado',
@@ -55,7 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider value={{ signIn, isAuthenticated }}>
+    <AuthContext.Provider value={{ signIn, isAuthenticated, user }}>
       {children}
     </AuthContext.Provider>
   );

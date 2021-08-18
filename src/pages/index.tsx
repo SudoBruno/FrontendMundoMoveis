@@ -13,8 +13,6 @@ export default function login() {
 
   const { signIn } = useContext(AuthContext);
 
-  setCookie(undefined, 'token', '');
-
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
@@ -24,7 +22,7 @@ export default function login() {
         password: password,
       };
 
-      signIn(data);
+      await signIn(data);
       setPassword('');
     } catch (error) {
       console.error(error);
