@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useEffect, useState } from 'react';
-import { setCookie } from 'nookies';
+import { parseCookies, setCookie } from 'nookies';
 import { api } from '../services/api';
 import { Notification } from '../components/Notification';
 import router from 'next/router';
@@ -30,11 +30,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>();
   const isAuthenticated = !!user;
 
-  useEffect(() => {
-    api.get('/user').then((response) => {
-      const { permissions, roles, user } = response.data;
-    });
-  }, []);
+  // useEffect(() => {
+  //   const { token } = parseCookies();
+
+  //   if (!token) {
+  //     router.push('/');
+  //   }
+
+  //   if (token) {
+  //     api.get('/user').then((response) => {
+  //       const { permissions, roles, email } = response.data;
+  //       setUser({
+  //         email,
+  //         permissions,
+  //         roles,
+  //       });
+  //     });
+  //   }
+  // }, []);
 
   async function signIn({ email, password }: signInCredentials) {
     try {
@@ -65,7 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
       router.push('/Profile');
     } catch (error) {
-      console.error(error.response);
+      console.error(error);
 
       Notification({
         type: 'error',
