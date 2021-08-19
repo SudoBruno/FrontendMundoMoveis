@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 import { setCookie } from 'nookies';
 import { api } from '../services/api';
 import { Notification } from '../components/Notification';
@@ -30,6 +30,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>();
   const isAuthenticated = !!user;
 
+  useEffect(() => {
+    api.get('/user').then((response) => {
+      const { permissions, roles, user } = response.data;
+    });
+  }, []);
+
   async function signIn({ email, password }: signInCredentials) {
     try {
       const data = {
@@ -42,6 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setCookie(undefined, 'token', response.data.token, {
         maxAge: 60 * 60 * 24, //24 horas
+        path: '/',
       });
 
       const { permissions, roles, user } = response.data;
