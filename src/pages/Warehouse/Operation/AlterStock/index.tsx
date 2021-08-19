@@ -150,7 +150,6 @@ export default function AlterSotock({
     const response = await api.get(`/warehouse/position`, {
       params: {
         warehouse_id: warehouseNewPositionId,
-        raw_material_id: rawMaterialId,
       },
     });
 
