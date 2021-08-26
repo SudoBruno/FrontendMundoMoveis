@@ -259,6 +259,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     data.forEach((element) => {
       Object.assign(element, {
         cargo: element.cargo === '' ? 'Generico' : element.cargo,
+        created_at: format(new Date(element.created_at), 'dd/MM/yyyy HH:mm'),
       });
     });
 

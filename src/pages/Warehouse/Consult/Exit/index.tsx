@@ -44,6 +44,10 @@ export default function categories({ exit }: IProps) {
   async function handleClickCsvLink(exit_id: string) {
     const response = await api.get(`/warehouse/exit/${exit_id}`);
 
+    response.data.forEach((exit) => {
+      exit.created_at = format(new Date(exit.created_at), 'dd/MM/yyyy HH:mm');
+    });
+
     setCsvData(response.data);
   }
 

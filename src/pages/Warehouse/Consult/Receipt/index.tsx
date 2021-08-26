@@ -45,6 +45,13 @@ export default function categories({ receipt }: IProps) {
       params: { id: receipt_id },
     });
 
+    response.data.forEach((receipt) => {
+      receipt.created_at = format(
+        new Date(receipt.created_at),
+        'dd/MM/yyyy HH:mm'
+      );
+    });
+
     setCsvData(response.data);
   }
   class SearchTable extends React.Component {
