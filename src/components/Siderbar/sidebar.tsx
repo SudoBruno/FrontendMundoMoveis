@@ -6,7 +6,9 @@ import {
   SearchOutlined,
   ShoppingCartOutlined,
   ExportOutlined,
+  DollarCircleOutlined,
 } from '@ant-design/icons';
+import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { Button, Layout, Menu, Result } from 'antd';
 import 'antd/dist/antd.css';
 import Link from 'next/link';
@@ -127,6 +129,26 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
                 </SubMenu>
               </SubMenu>
+
+              <SubMenu
+                key="WnsInsumosSearches"
+                title="Financeiro"
+                icon={<DollarCircleOutlined />}
+              >
+                <SubMenu
+                  key="subFinancialRegister"
+                  title="Cadastros"
+                  icon={<PlusOutlined />}
+                >
+                  <Menu.Item
+                    key="FinancialMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/AccountPlan/">Plano de Conta</Link>
+                  </Menu.Item>
+                </SubMenu>
+              </SubMenu>
+
               <Menu.Item key="Exit" icon={<ExportOutlined />}>
                 <Link href="/">Sair</Link>
               </Menu.Item>
