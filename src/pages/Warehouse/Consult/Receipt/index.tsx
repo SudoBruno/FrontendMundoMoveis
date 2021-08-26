@@ -357,7 +357,7 @@ export default function categories({ receipt }: IProps) {
     <Layout>
       <Modal
         width={900}
-        title="Alterar Estoque"
+        title="Recebimento"
         visible={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={[

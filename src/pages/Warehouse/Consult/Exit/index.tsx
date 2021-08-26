@@ -359,7 +359,7 @@ export default function categories({ exit }: IProps) {
       </Layout>
       <Modal
         width={900}
-        title="Alterar Estoque"
+        title="Saída"
         visible={isOpenModal}
         onCancel={() => setIsModalOpen(false)}
         footer={[
