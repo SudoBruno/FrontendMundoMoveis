@@ -23,6 +23,7 @@ import { getAPIClient } from '../../../services/axios';
 import Highlighter from 'react-highlight-words';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import styles from '../../../styles/app.module.scss';
+import { api } from '../../../services/api';
 
 const { Option } = Select;
 
@@ -32,21 +33,23 @@ interface IUser {
 }
 
 interface IProp {
-  user: IUser[];
+  users: IUser[];
 }
 
-export default function AccountPlan({ user }: IProp) {
+export default function AccountPlan({ users }: IProp) {
   const [isOpenModal, setIsModalOpen] = useState(false);
+  const [user, setUser] = useState(users);
+  const [name, setName] = useState('');
   const [managerId, setManagerId] = useState<string>('');
   const [managerName, setManagerName] = useState<string>('');
   const [competentAuthorityId, setCompetentAuthorityId] = useState<string>('');
   const [competentAuthorityName, setCompetentAuthorityName] =
     useState<string>('');
-  const [financeGoal, setFinancialGoal] = useState<Number>(0);
   const [directorId, setDirectorId] = useState<string>('');
   const [directorName, setDirectorName] = useState<string>('');
-  const [purchaseLimit, setPurchaseLimit] = useState<Number>(0);
-  const [goalLimitInPercent, setGoalLimitInPercent] = useState<Number>(0);
+  const [financeGoal, setFinancialGoal] = useState<number>(0);
+  const [purchaseLimit, setPurchaseLimit] = useState<number>(0);
+  const [goalLimitInPercent, setGoalLimitInPercent] = useState<number>(0);
 
   async function handleRegister(event: FormEvent) {
     event.preventDefault();
@@ -54,7 +57,7 @@ export default function AccountPlan({ user }: IProp) {
     const data = {
       manager_id: managerId,
       competent_authority_id: competentAuthorityId,
-      financial_goal: financeGoal,
+      finance_goal: financeGoal,
       purchase_limit: purchaseLimit,
       director_id: directorId,
       goal_limit_in_percent: goalLimitInPercent,
@@ -70,8 +73,8 @@ export default function AccountPlan({ user }: IProp) {
     } catch (error) {
       console.error(error);
       Notification({
-        type: 'success',
-        title: 'Sucesso',
+        type: 'error',
+        title: 'Erro',
         description: `${error.response}`,
       });
     }
@@ -79,7 +82,37 @@ export default function AccountPlan({ user }: IProp) {
 
   async function handleEdit(id: string) {}
 
-  async function handleDelete(id: string) {}
+  async function handleDelete(id: string) {
+    try {
+      const response = await api.delete(`/${id}`);
+
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Conta deletada com sucesso',
+      });
+    } catch (error) {
+      console.error(error);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: `${error.response}`,
+      });
+    }
+  }
+
+  function handleClose() {
+    setIsModalOpen(false);
+    setManagerId('');
+    setManagerName('');
+    setCompetentAuthorityId('');
+    setCompetentAuthorityName('');
+    setDirectorId('');
+    setDirectorName('');
+    setFinancialGoal(0);
+    setPurchaseLimit(0);
+    setGoalLimitInPercent(0);
+  }
 
   const popOverPurchaseLimitContent = (
     <>
@@ -293,7 +326,7 @@ export default function AccountPlan({ user }: IProp) {
           <Button
             key="back"
             onClick={() => {
-              ('');
+              handleClose();
             }}
             type="default"
           >
@@ -304,6 +337,30 @@ export default function AccountPlan({ user }: IProp) {
           </Button>,
         ]}
       >
+        <Row gutter={5}>
+          <Col span={7}>
+            <Form.Item
+              key="nameFormItem"
+              labelCol={{ span: 20 }}
+              label="Nome da Conta:"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
+              }}
+              required
+            >
+              <Input
+                type="number"
+                key="nameKey"
+                size="large"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
         <Row gutter={5}>
           <Col span={7}>
             <Form.Item
@@ -321,6 +378,7 @@ export default function AccountPlan({ user }: IProp) {
                 key="quantiyKey"
                 size="large"
                 style={{ width: '80%', marginRight: '2%' }}
+                value={String(purchaseLimit)}
                 onChange={(e) => {
                   setPurchaseLimit(Number(e.target.value));
                 }}
@@ -350,6 +408,7 @@ export default function AccountPlan({ user }: IProp) {
                 type="number"
                 key="quantiyKey"
                 size="large"
+                value={String(goalLimitInPercent)}
                 style={{ width: '80%', marginRight: '2%' }}
                 onChange={(e) => {
                   setGoalLimitInPercent(Number(e.target.value));
@@ -381,6 +440,7 @@ export default function AccountPlan({ user }: IProp) {
                 key="quantiyKey"
                 size="large"
                 style={{ width: '80%', marginRight: '2%' }}
+                value={String(financeGoal)}
                 onChange={(e) => {
                   setFinancialGoal(Number(e.target.value));
                 }}
