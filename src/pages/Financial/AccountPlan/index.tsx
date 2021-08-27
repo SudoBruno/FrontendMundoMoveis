@@ -1,9 +1,28 @@
+import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
+import EditFilled from '@ant-design/icons/lib/icons/EditFilled';
 import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
-import { Button, Col, Form, Input, Select, Modal, Row, Popover } from 'antd';
+import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Select,
+  Modal,
+  Row,
+  Popover,
+  Table,
+  Popconfirm,
+  Space,
+  Layout,
+} from 'antd';
 import { GetServerSideProps } from 'next';
 import React, { FormEvent, useState } from 'react';
 import { Notification } from '../../../components/Notification';
 import { getAPIClient } from '../../../services/axios';
+import Highlighter from 'react-highlight-words';
+import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
+import styles from '../../../styles/app.module.scss';
 
 const { Option } = Select;
 
@@ -17,6 +36,7 @@ interface IProp {
 }
 
 export default function AccountPlan({ user }: IProp) {
+  const [isOpenModal, setIsModalOpen] = useState(false);
   const [managerId, setManagerId] = useState<string>('');
   const [managerName, setManagerName] = useState<string>('');
   const [competentAuthorityId, setCompetentAuthorityId] = useState<string>('');
@@ -57,6 +77,10 @@ export default function AccountPlan({ user }: IProp) {
     }
   }
 
+  async function handleEdit(id: string) {}
+
+  async function handleDelete(id: string) {}
+
   const popOverPurchaseLimitContent = (
     <>
       {' '}
@@ -95,200 +119,363 @@ export default function AccountPlan({ user }: IProp) {
     </>
   );
 
+  class SearchTable extends React.Component {
+    state = {
+      searchText: '',
+      searchedColumn: '',
+    };
+    searchInput: Input;
+    getColumnSearchProps = (dataIndex) => ({
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={(node) => {
+              this.searchInput = node;
+            }}
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={(e) =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() =>
+              this.handleSearch(selectedKeys, confirm, dataIndex)
+            }
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() =>
+                this.handleSearch(selectedKeys, confirm, dataIndex)
+              }
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Buscar
+            </Button>
+            <Button
+              onClick={() => this.handleReset(clearFilters)}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Limpar
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => (
+        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      ),
+      onFilter: (value, record) =>
+        record[dataIndex]
+          ? record[dataIndex]
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
+          : '',
+      onFilterDropdownVisibleChange: (visible) => {
+        if (visible) {
+          setTimeout(() => this.searchInput.select(), 100);
+        }
+      },
+      render: (text) =>
+        this.state.searchedColumn === dataIndex ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+            searchWords={[this.state.searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ''}
+          />
+        ) : (
+          text
+        ),
+    });
+
+    handleSearch = (selectedKeys, confirm, dataIndex) => {
+      confirm();
+      this.setState({
+        searchText: selectedKeys[0],
+        searchedColumn: dataIndex,
+      });
+    };
+
+    handleReset = (clearFilters) => {
+      clearFilters();
+      this.setState({ searchText: '' });
+    };
+
+    render() {
+      const columns = [
+        {
+          title: 'Usuário',
+          dataIndex: 'users_name',
+          key: 'users_name',
+          width: '30%',
+          ...this.getColumnSearchProps('users_name'),
+          sorter: (a, b) => a.users_name.length - b.users_name.length,
+        },
+        {
+          title: 'Descrição',
+          dataIndex: 'description',
+          key: 'description',
+          width: '30%',
+          ...this.getColumnSearchProps('description'),
+          sorter: (a, b) => a.description.length - b.description.length,
+        },
+        {
+          title: 'Criado Em',
+          dataIndex: 'created_at',
+          key: 'created_at',
+          width: '40%',
+          ...this.getColumnSearchProps('created_at'),
+          sorter: (a, b) => a.created_at.length - b.created_at.length,
+        },
+        {
+          title: 'Operação',
+          key: 'operation',
+          render: (record) => {
+            return (
+              <>
+                <EditFilled
+                  style={{ cursor: 'pointer', fontSize: '16px' }}
+                  onClick={() => handleEdit(record)}
+                />
+                <Popconfirm
+                  title="Confirmar remoção?"
+                  onConfirm={() => handleDelete(record.id)}
+                >
+                  <a href="#" style={{ marginLeft: 20 }}>
+                    <DeleteOutlined
+                      style={{ color: '#ff0000', fontSize: '16px' }}
+                    />
+                  </a>
+                </Popconfirm>
+              </>
+            );
+          },
+        },
+      ];
+      return <Table columns={columns} dataSource={['oi']} />;
+    }
+  }
+
   return (
-    <Modal
-      title="Cadastro de Plano de Conta"
-      width={1100}
-      visible={true}
-      onCancel={() => {
-        ('');
-      }}
-      footer={[
-        <Button
-          key="back"
-          onClick={() => {
-            ('');
-          }}
-          type="default"
-        >
-          Cancelar
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleRegister}>
-          Salvar
-        </Button>,
-      ]}
-    >
-      <Row gutter={5}>
-        <Col span={7}>
-          <Form.Item
-            key="nameFormItem"
-            labelCol={{ span: 20 }}
-            label="Limite de Compra (R$):"
-            labelAlign={'left'}
-            style={{
-              backgroundColor: 'white',
-            }}
-            required
-          >
-            <Input
-              type="number"
-              key="quantiyKey"
-              size="large"
-              style={{ width: '80%', marginRight: '2%' }}
-              onChange={(e) => {
-                setPurchaseLimit(Number(e.target.value));
-              }}
-            />
-            <Popover
-              content={popOverPurchaseLimitContent}
-              title="O que é o limite de compra ?"
+    <>
+      <Layout>
+        <Row justify="end">
+          <Col>
+            <Button
+              size={'large'}
+              className={styles.button}
+              icon={<PlusOutlined style={{ fontSize: '16px' }} />}
+              onClick={() => setIsModalOpen(true)}
             >
-              <QuestionCircleOutlined
-                style={{ fontSize: '20px', cursor: 'pointer' }}
+              Cadastrar Inquilino
+            </Button>
+          </Col>
+        </Row>
+        <SearchTable />
+      </Layout>
+      <Modal
+        title="Cadastro de Plano de Conta"
+        width={1100}
+        visible={isOpenModal}
+        onCancel={() => {
+          ('');
+        }}
+        footer={[
+          <Button
+            key="back"
+            onClick={() => {
+              ('');
+            }}
+            type="default"
+          >
+            Cancelar
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleRegister}>
+            Salvar
+          </Button>,
+        ]}
+      >
+        <Row gutter={5}>
+          <Col span={7}>
+            <Form.Item
+              key="nameFormItem"
+              labelCol={{ span: 20 }}
+              label="Limite de Compra (R$):"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
+              }}
+              required
+            >
+              <Input
+                type="number"
+                key="quantiyKey"
+                size="large"
+                style={{ width: '80%', marginRight: '2%' }}
+                onChange={(e) => {
+                  setPurchaseLimit(Number(e.target.value));
+                }}
               />
-            </Popover>
-          </Form.Item>
-        </Col>
-        <Col span={7}>
-          <Form.Item
-            key="goalLimitFormItem"
-            labelCol={{ span: 20 }}
-            label="Limite da meta (%):"
-            labelAlign={'left'}
-            style={{
-              backgroundColor: 'white',
-            }}
-            required
-          >
-            <Input
-              type="number"
-              key="quantiyKey"
-              size="large"
-              style={{ width: '80%', marginRight: '2%' }}
-              onChange={(e) => {
-                setGoalLimitInPercent(Number(e.target.value));
+              <Popover
+                content={popOverPurchaseLimitContent}
+                title="O que é o limite de compra ?"
+              >
+                <QuestionCircleOutlined
+                  style={{ fontSize: '20px', cursor: 'pointer' }}
+                />
+              </Popover>
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              key="goalLimitFormItem"
+              labelCol={{ span: 20 }}
+              label="Limite da meta (%):"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
               }}
-            />
-            <Popover
-              content={popOverGoalLimitContent}
-              title="O que é o limite de meta ?"
+              required
             >
-              <QuestionCircleOutlined
-                style={{ fontSize: '20px', cursor: 'pointer' }}
+              <Input
+                type="number"
+                key="quantiyKey"
+                size="large"
+                style={{ width: '80%', marginRight: '2%' }}
+                onChange={(e) => {
+                  setGoalLimitInPercent(Number(e.target.value));
+                }}
               />
-            </Popover>
-          </Form.Item>
-        </Col>
-        <Col span={7}>
-          <Form.Item
-            key="goalLimitFormItem"
-            labelCol={{ span: 20 }}
-            label="Meta Financeira da Conta (R$):"
-            labelAlign={'left'}
-            style={{
-              backgroundColor: 'white',
-            }}
-            required
-          >
-            <Input
-              type="number"
-              key="quantiyKey"
-              size="large"
-              style={{ width: '80%', marginRight: '2%' }}
-              onChange={(e) => {
-                setFinancialGoal(Number(e.target.value));
+              <Popover
+                content={popOverGoalLimitContent}
+                title="O que é o limite de meta ?"
+              >
+                <QuestionCircleOutlined
+                  style={{ fontSize: '20px', cursor: 'pointer' }}
+                />
+              </Popover>
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              key="goalLimitFormItem"
+              labelCol={{ span: 20 }}
+              label="Meta Financeira da Conta (R$):"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
               }}
-            />
-            <Popover
-              content={popOverFinancialGoalContent}
-              title="O que é a meta Financeira ?"
+              required
             >
-              <QuestionCircleOutlined
-                style={{ fontSize: '20px', cursor: 'pointer' }}
+              <Input
+                type="number"
+                key="quantiyKey"
+                size="large"
+                style={{ width: '80%', marginRight: '2%' }}
+                onChange={(e) => {
+                  setFinancialGoal(Number(e.target.value));
+                }}
               />
-            </Popover>
-          </Form.Item>
-        </Col>
-      </Row>
-      <Row gutter={5}>
-        <Col span={7}>
-          <Form.Item
-            key="nameFormItem"
-            labelCol={{ span: 23 }}
-            label="Nome do Gerente:"
-            labelAlign={'left'}
-            style={{
-              backgroundColor: 'white',
-            }}
-            required
-          >
-            <Select
-              key="managerName"
-              size="large"
-              placeholder="Selecione o Gerente da Conta"
-              value={managerId}
-              onChange={(e) => {
-                setManagerId(e.toString());
+              <Popover
+                content={popOverFinancialGoalContent}
+                title="O que é a meta Financeira ?"
+              >
+                <QuestionCircleOutlined
+                  style={{ fontSize: '20px', cursor: 'pointer' }}
+                />
+              </Popover>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={5}>
+          <Col span={7}>
+            <Form.Item
+              key="nameFormItem"
+              labelCol={{ span: 23 }}
+              label="Nome do Gerente:"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
               }}
+              required
             >
-              <Option key={'1'} value={'oi'}>
-                {'oid'}
-              </Option>
-            </Select>
-          </Form.Item>
-        </Col>
-        <Col span={7}>
-          <Form.Item
-            key="competentAuthorityNameFormItem"
-            labelCol={{ span: 23 }}
-            label="Autoridade Competente:"
-            labelAlign={'left'}
-            style={{
-              backgroundColor: 'white',
-            }}
-            required
-          >
-            <Select
-              key="competentAuthorityNameSelect"
-              size="large"
-              value={competentAuthorityId}
-              onChange={(e) => {
-                setCompetentAuthorityId(e.toString());
+              <Select
+                key="managerName"
+                size="large"
+                placeholder="Selecione o Gerente da Conta"
+                value={managerId}
+                onChange={(e) => {
+                  setManagerId(e.toString());
+                }}
+              >
+                <Option key={'1'} value={'oi'}>
+                  {'oid'}
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              key="competentAuthorityNameFormItem"
+              labelCol={{ span: 23 }}
+              label="Autoridade Competente:"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
               }}
+              required
             >
-              <Option key={'1'} value={'oi'}>
-                {'oid'}
-              </Option>
-            </Select>
-          </Form.Item>
-        </Col>
-        <Col span={7}>
-          <Form.Item
-            key="directorFormItem"
-            labelCol={{ span: 23 }}
-            label="Diretor:"
-            labelAlign={'left'}
-            style={{
-              backgroundColor: 'white',
-            }}
-            required
-          >
-            <Select
-              key="dirctorName"
-              size="large"
-              value={directorId}
-              onChange={(e) => {
-                setDirectorId(e.toString());
+              <Select
+                key="competentAuthorityNameSelect"
+                size="large"
+                value={competentAuthorityId}
+                onChange={(e) => {
+                  setCompetentAuthorityId(e.toString());
+                }}
+              >
+                <Option key={'1'} value={'oi'}>
+                  {'oid'}
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              key="directorFormItem"
+              labelCol={{ span: 23 }}
+              label="Diretor:"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
               }}
+              required
             >
-              <Option key={'1'} value={'oi'}>
-                {'oid'}
-              </Option>
-            </Select>
-          </Form.Item>
-        </Col>
-      </Row>
-    </Modal>
+              <Select
+                key="dirctorName"
+                size="large"
+                value={directorId}
+                onChange={(e) => {
+                  setDirectorId(e.toString());
+                }}
+              >
+                <Option key={'1'} value={'oi'}>
+                  {'oid'}
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Modal>
+    </>
   );
 }
 
