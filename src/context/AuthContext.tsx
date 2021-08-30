@@ -34,6 +34,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setCookie(undefined, 'token', response.data.token, {
         maxAge: 60 * 60 * 24, //24 horas
+        path: '/',
       });
 
       Notification({
