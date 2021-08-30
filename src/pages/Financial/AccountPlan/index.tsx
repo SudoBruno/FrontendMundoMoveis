@@ -543,10 +543,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
     const { data } = await apiClient.get('/users');
+    const accountPlansResponse = await apiClient.get('/users');
 
     return {
       props: {
         users: data,
+        accountPlans: accountPlansResponse.data,
       },
     };
   } catch (error) {
