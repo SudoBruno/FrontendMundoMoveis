@@ -38,6 +38,7 @@ interface IProp {
 
 export default function AccountPlan({ users }: IProp) {
   const [isOpenModal, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState(users);
   const [name, setName] = useState('');
   const [managerId, setManagerId] = useState<string>('');
@@ -55,6 +56,7 @@ export default function AccountPlan({ users }: IProp) {
     event.preventDefault();
 
     const data = {
+      name: name,
       manager_id: managerId,
       competent_authority_id: competentAuthorityId,
       finance_goal: financeGoal,
@@ -63,19 +65,25 @@ export default function AccountPlan({ users }: IProp) {
       goal_limit_in_percent: goalLimitInPercent,
     };
 
-    Notification({
-      type: 'success',
-      title: 'Sucesso',
-      description: 'Conta criada com sucesso',
-    });
+    console.log(data);
 
     try {
+      setLoading(true);
+      const response = await api.post('/financial/account-plan', data);
+      setLoading(false);
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Conta criada com sucesso',
+      });
+      handleClose();
     } catch (error) {
-      console.error(error);
+      setLoading(false);
+      console.error(error.response.data.message);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: `${error.response}`,
+        description: `${error.response.data.message}`,
       });
     }
   }
@@ -102,6 +110,7 @@ export default function AccountPlan({ users }: IProp) {
   }
 
   function handleClose() {
+    setLoading(false);
     setIsModalOpen(false);
     setManagerId('');
     setManagerName('');
@@ -309,7 +318,7 @@ export default function AccountPlan({ users }: IProp) {
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
               onClick={() => setIsModalOpen(true)}
             >
-              Cadastrar Inquilino
+              Cadastrar Conta
             </Button>
           </Col>
         </Row>
@@ -332,7 +341,12 @@ export default function AccountPlan({ users }: IProp) {
           >
             Cancelar
           </Button>,
-          <Button key="submit" type="primary" onClick={handleRegister}>
+          <Button
+            key="submit"
+            loading={loading}
+            type="primary"
+            onClick={handleRegister}
+          >
             Salvar
           </Button>,
         ]}
@@ -350,7 +364,6 @@ export default function AccountPlan({ users }: IProp) {
               required
             >
               <Input
-                type="number"
                 key="nameKey"
                 size="large"
                 value={name}
@@ -397,37 +410,6 @@ export default function AccountPlan({ users }: IProp) {
             <Form.Item
               key="goalLimitFormItem"
               labelCol={{ span: 20 }}
-              label="Limite da meta (%):"
-              labelAlign={'left'}
-              style={{
-                backgroundColor: 'white',
-              }}
-              required
-            >
-              <Input
-                type="number"
-                key="quantiyKey"
-                size="large"
-                value={String(goalLimitInPercent)}
-                style={{ width: '80%', marginRight: '2%' }}
-                onChange={(e) => {
-                  setGoalLimitInPercent(Number(e.target.value));
-                }}
-              />
-              <Popover
-                content={popOverGoalLimitContent}
-                title="O que é o limite de meta ?"
-              >
-                <QuestionCircleOutlined
-                  style={{ fontSize: '20px', cursor: 'pointer' }}
-                />
-              </Popover>
-            </Form.Item>
-          </Col>
-          <Col span={7}>
-            <Form.Item
-              key="goalLimitFormItem"
-              labelCol={{ span: 20 }}
               label="Meta Financeira da Conta (R$):"
               labelAlign={'left'}
               style={{
@@ -448,6 +430,37 @@ export default function AccountPlan({ users }: IProp) {
               <Popover
                 content={popOverFinancialGoalContent}
                 title="O que é a meta Financeira ?"
+              >
+                <QuestionCircleOutlined
+                  style={{ fontSize: '20px', cursor: 'pointer' }}
+                />
+              </Popover>
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              key="goalLimitFormItem"
+              labelCol={{ span: 20 }}
+              label="Limite da meta (%):"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
+              }}
+              required
+            >
+              <Input
+                type="number"
+                key="quantiyKey"
+                size="large"
+                value={String(goalLimitInPercent)}
+                style={{ width: '80%', marginRight: '2%' }}
+                onChange={(e) => {
+                  setGoalLimitInPercent(Number(e.target.value));
+                }}
+              />
+              <Popover
+                content={popOverGoalLimitContent}
+                title="O que é o limite de meta ?"
               >
                 <QuestionCircleOutlined
                   style={{ fontSize: '20px', cursor: 'pointer' }}
@@ -477,9 +490,13 @@ export default function AccountPlan({ users }: IProp) {
                   setManagerId(e.toString());
                 }}
               >
-                <Option key={'1'} value={'oi'}>
-                  {'oid'}
-                </Option>
+                {user.map((item) => (
+                  <>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  </>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -502,9 +519,13 @@ export default function AccountPlan({ users }: IProp) {
                   setCompetentAuthorityId(e.toString());
                 }}
               >
-                <Option key={'1'} value={'oi'}>
-                  {'oid'}
-                </Option>
+                {user.map((item) => (
+                  <>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  </>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -527,9 +548,13 @@ export default function AccountPlan({ users }: IProp) {
                   setDirectorId(e.toString());
                 }}
               >
-                <Option key={'1'} value={'oi'}>
-                  {'oid'}
-                </Option>
+                {user.map((item) => (
+                  <>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  </>
+                ))}
               </Select>
             </Form.Item>
           </Col>
