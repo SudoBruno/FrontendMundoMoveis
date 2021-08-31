@@ -32,14 +32,29 @@ interface IUser {
   name: string;
 }
 
-interface IProp {
-  users: IUser[];
+interface IAccountPlan {
+  id: string;
+  name: string;
+  goal_limit_in_percent: number;
+  purchase_limit: number;
+  finance_goal: number;
+  director_id: string;
+  competent_authority_id: string;
+  manager_id: string;
+  competent_authority_name: string;
 }
 
-export default function AccountPlan({ users }: IProp) {
+interface IProp {
+  users: IUser[];
+  accountPlans: IAccountPlan[];
+}
+
+export default function AccountPlan({ users, accountPlans }: IProp) {
   const [isOpenModal, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [user, setUser] = useState(users);
+  const [accountPlan, setAccountPlan] = useState<IAccountPlan[]>(accountPlans);
+  const [accountPlanId, setAccountPlanId] = useState<string>('');
+  const [user, setUser] = useState<IUser[]>(users);
   const [name, setName] = useState('');
   const [managerId, setManagerId] = useState<string>('');
   const [managerName, setManagerName] = useState<string>('');
@@ -65,28 +80,75 @@ export default function AccountPlan({ users }: IProp) {
       goal_limit_in_percent: goalLimitInPercent,
     };
 
-    try {
-      setLoading(true);
-      const response = await api.post('/financial/account-plan', data);
-      setLoading(false);
-      Notification({
-        type: 'success',
-        title: 'Sucesso',
-        description: 'Conta criada com sucesso',
-      });
-      handleClose();
-    } catch (error) {
-      setLoading(false);
-      console.error(error.response.data.message);
-      Notification({
-        type: 'error',
-        title: 'Erro',
-        description: `${error.response.data.message}`,
-      });
+    if (accountPlanId) {
+      try {
+        setLoading(true);
+        const response = await api.put(
+          `/financial/account-plan/${accountPlanId}`,
+          data
+        );
+
+        const filteredAccountPlan = accountPlan.filter((iten) => {
+          if (iten.id !== accountPlanId) {
+            return iten;
+          }
+        });
+
+        filteredAccountPlan.push(response.data);
+
+        setAccountPlan(filteredAccountPlan);
+
+        setLoading(false);
+        Notification({
+          type: 'success',
+          title: 'Sucesso',
+          description: 'Conta editada com sucesso',
+        });
+        handleClose();
+      } catch (error) {
+        setLoading(false);
+        console.error(error.response.data.message);
+        Notification({
+          type: 'error',
+          title: 'Erro',
+          description: `${error.response.data.message}`,
+        });
+      }
+    } else {
+      try {
+        setLoading(true);
+        const response = await api.post('/financial/account-plan', data);
+        setLoading(false);
+        Notification({
+          type: 'success',
+          title: 'Sucesso',
+          description: 'Conta criada com sucesso',
+        });
+        handleClose();
+      } catch (error) {
+        setLoading(false);
+        console.error(error.response.data.message);
+        Notification({
+          type: 'error',
+          title: 'Erro',
+          description: `${error.response.data.message}`,
+        });
+      }
     }
   }
 
-  async function handleEdit(id: string) {}
+  async function handleEdit(id: string) {
+    const searchedAccount = accountPlan.find((account) => account.id === id);
+    setAccountPlanId(id);
+    setIsModalOpen(true);
+    setName(searchedAccount.name);
+    setPurchaseLimit(searchedAccount.purchase_limit);
+    setFinancialGoal(searchedAccount.finance_goal);
+    setGoalLimitInPercent(searchedAccount.goal_limit_in_percent);
+    setManagerId(searchedAccount.manager_id);
+    setCompetentAuthorityId(searchedAccount.competent_authority_id);
+    setDirectorId(searchedAccount.director_id);
+  }
 
   async function handleDelete(id: string) {
     try {
@@ -253,20 +315,36 @@ export default function AccountPlan({ users }: IProp) {
     render() {
       const columns = [
         {
-          title: 'Usuário',
-          dataIndex: 'users_name',
-          key: 'users_name',
-          width: '30%',
-          ...this.getColumnSearchProps('users_name'),
-          sorter: (a, b) => a.users_name.length - b.users_name.length,
+          title: 'Nome da Conta',
+          dataIndex: 'name',
+          key: 'name',
+          width: '20%',
+          ...this.getColumnSearchProps('name'),
+          sorter: (a, b) => a.name.length - b.name.length,
         },
         {
-          title: 'Descrição',
-          dataIndex: 'description',
-          key: 'description',
-          width: '30%',
-          ...this.getColumnSearchProps('description'),
-          sorter: (a, b) => a.description.length - b.description.length,
+          title: 'Limite por compra',
+          dataIndex: 'purchase_limit',
+          key: 'purchase_limit',
+          width: '20%',
+          ...this.getColumnSearchProps('purchase_limit'),
+          sorter: (a, b) => a.purchase_limit.length - b.purchase_limit.length,
+        },
+        {
+          title: 'Meta Financeira',
+          dataIndex: 'finance_goal',
+          key: 'finance_goal',
+          width: '20%',
+          ...this.getColumnSearchProps('finance_goal'),
+          sorter: (a, b) => a.finance_goal.length - b.finance_goal.length,
+        },
+        {
+          title: 'Limite da meta (%)',
+          dataIndex: 'purchase_limit',
+          key: 'purchase_limit',
+          width: '20%',
+          ...this.getColumnSearchProps('purchase_limit'),
+          sorter: (a, b) => a.purchase_limit.length - b.purchase_limit.length,
         },
         {
           title: 'Criado Em',
@@ -284,7 +362,7 @@ export default function AccountPlan({ users }: IProp) {
               <>
                 <EditFilled
                   style={{ cursor: 'pointer', fontSize: '16px' }}
-                  onClick={() => handleEdit(record)}
+                  onClick={() => handleEdit(record.id)}
                 />
                 <Popconfirm
                   title="Confirmar remoção?"
@@ -301,7 +379,7 @@ export default function AccountPlan({ users }: IProp) {
           },
         },
       ];
-      return <Table columns={columns} dataSource={['oi']} />;
+      return <Table columns={columns} dataSource={accountPlan} />;
     }
   }
 
@@ -327,7 +405,7 @@ export default function AccountPlan({ users }: IProp) {
         width={1100}
         visible={isOpenModal}
         onCancel={() => {
-          ('');
+          handleClose();
         }}
         footer={[
           <Button
@@ -566,7 +644,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
     const { data } = await apiClient.get('/users');
-    const accountPlansResponse = await apiClient.get('/users');
+    const accountPlansResponse = await apiClient.get('financial/account-plan');
 
     return {
       props: {

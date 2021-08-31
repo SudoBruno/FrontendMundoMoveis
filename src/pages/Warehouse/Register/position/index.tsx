@@ -95,7 +95,7 @@ export default function position({
       filterPosition.push(response.data);
 
       setPositions(filterPosition);
-
+      setLoading(false);
       handleClose();
       Notification({
         type: 'success',

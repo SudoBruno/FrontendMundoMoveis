@@ -2,7 +2,7 @@ import { createContext, ReactNode } from 'react';
 import { setCookie } from 'nookies';
 import { api } from '../services/api';
 import { Notification } from '../components/Notification';
-import router from 'next/router';
+import Router from 'next/router';
 
 interface signInCredentials {
   email: string;
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         title: 'Logado',
         description: 'Login Efetuado',
       });
-      router.push('/Profile');
+      Router.push('/Profile');
     } catch (error) {
       console.error(error.response);
 
