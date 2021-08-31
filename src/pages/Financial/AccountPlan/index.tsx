@@ -65,8 +65,6 @@ export default function AccountPlan({ users }: IProp) {
       goal_limit_in_percent: goalLimitInPercent,
     };
 
-    console.log(data);
-
     try {
       setLoading(true);
       const response = await api.post('/financial/account-plan', data);
