@@ -1,7 +1,11 @@
-import DeleteOutlined from '@ant-design/icons/lib/icons/DeleteOutlined';
-import EditFilled from '@ant-design/icons/lib/icons/EditFilled';
-import QuestionCircleOutlined from '@ant-design/icons/lib/icons/QuestionCircleOutlined';
-import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
+import {
+  DeleteOutlined,
+  EditFilled,
+  QuestionCircleOutlined,
+  SearchOutlined,
+  PlusOutlined,
+} from '@ant-design/icons/lib/icons/';
+
 import {
   Button,
   Col,
@@ -21,7 +25,6 @@ import React, { FormEvent, useState } from 'react';
 import { Notification } from '../../../components/Notification';
 import { getAPIClient } from '../../../services/axios';
 import Highlighter from 'react-highlight-words';
-import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import styles from '../../../styles/app.module.scss';
 import { api } from '../../../services/api';
 
@@ -171,6 +174,7 @@ export default function AccountPlan({ users, accountPlans }: IProp) {
 
   function handleClose() {
     setLoading(false);
+    setAccountPlanId('');
     setIsModalOpen(false);
     setManagerId('');
     setManagerName('');
