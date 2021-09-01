@@ -13,8 +13,6 @@ export default function login() {
 
   const { signIn } = useContext(AuthContext);
 
-  setCookie(undefined, 'token', '');
-
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
