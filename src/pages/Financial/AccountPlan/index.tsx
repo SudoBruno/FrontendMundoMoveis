@@ -121,12 +121,16 @@ export default function AccountPlan({ users, accountPlans }: IProp) {
       try {
         setLoading(true);
         const response = await api.post('/financial/account-plan', data);
+
         setLoading(false);
         Notification({
           type: 'success',
           title: 'Sucesso',
           description: 'Conta criada com sucesso',
         });
+        const newAccountPlanRegistered = response.data;
+        accountPlan.push(newAccountPlanRegistered);
+
         handleClose();
       } catch (error) {
         setLoading(false);
@@ -193,7 +197,7 @@ export default function AccountPlan({ users, accountPlans }: IProp) {
       <p>
         O limite de compra é a quantidade estipulada de uma compra,
         <br />
-        que quando excedido, o diretor responsável deve ser acionado
+        que quando excedido, o gestor responsável deve ser acionado
         <br />
         para a efetuar a autorização da mesma.
       </p>

@@ -146,6 +146,12 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   >
                     <Link href="/Financial/AccountPlan/">Plano de Conta</Link>
                   </Menu.Item>
+                  <Menu.Item
+                    key="FinancialCostCenterMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/CostCenter/">Centro de custo</Link>
+                  </Menu.Item>
                 </SubMenu>
               </SubMenu>
 
