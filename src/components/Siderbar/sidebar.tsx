@@ -160,6 +160,14 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                       Tipo de Solicitação
                     </Link>
                   </Menu.Item>
+                  <Menu.Item
+                    key="PaymentTypeMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/PaymentType/">
+                      Tipo de Pagamento
+                    </Link>
+                  </Menu.Item>
                 </SubMenu>
               </SubMenu>
 

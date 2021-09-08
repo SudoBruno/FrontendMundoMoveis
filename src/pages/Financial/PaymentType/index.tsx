@@ -6,7 +6,6 @@ import {
   Col,
   Form,
   Input,
-  Select,
   Modal,
   Row,
   Popover,
@@ -29,32 +28,27 @@ import {
   SearchOutlined,
 } from '@ant-design/icons/lib/icons/';
 
-const { Option } = Select;
-
-interface ISolicitationType {
+interface IPaymentType {
   id: string;
   name: string;
   color: any;
 }
 
 interface IProp {
-  solicitationTypes: ISolicitationType[];
+  paymentTypes: IPaymentType[];
 }
 
-export default function SolicitationType({ solicitationTypes }: IProp) {
+export default function PaymentType({ paymentTypes }: IProp) {
   const [isOpenModal, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [solicitationType, setSolicitationType] =
-    useState<ISolicitationType[]>(solicitationTypes);
-  const [solicitationTypeId, setSolicitationTypeId] = useState<string>('');
+  const [paymentType, setPaymentType] = useState<IPaymentType[]>(paymentTypes);
+  const [paymentTypeId, setPaymentTypeId] = useState<string>('');
   const [name, setName] = useState<string>('');
-  const [initializeColor, setInitializeColor] = useColor('hex', '#121212');
-  const [color, setColor] = useState('');
 
   async function handleRegister(event: FormEvent) {
     event.preventDefault();
 
-    if (name === '' || color === '#121212' || color === '') {
+    if (name === '') {
       Notification({
         type: 'error',
         title: 'Erro',
@@ -65,26 +59,25 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
 
     const data = {
       name: name,
-      color: color,
     };
 
-    if (solicitationTypeId) {
+    if (paymentTypeId) {
       try {
         setLoading(true);
         const response = await api.put(
-          `/financial/solicitation-type/${solicitationTypeId}`,
+          `/financial/payment-type/${paymentTypeId}`,
           data
         );
 
-        const filteredSolicitationTypes = solicitationTypes.filter((iten) => {
-          if (iten.id !== solicitationTypeId) {
+        const filteredPaymentTypes = paymentTypes.filter((iten) => {
+          if (iten.id !== paymentTypeId) {
             return iten;
           }
         });
 
-        filteredSolicitationTypes.push(response.data);
+        filteredPaymentTypes.push(response.data);
 
-        setSolicitationType(filteredSolicitationTypes);
+        setPaymentType(filteredPaymentTypes);
 
         setLoading(false);
         handleClose();
@@ -104,7 +97,7 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
     } else {
       try {
         setLoading(true);
-        const response = await api.post('/financial/solicitation-type', data);
+        const response = await api.post('/financial/payment-type', data);
         console.log(response.data);
 
         setLoading(false);
@@ -115,7 +108,7 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
         });
 
         const newAccountPlanRegistered = response.data;
-        solicitationTypes.push(newAccountPlanRegistered);
+        paymentTypes.push(newAccountPlanRegistered);
 
         handleClose();
       } catch (error) {
@@ -131,25 +124,19 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
   }
 
   async function handleEdit(id: string) {
-    const searchedsolicitationTypes = solicitationTypes.find(
-      (item) => item.id === id
-    );
+    const searchedPaymentTypes = paymentType.find((item) => item.id === id);
     console.log(id);
 
     setIsModalOpen(true);
-    setSolicitationTypeId(id);
-    setName(searchedsolicitationTypes.name);
+    setPaymentTypeId(id);
+    setName(searchedPaymentTypes.name);
   }
 
   async function handleClose() {
     setIsModalOpen(false);
     setLoading(false);
-    setSolicitationTypeId('');
+    setPaymentTypeId('');
     setName('');
-    setColor('');
-  }
-  function handleChangeColor(e) {
-    setColor(e.hex);
   }
 
   class SearchTable extends React.Component {
@@ -254,19 +241,6 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
           sorter: (a, b) => a.name.length - b.name.length,
         },
         {
-          title: 'Cor',
-          key: 'color',
-          render: (record) => {
-            return (
-              <>
-                <Tag color={record.color} key={record.color}>
-                  ⠀⠀⠀⠀⠀⠀⠀
-                </Tag>
-              </>
-            );
-          },
-        },
-        {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
@@ -300,7 +274,7 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
           },
         },
       ];
-      return <Table columns={columns} dataSource={solicitationType} />;
+      return <Table columns={columns} dataSource={paymentType} />;
     }
   }
 
@@ -363,38 +337,11 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
               <Input
                 key="nameKey"
                 size="large"
-                placeholder="Ex: Urgente, Normal"
+                placeholder="Ex: Cartão, Boleto..."
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
                 }}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={5}>
-          <Col span={20}>
-            <Form.Item
-              key="codeFormItem"
-              labelCol={{ span: 20 }}
-              label="Cor do Status:"
-              labelAlign={'left'}
-              style={{
-                backgroundColor: 'white',
-              }}
-              required
-            >
-              <ColorPicker
-                width={300}
-                height={150}
-                color={initializeColor}
-                onChange={(e) => {
-                  setInitializeColor(e);
-                  handleChangeColor(e);
-                }}
-                hideHSV
-                hideRGB
-                dark
               />
             </Form.Item>
           </Col>
@@ -407,18 +354,18 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
-    const { data } = await apiClient.get('/financial/solicitation-type');
+    const { data } = await apiClient.get('/financial/payment-type');
 
     return {
       props: {
-        solicitationTypes: data,
+        paymentTypes: data,
       },
     };
   } catch (error) {
     console.error(error);
     return {
       props: {
-        solicitationTypes: [],
+        paymentTypes: [],
       },
     };
   }
