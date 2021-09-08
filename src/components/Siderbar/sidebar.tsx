@@ -152,6 +152,14 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   >
                     <Link href="/Financial/CostCenter/">Centro de custo</Link>
                   </Menu.Item>
+                  <Menu.Item
+                    key="SolicitationTypeMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/SolicitationType/">
+                      Tipo de Solicitação
+                    </Link>
+                  </Menu.Item>
                 </SubMenu>
               </SubMenu>
 

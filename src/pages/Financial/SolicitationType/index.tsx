@@ -1,5 +1,6 @@
 import React, { FormEvent, useState } from 'react';
-
+import { ColorPicker, useColor } from 'react-color-palette';
+import 'react-color-palette/lib/css/styles.css';
 import {
   Button,
   Col,
@@ -13,6 +14,7 @@ import {
   Popconfirm,
   Space,
   Layout,
+  Tag,
 } from 'antd';
 import { GetServerSideProps } from 'next';
 import { Notification } from '../../../components/Notification';
@@ -29,56 +31,67 @@ import {
 
 const { Option } = Select;
 
-interface ICenterCost {
+interface ISolicitationType {
   id: string;
   name: string;
-  code: any;
+  color: any;
 }
 
 interface IProp {
-  centerCosts: ICenterCost[];
+  solicitationTypes: ISolicitationType[];
 }
 
-export default function CenterCost({ centerCosts }: IProp) {
+export default function CenterCost({ solicitationTypes }: IProp) {
   const [isOpenModal, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [centerCost, setCenterCost] = useState<ICenterCost[]>(centerCosts);
-  const [centerCostId, setCenterCostId] = useState<string>('');
+  const [solicitationType, setSolicitationType] =
+    useState<ISolicitationType[]>(solicitationTypes);
+  const [solicitationTypeId, setSolicitationTypeId] = useState<string>('');
   const [name, setName] = useState<string>('');
-  const [code, setCode] = useState<any>('');
+  const [initializeColor, setInitializeColor] = useColor('hex', '#121212');
+  const [color, setColor] = useState('');
 
   async function handleRegister(event: FormEvent) {
     event.preventDefault();
 
+    if (name === '' || color === '#121212' || color === '') {
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Nenhum campo pode ser vazio',
+      });
+      return;
+    }
+
     const data = {
       name: name,
-      code: code,
+      color: color,
     };
 
-    if (centerCostId) {
+    if (solicitationTypeId) {
       try {
         setLoading(true);
         const response = await api.put(
-          `/financial/cost-center/${centerCostId}`,
+          `/financial/solicitation-type/${solicitationTypeId}`,
           data
         );
 
-        const filteredCostCenter = centerCost.filter((iten) => {
-          if (iten.id !== centerCostId) {
+        const filteredSolicitationTypes = solicitationTypes.filter((iten) => {
+          if (iten.id !== solicitationTypeId) {
             return iten;
           }
         });
 
-        filteredCostCenter.push(response.data);
+        filteredSolicitationTypes.push(response.data);
 
-        setCenterCost(filteredCostCenter);
+        setSolicitationType(filteredSolicitationTypes);
 
         setLoading(false);
         handleClose();
         Notification({
           type: 'success',
           title: 'Sucesso',
-          description: 'Centro de custo editada com sucesso',
+          description: 'Tipo editado com sucesso',
         });
       } catch (error) {
         console.error(error.response.data.message);
@@ -91,18 +104,18 @@ export default function CenterCost({ centerCosts }: IProp) {
     } else {
       try {
         setLoading(true);
-        const response = await api.post('/financial/cost-center', data);
+        const response = await api.post('/financial/solicitation-type', data);
         console.log(response.data);
 
         setLoading(false);
         Notification({
           type: 'success',
           title: 'Sucesso',
-          description: 'Centro de custo criada com sucesso',
+          description: 'Tipo criado com sucesso',
         });
 
         const newAccountPlanRegistered = response.data;
-        centerCost.push(newAccountPlanRegistered);
+        solicitationTypes.push(newAccountPlanRegistered);
 
         handleClose();
       } catch (error) {
@@ -118,21 +131,25 @@ export default function CenterCost({ centerCosts }: IProp) {
   }
 
   async function handleEdit(id: string) {
-    const searchedCenterCost = centerCost.find((item) => item.id === id);
+    const searchedsolicitationTypes = solicitationTypes.find(
+      (item) => item.id === id
+    );
     console.log(id);
 
     setIsModalOpen(true);
-    setCenterCostId(id);
-    setName(searchedCenterCost.name);
-    setCode(searchedCenterCost.code);
+    setSolicitationTypeId(id);
+    setName(searchedsolicitationTypes.name);
   }
 
   async function handleClose() {
     setIsModalOpen(false);
     setLoading(false);
-    setCenterCostId('');
+    setSolicitationTypeId('');
     setName('');
-    setCode('');
+    setColor('');
+  }
+  function handleChangeColor(e) {
+    setColor(e.hex);
   }
 
   class SearchTable extends React.Component {
@@ -237,12 +254,17 @@ export default function CenterCost({ centerCosts }: IProp) {
           sorter: (a, b) => a.name.length - b.name.length,
         },
         {
-          title: 'Código',
-          dataIndex: 'code',
-          key: 'code',
-          width: '20%',
-          ...this.getColumnSearchProps('code'),
-          sorter: (a, b) => a.code.length - b.code.length,
+          title: 'Cor',
+          key: 'color',
+          render: (record) => {
+            return (
+              <>
+                <Tag color={record.color} key={record.color}>
+                  {record.color}
+                </Tag>
+              </>
+            );
+          },
         },
         {
           title: 'Criado Em',
@@ -277,7 +299,7 @@ export default function CenterCost({ centerCosts }: IProp) {
           },
         },
       ];
-      return <Table columns={columns} dataSource={centerCost} />;
+      return <Table columns={columns} dataSource={solicitationType} />;
     }
   }
 
@@ -330,7 +352,7 @@ export default function CenterCost({ centerCosts }: IProp) {
             <Form.Item
               key="nameFormItem"
               labelCol={{ span: 20 }}
-              label="Nome do centro de custo:"
+              label="Nome do Status:"
               labelAlign={'left'}
               style={{
                 backgroundColor: 'white',
@@ -340,6 +362,7 @@ export default function CenterCost({ centerCosts }: IProp) {
               <Input
                 key="nameKey"
                 size="large"
+                placeholder="Ex: Urgente, Normal"
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
@@ -353,21 +376,24 @@ export default function CenterCost({ centerCosts }: IProp) {
             <Form.Item
               key="codeFormItem"
               labelCol={{ span: 20 }}
-              label="Código do centro de custo:"
+              label="Cor do Status:"
               labelAlign={'left'}
               style={{
                 backgroundColor: 'white',
               }}
               required
             >
-              <Input
-                type="number"
-                key="codeKey"
-                size="large"
-                value={code}
+              <ColorPicker
+                width={300}
+                height={150}
+                color={initializeColor}
                 onChange={(e) => {
-                  setCode(e.target.value);
+                  setInitializeColor(e);
+                  handleChangeColor(e);
                 }}
+                hideHSV
+                hideRGB
+                dark
               />
             </Form.Item>
           </Col>
@@ -380,18 +406,18 @@ export default function CenterCost({ centerCosts }: IProp) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
-    const { data } = await apiClient.get('/financial/cost-center');
+    const { data } = await apiClient.get('/financial/solicitation-type');
 
     return {
       props: {
-        centerCosts: data,
+        solicitationTypes: data,
       },
     };
   } catch (error) {
     console.error(error);
     return {
       props: {
-        centerCosts: [],
+        solicitationTypes: [],
       },
     };
   }
