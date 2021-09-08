@@ -246,7 +246,7 @@ export default function CenterCost({ solicitationTypes }: IProp) {
     render() {
       const columns = [
         {
-          title: 'Nome do Centro de Custo',
+          title: 'Nome da Urgência',
           dataIndex: 'name',
           key: 'name',
           width: '20%',
@@ -260,7 +260,7 @@ export default function CenterCost({ solicitationTypes }: IProp) {
             return (
               <>
                 <Tag color={record.color} key={record.color}>
-                  {record.color}
+                  ⠀⠀⠀⠀⠀⠀⠀
                 </Tag>
               </>
             );
