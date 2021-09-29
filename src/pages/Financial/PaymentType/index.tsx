@@ -289,7 +289,7 @@ export default function PaymentType({ paymentTypes }: IProp) {
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
               onClick={() => setIsModalOpen(true)}
             >
-              Cadastrar Conta
+              Cadastrar Tipo
             </Button>
           </Col>
         </Row>

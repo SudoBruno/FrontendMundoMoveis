@@ -292,7 +292,7 @@ export default function CenterCost({ centerCosts }: IProp) {
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
               onClick={() => setIsModalOpen(true)}
             >
-              Cadastrar Conta
+              Cadastrar Centro de custo
             </Button>
           </Col>
         </Row>
