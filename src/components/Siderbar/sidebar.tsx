@@ -6,6 +6,7 @@ import {
   SearchOutlined,
   ShoppingCartOutlined,
   ExportOutlined,
+  ProfileOutlined,
   DollarCircleOutlined,
 } from '@ant-design/icons';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
@@ -169,6 +170,13 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                     </Link>
                   </Menu.Item>
                 </SubMenu>
+
+                <Menu.Item
+                  key="SolicitationMenuItem"
+                  icon={<ProfileOutlined />}
+                >
+                  <Link href="/Financial/Solicitation/">Solicitação</Link>
+                </Menu.Item>
               </SubMenu>
 
               <Menu.Item key="Exit" icon={<ExportOutlined />}>

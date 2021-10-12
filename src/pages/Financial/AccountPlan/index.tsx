@@ -331,7 +331,7 @@ export default function AccountPlan({ users, accountPlans }: IProp) {
           sorter: (a, b) => a.name.length - b.name.length,
         },
         {
-          title: 'Limite por compra',
+          title: 'Limite por compra (R$)',
           dataIndex: 'purchase_limit',
           key: 'purchase_limit',
           width: '20%',
@@ -339,7 +339,7 @@ export default function AccountPlan({ users, accountPlans }: IProp) {
           sorter: (a, b) => a.purchase_limit.length - b.purchase_limit.length,
         },
         {
-          title: 'Meta Financeira',
+          title: 'Meta Financeira (R$)',
           dataIndex: 'finance_goal',
           key: 'finance_goal',
           width: '20%',
@@ -347,7 +347,7 @@ export default function AccountPlan({ users, accountPlans }: IProp) {
           sorter: (a, b) => a.finance_goal.length - b.finance_goal.length,
         },
         {
-          title: 'Limite da meta (%)',
+          title: 'Limite da meta (R$)',
           dataIndex: 'purchase_limit',
           key: 'purchase_limit',
           width: '20%',
