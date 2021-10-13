@@ -322,7 +322,7 @@ export default function SolicitationType({ solicitationTypes }: IProp) {
         <SearchTable />
       </Layout>
       <Modal
-        title="Cadastro Centro de custo"
+        title="Cadastro de tipo"
         width={500}
         visible={isOpenModal}
         onCancel={() => {

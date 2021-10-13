@@ -477,7 +477,6 @@ export default function Solicitation({
                 style={{
                   backgroundColor: 'white',
                 }}
-                required
               >
                 <TextArea
                   key="nameKey"

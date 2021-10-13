@@ -296,7 +296,7 @@ export default function PaymentType({ paymentTypes }: IProp) {
         <SearchTable />
       </Layout>
       <Modal
-        title="Cadastro Centro de custo"
+        title="Cadastro de tipo de pagamento"
         width={500}
         visible={isOpenModal}
         onCancel={() => {
