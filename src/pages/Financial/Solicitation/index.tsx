@@ -82,6 +82,7 @@ export default function Solicitation({
   const [budgetProvider, setBudgetProvider] = useState<string>('');
   const [budgetSeller, setBudgetSeller] = useState<string>('');
   const [dueDate, setDueDate] = useState('');
+  const [freight, setFreight] = useState<number>();
   const [productsAdded, setProductsAdded] = useState<any[]>([
     {
       name: '',
@@ -148,6 +149,7 @@ export default function Solicitation({
         payment_type_id: paymentTypeId,
         financial_solicitation_id: solicitationId,
         due_date: dueDate,
+        freight: freight,
       };
 
       setLoading(true);
@@ -468,6 +470,28 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
+            <Col span={5}>
+              <Form.Item
+                key="freightFormItem"
+                labelCol={{ span: 20 }}
+                label="Valor do Frete"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  key="nameKey"
+                  defaultValue={0}
+                  placeholder=""
+                  value={freight}
+                  onChange={(e) => {
+                    setFreight(Number(e.target.value));
+                  }}
+                />
+              </Form.Item>
+            </Col>
             <Col span={10}>
               <Form.Item
                 key="observationFormItem"
@@ -760,6 +784,27 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
+            <Col span={5}>
+              <Form.Item
+                key="sellerFormItem"
+                labelCol={{ span: 20 }}
+                label="Valor do Frete"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  key="nameKey"
+                  defaultValue={0}
+                  value={freight}
+                  onChange={(e) => {
+                    setFreight(Number(e.target.value));
+                  }}
+                />
+              </Form.Item>
+            </Col>
             <Col span={10}>
               <Form.Item
                 key="observationFormItem"
@@ -769,7 +814,6 @@ export default function Solicitation({
                 style={{
                   backgroundColor: 'white',
                 }}
-                required
               >
                 <TextArea
                   key="nameKey"
@@ -1054,6 +1098,28 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
+            <Col span={5}>
+              <Form.Item
+                key="sellerFormItem"
+                labelCol={{ span: 20 }}
+                label="Valor do Frete"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  defaultValue={0}
+                  key="nameKey"
+                  placeholder="Ex: Francisca, André, Gilberto..."
+                  value={freight}
+                  onChange={(e) => {
+                    setFreight(Number(e.target.value));
+                  }}
+                />
+              </Form.Item>
+            </Col>
             <Col span={10}>
               <Form.Item
                 key="observationFormItem"
@@ -1063,7 +1129,6 @@ export default function Solicitation({
                 style={{
                   backgroundColor: 'white',
                 }}
-                required
               >
                 <TextArea
                   key="nameKey"
