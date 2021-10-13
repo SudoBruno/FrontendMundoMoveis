@@ -81,7 +81,7 @@ export default function Solicitation({
   const [budgetObservation, setBudgetObservation] = useState<string>('');
   const [budgetProvider, setBudgetProvider] = useState<string>('');
   const [budgetSeller, setBudgetSeller] = useState<string>('');
-  const [dueDate, setDueDate] = useState();
+  const [dueDate, setDueDate] = useState('');
   const [productsAdded, setProductsAdded] = useState<any[]>([
     {
       name: '',
@@ -481,7 +481,6 @@ export default function Solicitation({
                 <TextArea
                   key="nameKey"
                   size="large"
-                  placeholder="Ex: Francisca, André, Gilberto..."
                   value={budgetObservation}
                   onChange={(e) => {
                     setBudgetObservation(e.target.value);
@@ -1260,17 +1259,11 @@ export default function Solicitation({
 
   const next = () => {
     setCurrent(current + 1);
-    setProductsAdded([
-      {
-        name: '',
-        unit_of_measurement: '',
-        utilization: '',
-        requester: '',
-        unitary_value: '',
-        quantity: '',
-        total_value: '',
-      },
-    ]);
+    setBudgetSeller('');
+    setBudgetProvider('');
+    setPaymentTypeId('');
+    setBudgetObservation('');
+    setDueDate('');
   };
 
   const prev = () => {
