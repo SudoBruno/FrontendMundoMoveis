@@ -14,6 +14,7 @@ import {
   DatePicker,
   Space,
   Divider,
+  Table,
 } from 'antd';
 import { GetServerSideProps } from 'next';
 import React, { FormEvent, useState } from 'react';
@@ -25,6 +26,9 @@ import CenterCost from '../CostCenter/index';
 import { api } from '../../../services/api';
 import TextArea from 'antd/lib/input/TextArea';
 import MinusCircleOutlined from '@ant-design/icons/lib/icons/MinusCircleOutlined';
+import Highlighter from 'react-highlight-words';
+import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
+import moment from 'moment';
 
 const { Option } = Select;
 const { Step } = Steps;
@@ -50,11 +54,17 @@ interface IPaymentType {
   name: string;
 }
 
+interface ISolicitation {
+  id: string;
+  description: string;
+}
+
 interface IProps {
   solicitationTypes: ISolicitationType[];
   accountPlans: IAccountPlan[];
   costCenters: ICostCenter[];
   paymentTypes: IPaymentType[];
+  solicitations: ISolicitation[];
 }
 
 export default function Solicitation({
@@ -62,10 +72,13 @@ export default function Solicitation({
   accountPlans,
   costCenters,
   paymentTypes,
+  solicitations,
 }: IProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpenModal, setIsModalOpen] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [solicitation, setSolicitation] =
+    useState<ISolicitation[]>(solicitations);
   const [solicitationId, setSolicitationId] = useState('');
   const [description, setDescription] = useState<string>('');
   const [accountPlan, setAccountPlan] = useState<IAccountPlan[]>(accountPlans);
@@ -83,6 +96,7 @@ export default function Solicitation({
   const [budgetSeller, setBudgetSeller] = useState<string>('');
   const [dueDate, setDueDate] = useState('');
   const [freight, setFreight] = useState<number>();
+  const [installments, setInstallments] = useState<string>('');
   const [productsAdded, setProductsAdded] = useState<any[]>([
     {
       name: '',
@@ -150,6 +164,7 @@ export default function Solicitation({
         financial_solicitation_id: solicitationId,
         due_date: dueDate,
         freight: freight,
+        installments: installments,
       };
 
       setLoading(true);
@@ -451,25 +466,29 @@ export default function Solicitation({
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <Form.Item
-                key="sellerFormItem"
+                key="freightFormItem"
                 labelCol={{ span: 20 }}
-                label="Data de Vencimento:"
+                label="Qtd Parcelas"
                 labelAlign={'left'}
                 style={{
                   backgroundColor: 'white',
                 }}
                 required
               >
-                <DatePicker
-                  format="DD/MM/YYYY"
+                <Input
+                  key="nameKey"
+                  defaultValue={0}
+                  placeholder=""
+                  value={installments}
                   onChange={(e) => {
-                    setDueDate(e);
+                    setInstallments(e.target.value);
                   }}
                 />
               </Form.Item>
             </Col>
+
             <Col span={5}>
               <Form.Item
                 key="freightFormItem"
@@ -492,6 +511,26 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
+            <Col span={6}>
+              <Form.Item
+                key="sellerFormItem"
+                labelCol={{ span: 20 }}
+                label="Data de Vencimento:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <DatePicker
+                  format="DD/MM/YYYY"
+                  onChange={(e) => {
+                    setDueDate(e);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+
             <Col span={10}>
               <Form.Item
                 key="observationFormItem"
@@ -765,6 +804,51 @@ export default function Solicitation({
                 </Select>
               </Form.Item>
             </Col>
+            <Col span={4}>
+              <Form.Item
+                key="freightFormItem"
+                labelCol={{ span: 20 }}
+                label="Qtd Parcelas"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  key="nameKey"
+                  defaultValue={0}
+                  placeholder=""
+                  value={installments}
+                  onChange={(e) => {
+                    setInstallments(e.target.value);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={5}>
+              <Form.Item
+                key="freightFormItem"
+                labelCol={{ span: 20 }}
+                label="Valor do Frete"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  key="nameKey"
+                  defaultValue={0}
+                  placeholder=""
+                  value={freight}
+                  onChange={(e) => {
+                    setFreight(Number(e.target.value));
+                  }}
+                />
+              </Form.Item>
+            </Col>
             <Col span={6}>
               <Form.Item
                 key="sellerFormItem"
@@ -784,27 +868,7 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
-            <Col span={5}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Valor do Frete"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  defaultValue={0}
-                  value={freight}
-                  onChange={(e) => {
-                    setFreight(Number(e.target.value));
-                  }}
-                />
-              </Form.Item>
-            </Col>
+
             <Col span={10}>
               <Form.Item
                 key="observationFormItem"
@@ -818,7 +882,6 @@ export default function Solicitation({
                 <TextArea
                   key="nameKey"
                   size="large"
-                  placeholder="Ex: Francisca, André, Gilberto..."
                   value={budgetObservation}
                   onChange={(e) => {
                     setBudgetObservation(e.target.value);
@@ -1079,6 +1142,51 @@ export default function Solicitation({
                 </Select>
               </Form.Item>
             </Col>
+            <Col span={4}>
+              <Form.Item
+                key="freightFormItem"
+                labelCol={{ span: 20 }}
+                label="Qtd Parcelas"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  key="nameKey"
+                  defaultValue={0}
+                  placeholder=""
+                  value={installments}
+                  onChange={(e) => {
+                    setInstallments(e.target.value);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={5}>
+              <Form.Item
+                key="freightFormItem"
+                labelCol={{ span: 20 }}
+                label="Valor do Frete"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  key="nameKey"
+                  defaultValue={0}
+                  placeholder=""
+                  value={freight}
+                  onChange={(e) => {
+                    setFreight(Number(e.target.value));
+                  }}
+                />
+              </Form.Item>
+            </Col>
             <Col span={6}>
               <Form.Item
                 key="sellerFormItem"
@@ -1098,28 +1206,7 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
-            <Col span={5}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Valor do Frete"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  defaultValue={0}
-                  key="nameKey"
-                  placeholder="Ex: Francisca, André, Gilberto..."
-                  value={freight}
-                  onChange={(e) => {
-                    setFreight(Number(e.target.value));
-                  }}
-                />
-              </Form.Item>
-            </Col>
+
             <Col span={10}>
               <Form.Item
                 key="observationFormItem"
@@ -1133,7 +1220,6 @@ export default function Solicitation({
                 <TextArea
                   key="nameKey"
                   size="large"
-                  placeholder="Ex: Francisca, André, Gilberto..."
                   value={budgetObservation}
                   onChange={(e) => {
                     setBudgetObservation(e.target.value);
@@ -1328,17 +1414,130 @@ export default function Solicitation({
     setBudgetProvider('');
     setPaymentTypeId('');
     setBudgetObservation('');
-    setDueDate('');
+    setInstallments('');
+    setFreight(0);
   };
 
   const prev = () => {
     setCurrent(current - 1);
   };
 
-  async function handleRegister() {}
-
   async function handleClose() {
     setIsModalOpen(false);
+  }
+
+  class SearchTable extends React.Component {
+    state = {
+      searchText: '',
+      searchedColumn: '',
+    };
+    searchInput: Input;
+    getColumnSearchProps = (dataIndex) => ({
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={(node) => {
+              this.searchInput = node;
+            }}
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={(e) =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() =>
+              this.handleSearch(selectedKeys, confirm, dataIndex)
+            }
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() =>
+                this.handleSearch(selectedKeys, confirm, dataIndex)
+              }
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Buscar
+            </Button>
+            <Button
+              onClick={() => this.handleReset(clearFilters)}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Limpar
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered) => (
+        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      ),
+      onFilter: (value, record) =>
+        record[dataIndex]
+          ? record[dataIndex]
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
+          : '',
+      onFilterDropdownVisibleChange: (visible) => {
+        if (visible) {
+          setTimeout(() => this.searchInput.select(), 100);
+        }
+      },
+      render: (text) =>
+        this.state.searchedColumn === dataIndex ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+            searchWords={[this.state.searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ''}
+          />
+        ) : (
+          text
+        ),
+    });
+
+    handleSearch = (selectedKeys, confirm, dataIndex) => {
+      confirm();
+      this.setState({
+        searchText: selectedKeys[0],
+        searchedColumn: dataIndex,
+      });
+    };
+
+    handleReset = (clearFilters) => {
+      clearFilters();
+      this.setState({ searchText: '' });
+    };
+
+    render() {
+      const columns = [
+        {
+          title: 'Nome',
+          dataIndex: 'user_name',
+          key: 'user_name',
+          width: '20%',
+          ...this.getColumnSearchProps('user_name'),
+          sorter: (a, b) => a.user_name.length - b.user_name.length,
+        },
+        {
+          title: 'Descrição',
+          dataIndex: 'description',
+          key: 'description',
+          width: '80%',
+          ...this.getColumnSearchProps('description'),
+          sorter: (a, b) => a.description.length - b.description.length,
+        },
+      ];
+      return <Table columns={columns} dataSource={solicitation} />;
+    }
   }
 
   return (
@@ -1356,7 +1555,7 @@ export default function Solicitation({
             </Button>
           </Col>
         </Row>
-        {/* <SearchTable /> */}
+        <SearchTable />
       </Layout>
       <Modal
         title="Solicitação"
@@ -1404,11 +1603,11 @@ export default function Solicitation({
                 {current === steps.length - 1 && (
                   <Button
                     type="primary"
-                    onClick={(e) =>
+                    onClick={(e) => {
                       current === 0
                         ? handleCreateSolicitation(e)
-                        : handleCreateBudget(e)
-                    }
+                        : handleCreateBudget(e);
+                    }}
                   >
                     Done
                   </Button>
@@ -1434,12 +1633,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const paymentTypeResponse = await apiClient.get('/financial/payment-type');
     const costCenter = await apiClient.get('/financial/cost-center');
     const accountPlansResponse = await apiClient.get('financial/account-plan');
+    const solicitation = await apiClient.get('financial/solicitation');
+
     return {
       props: {
         solicitationTypes: data,
         accountPlans: accountPlansResponse.data,
         costCenters: costCenter.data,
         paymentTypes: paymentTypeResponse.data,
+        solicitations: solicitation.data,
       },
     };
   } catch (error) {
