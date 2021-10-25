@@ -1,59 +1,43 @@
-import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
+import React, { FormEvent, useState } from 'react';
+import { ColorPicker, useColor } from 'react-color-palette';
+import 'react-color-palette/lib/css/styles.css';
 import {
-  Modal,
   Button,
-  Row,
   Col,
   Form,
   Input,
-  Layout,
-  Steps,
-  message,
   Select,
-  Tag,
-  DatePicker,
-  Space,
-  Divider,
+  Modal,
+  Row,
+  Popover,
   Table,
+  Popconfirm,
+  Space,
+  Layout,
+  Tag,
+  Steps,
+  Divider,
+  DatePicker,
 } from 'antd';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import React, { FormEvent, useState } from 'react';
-import styles from '../../../styles/app.module.scss';
-import localStyles from './styles.module.scss';
+import next, { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { Notification } from '../../../components/Notification';
 import { getAPIClient } from '../../../services/axios';
-import SolicitationType from '../SolicitationType/index';
-import CenterCost from '../CostCenter/index';
-import { api } from '../../../services/api';
-import TextArea from 'antd/lib/input/TextArea';
-import MinusCircleOutlined from '@ant-design/icons/lib/icons/MinusCircleOutlined';
 import Highlighter from 'react-highlight-words';
-import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
-import moment from 'moment';
-import PaymentType from '../PaymentType/index';
+import styles from '../../../styles/app.module.scss';
+import { api } from '../../../services/api';
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditFilled,
+  EyeOutlined,
+  SearchOutlined,
+} from '@ant-design/icons/lib/icons/';
+import localStyles from './styles.module.scss';
+import MinusCircleOutlined from '@ant-design/icons/lib/icons/MinusCircleOutlined';
+import TextArea from 'antd/lib/input/TextArea';
 
 const { Option } = Select;
 const { Step } = Steps;
-
-interface ISolicitationType {
-  id: string;
-  name: string;
-  color: any;
-}
-
-interface IAccountPlan {
-  id: string;
-  name: string;
-}
-
-interface ICostCenter {
-  id: string;
-  name: string;
-}
-
-interface IPaymentType {
-  id: string;
-  name: string;
-}
 
 interface ISolicitation {
   id: string;
@@ -61,226 +45,75 @@ interface ISolicitation {
 }
 
 interface IProps {
-  solicitationTypes: ISolicitationType[];
-  accountPlans: IAccountPlan[];
-  costCenters: ICostCenter[];
-  paymentTypes: IPaymentType[];
   solicitations: ISolicitation[];
 }
 
-export default function Solicitation({
-  solicitationTypes,
-  accountPlans,
-  costCenters,
-  paymentTypes,
+export default function Approve({
   solicitations,
-}: IProps) {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [isOpenModal, setIsModalOpen] = useState(false);
-  const [current, setCurrent] = useState(0);
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [solicitation, setSolicitation] =
     useState<ISolicitation[]>(solicitations);
-  const [solicitationId, setSolicitationId] = useState('');
+  const [current, setCurrent] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [description, setDescription] = useState<string>('');
-  const [accountPlan, setAccountPlan] = useState<IAccountPlan[]>(accountPlans);
-  const [paymentType, setPaymentType] = useState<IPaymentType[]>(paymentTypes);
-  const [solicitationType, setSolicitationType] =
-    useState<ISolicitationType[]>(solicitationTypes);
-  const [costCenter, setCenterCost] = useState<ICostCenter[]>(costCenters);
-  const [costCentersAdded, setCostCentersAdded] = useState<any>([]);
-  const [solicitationTypeId, setSolicitationTypeId] = useState<string>('');
-  const [accountPlanId, setAccountPlanId] = useState<string>('');
-  const [paymentTypeId, setPaymentTypeId] = useState<string>('');
-  const [budgetId, setBudgetId] = useState<string>('');
-  const [budgetObservation, setBudgetObservation] = useState<string>('');
-  const [budgetProvider, setBudgetProvider] = useState<string>('');
-  const [budgetSeller, setBudgetSeller] = useState<string>('');
-  const [dueDate, setDueDate] = useState('');
-  const [freight, setFreight] = useState<number>();
-  const [installments, setInstallments] = useState<number>(1);
-  const [situationDescription, setSituationDescription] = useState<string>('');
-  const [productsAdded, setProductsAdded] = useState<any[]>([
+  const [products, setProducts] = useState([]);
+  const [budget, setBudget] = useState([
     {
-      name: '',
-      unit_of_measurement: '',
-      utilization: '',
-      requester: '',
-      unitary_value: '',
-      quantity: '',
-      total_value: '',
+      id: '',
+      provider: '',
+      seller: '',
+      observation: '',
+      financial_solicitation_id: '',
+      payment_type_id: '',
+      installments: 0,
+      due_date: '',
+      freight: 0,
     },
   ]);
 
-  function handleAddCenterCost(value) {
-    setCostCentersAdded(value);
-    console.log(costCentersAdded);
+  async function handleChangeSolicitation(data) {
+    try {
+      setIsOpenModal(true);
+      setDescription(data.description);
+      console.log(data.id);
+
+      const response = await api.get(`/financial/budget/${data.id}`);
+      setBudget(response.data);
+
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  async function handleCreateSolicitation(e: FormEvent) {
-    e.preventDefault();
+  async function approveBudget(current) {
     try {
-      const data = {
-        description: description,
-        solicitation_type_id: solicitationTypeId,
-      };
+      const budgetId = budget[current].id;
+      const financialSolicitationId = budget[current].financial_solicitation_id;
 
-      setLoading(true);
-      const solicitationIdResponse = await api.post(
-        '/financial/solicitation',
-        data
-      );
-
-      setSolicitationId(solicitationIdResponse.data.id);
-
-      const solicitationAccountPlanId = await api.post(
-        `/financial/solicitation/${solicitationIdResponse.data.id}`,
+      const response = await api.put(
+        `/financial/solicitation/approve/${budgetId}`,
         {
-          financial_account_plan_id: accountPlanId,
+          financial_solicitation_id: financialSolicitationId,
+          is_approved: true,
         }
       );
-
-      await api.post(
-        `/financial/solicitation/account-plan/${solicitationAccountPlanId.data.id}`,
-        { financial_cost_centers: costCentersAdded }
-      );
-
-      message.success('Tudo OK. Prosseguindo...');
-
-      setLoading(false);
-      next();
-    } catch (error) {
-      console.error(error.response);
-      message.error('Etapa não concluida');
-      setLoading(false);
-    }
+    } catch (error) {}
   }
 
-  async function handleCreateBudget(e: FormEvent) {
-    e.preventDefault();
-    try {
-      const data = {
-        observation: budgetObservation,
-        provider: budgetProvider,
-        seller: budgetSeller,
-        payment_type_id: paymentTypeId,
-        financial_solicitation_id: solicitationId,
-        due_date: dueDate,
-        freight: freight,
-        installments: installments,
-      };
-
-      setLoading(true);
-      const budgetIdResponse = await api.post('/financial/budget', data);
-
-      const response = await api.post('/financial/budget/product', {
-        budget_id: budgetIdResponse.data.id,
-        products: productsAdded,
-      });
-
-      await api.post(`/financial/solicitation/status/${solicitationId}`);
-      message.success('Tudo OK. Prosseguindo...');
-      setLoading(false);
-      closeModal(current);
-    } catch (error) {
-      console.error(error.response);
-      message.error('Etapa não concluida');
-      setLoading(false);
-    }
+  function handleClose() {
+    setIsOpenModal(false);
   }
 
-  const closeModal = (current) => {
-    if (current === steps.length - 1) {
-      setIsModalOpen(false);
-      handleClose();
-    } else {
-      next();
-    }
+  const next = () => {
+    setCurrent(current + 1);
   };
 
-  function addNewProduct() {
-    const newArray = [
-      ...productsAdded,
-      {
-        name: '',
-        unit_of_measurement: '',
-        utilization: '',
-        requester: '',
-        unitary_value: '',
-        quantity: '',
-        total_value: '',
-      },
-    ];
-    setProductsAdded(newArray);
-  }
-
-  function handleChangeProductName(value, index) {
-    let newArray = [...productsAdded];
-
-    newArray[index].name = value;
-
-    setProductsAdded(newArray);
-  }
-
-  function handleChangeUnit(value, index) {
-    let newArray = [...productsAdded];
-
-    newArray[index].unit_of_measurement = value;
-
-    setProductsAdded(newArray);
-  }
-
-  function handleChangeUnitaryValue(value, index) {
-    let newArray = [...productsAdded];
-
-    newArray[index].unitary_value = Number(value);
-    newArray[index].total_value =
-      Number(value) * Number(newArray[index].quantity);
-
-    setProductsAdded(newArray);
-  }
-
-  function handleChangeQuantity(value, index) {
-    let newArray = [...productsAdded];
-
-    newArray[index].quantity = Number(value);
-    newArray[index].total_value =
-      Number(value) * Number(newArray[index].unitary_value);
-
-    console.log(newArray);
-
-    setProductsAdded(newArray);
-  }
-
-  function handleChangeUtilization(value, index) {
-    let newArray = [...productsAdded];
-
-    newArray[index].utilization = value;
-
-    setProductsAdded(newArray);
-  }
-
-  function handleChangeRequester(value, index) {
-    let newArray = [...productsAdded];
-
-    newArray[index].requester = value;
-
-    setProductsAdded(newArray);
-  }
-
-  function removeProduct(indexOfItem: number) {
-    let newArray = [...productsAdded];
-    newArray.splice(indexOfItem, 1);
-    setProductsAdded(newArray);
-  }
-
-  function FunctionIsAproved() {
-    setSituationDescription('APROVADO');
-    return 'green';
-  }
-
-  function FunctionNotAprovedOrOnHold() {
-    return 'green';
-  }
+  const prev = () => {
+    setCurrent(current - 1);
+    setLoading(false);
+  };
 
   const steps = [
     {
@@ -305,107 +138,14 @@ export default function Solicitation({
                   size="large"
                   placeholder="Ex: Compra de Teclados..."
                   value={description}
-                  onChange={(e) => {
-                    setDescription(e.target.value);
-                  }}
                 />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={5} align={'middle'}>
-            <Col span={8}>
-              <Form.Item
-                key="solicitationTypeFormItem"
-                labelCol={{ span: 23 }}
-                label="Tipo de Solicitação:"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Select
-                  key="managerName"
-                  value={solicitationTypeId}
-                  onChange={(e) => {
-                    setSolicitationTypeId(e.toString());
-                  }}
-                >
-                  {solicitationType.map((item) => (
-                    <>
-                      <Option key={item.id} value={item.id}>
-                        <Tag color={item.color} key={item.color}>
-                          ⠀⠀⠀⠀⠀⠀⠀
-                        </Tag>
-                        {item.name}
-                      </Option>
-                    </>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={9}>
-              <Form.Item
-                key="AccountFormItem"
-                labelCol={{ span: 23 }}
-                label="Selecione o Plano de Conta"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Select
-                  key="managerName"
-                  value={accountPlanId}
-                  onChange={(e) => {
-                    setAccountPlanId(e.toString());
-                  }}
-                >
-                  {accountPlan.map((item) => (
-                    <>
-                      <Option key={item.id} value={item.id}>
-                        {item.name}
-                      </Option>
-                    </>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={15}>
-              <Form.Item
-                key="CenterCostFormItem"
-                labelCol={{ span: 23 }}
-                label="Selecione o(s) centro(s) de custo"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Select
-                  mode="multiple"
-                  allowClear
-                  style={{ width: '100%' }}
-                  onChange={(e) => handleAddCenterCost(e)}
-                >
-                  {costCenter.map((item) => (
-                    <>
-                      <Option key={item.id} value={item.id}>
-                        {item.name}
-                      </Option>
-                    </>
-                  ))}
-                </Select>
               </Form.Item>
             </Col>
           </Row>
         </>
       ),
     },
-    {
+    budget.map((item) => ({
       title: 'Orçamento 1',
       content: (
         <>
@@ -425,10 +165,7 @@ export default function Solicitation({
                   key="nameKey"
                   size="large"
                   placeholder="Ex: Mercado Livre, Pontofrio..."
-                  value={budgetProvider}
-                  onChange={(e) => {
-                    setBudgetProvider(e.target.value);
-                  }}
+                  value={item.provider}
                 />
               </Form.Item>
             </Col>
@@ -447,10 +184,7 @@ export default function Solicitation({
                   key="nameKey"
                   size="large"
                   placeholder="Ex: Francisca, André, Gilberto..."
-                  value={budgetSeller}
-                  onChange={(e) => {
-                    setBudgetSeller(e.target.value);
-                  }}
+                  value={item.seller}
                 />
               </Form.Item>
             </Col>
@@ -465,18 +199,7 @@ export default function Solicitation({
                 }}
                 required
               >
-                <Select
-                  value={paymentTypeId}
-                  onChange={(e) => setPaymentTypeId(e.toString())}
-                >
-                  {paymentType.map((item) => (
-                    <>
-                      <Option key={item.id} value={item.id}>
-                        {item.name}
-                      </Option>
-                    </>
-                  ))}
-                </Select>
+                <Select value={item.payment_type_id}></Select>
               </Form.Item>
             </Col>
             <Col span={4}>
@@ -494,10 +217,7 @@ export default function Solicitation({
                   key="nameKey"
                   defaultValue={0}
                   placeholder=""
-                  value={installments}
-                  onChange={(e) => {
-                    setInstallments(Number(e.target.value));
-                  }}
+                  value={item.installments}
                 />
               </Form.Item>
             </Col>
@@ -517,10 +237,7 @@ export default function Solicitation({
                   key="nameKey"
                   defaultValue={0}
                   placeholder=""
-                  value={freight}
-                  onChange={(e) => {
-                    setFreight(Number(e.target.value));
-                  }}
+                  value={item.freight}
                 />
               </Form.Item>
             </Col>
@@ -535,12 +252,7 @@ export default function Solicitation({
                 }}
                 required
               >
-                <DatePicker
-                  format="DD/MM/YYYY"
-                  onChange={(e) => {
-                    setDueDate(e);
-                  }}
-                />
+                <DatePicker format="DD/MM/YYYY" value={item.due_date} />
               </Form.Item>
             </Col>
 
@@ -554,20 +266,13 @@ export default function Solicitation({
                   backgroundColor: 'white',
                 }}
               >
-                <TextArea
-                  key="nameKey"
-                  size="large"
-                  value={budgetObservation}
-                  onChange={(e) => {
-                    setBudgetObservation(e.target.value);
-                  }}
-                />
+                <TextArea key="nameKey" size="large" value={item.observation} />
               </Form.Item>
             </Col>
           </Row>
           <Divider />
           <h2>Produtos</h2>
-          {productsAdded.map((selectedIten, index) => (
+          {products.map((selectedIten, index) => (
             <>
               <Row gutter={5}>
                 <Col span={10}>
@@ -583,9 +288,6 @@ export default function Solicitation({
                       size="large"
                       placeholder="EX: José Dirceu da Silva"
                       value={selectedIten.requester}
-                      onChange={(e) => {
-                        handleChangeRequester(e.target.value, index);
-                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -602,9 +304,6 @@ export default function Solicitation({
                       size="large"
                       placeholder="EX: Escritorio, Almoxarifado"
                       value={selectedIten.utilization}
-                      onChange={(e) => {
-                        handleChangeUtilization(e.target.value, index);
-                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -623,9 +322,6 @@ export default function Solicitation({
                       size="large"
                       placeholder="Ex: Notebook I5 8gb"
                       value={selectedIten.name}
-                      onChange={(e) => {
-                        handleChangeProductName(e.target.value, index);
-                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -645,9 +341,6 @@ export default function Solicitation({
                       size="large"
                       placeholder=""
                       value={selectedIten.unitary_value}
-                      onChange={(e) => {
-                        handleChangeUnitaryValue(e.target.value, index);
-                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -665,9 +358,6 @@ export default function Solicitation({
                       size="large"
                       placeholder=""
                       value={selectedIten.quantity}
-                      onChange={(e) => {
-                        handleChangeQuantity(e.target.value, index);
-                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -705,45 +395,20 @@ export default function Solicitation({
                       placeholder="EX: Pç, unidade"
                       value={selectedIten.unit_of_measurement}
                       style={{ width: '85%', marginRight: '5%' }}
-                      onChange={(e) => {
-                        handleChangeUnit(e.target.value, index);
-                      }}
                     />
-                    {productsAdded.length != 1 && (
-                      <MinusCircleOutlined
-                        style={{ color: 'red' }}
-                        onClick={() => removeProduct(index)}
-                      />
+                    {products.length != 1 && (
+                      <MinusCircleOutlined style={{ color: 'red' }} />
                     )}
                     <Divider />
                   </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={24}>
-                  {productsAdded.length - 1 === index && (
-                    <Button
-                      key="primary"
-                      title="Novo insumo"
-                      style={{
-                        width: '100%',
-                        color: 'white',
-                        backgroundColor: 'rgb(5, 155, 50)',
-                      }}
-                      onClick={addNewProduct}
-                    >
-                      <PlusOutlined />
-                      Adicionar Produto
-                    </Button>
-                  )}
                 </Col>
               </Row>
             </>
           ))}
         </>
       ),
-    },
-    {
+    })),
+    /*{
       title: 'Orçamento 2',
       content: (
         <>
@@ -834,7 +499,7 @@ export default function Solicitation({
                   placeholder=""
                   value={installments}
                   onChange={(e) => {
-                    setInstallments(Number(e.target.value));
+                    setInstallments(e.target.value);
                   }}
                 />
               </Form.Item>
@@ -895,17 +560,15 @@ export default function Solicitation({
                 <TextArea
                   key="nameKey"
                   size="large"
-                  value={budgetObservation}
-                  onChange={(e) => {
-                    setBudgetObservation(e.target.value);
-                  }}
+                  value={}
+              
                 />
               </Form.Item>
             </Col>
           </Row>
           <Divider />
           <h2>Produtos</h2>
-          {productsAdded.map((selectedIten, index) => (
+          {products.map((selectedIten, index) => (
             <>
               <Row gutter={5}>
                 <Col span={10}>
@@ -921,9 +584,7 @@ export default function Solicitation({
                       size="large"
                       placeholder="EX: José Dirceu da Silva"
                       value={selectedIten.requester}
-                      onChange={(e) => {
-                        handleChangeRequester(e.target.value, index);
-                      }}
+                    
                     />
                   </Form.Item>
                 </Col>
@@ -940,9 +601,7 @@ export default function Solicitation({
                       size="large"
                       placeholder="EX: Escritorio, Almoxarifado"
                       value={selectedIten.utilization}
-                      onChange={(e) => {
-                        handleChangeUtilization(e.target.value, index);
-                      }}
+                    
                     />
                   </Form.Item>
                 </Col>
@@ -961,9 +620,7 @@ export default function Solicitation({
                       size="large"
                       placeholder="Ex: Notebook I5 8gb"
                       value={selectedIten.name}
-                      onChange={(e) => {
-                        handleChangeProductName(e.target.value, index);
-                      }}
+                  
                     />
                   </Form.Item>
                 </Col>
@@ -983,9 +640,7 @@ export default function Solicitation({
                       size="large"
                       placeholder=""
                       value={selectedIten.unitary_value}
-                      onChange={(e) => {
-                        handleChangeUnitaryValue(e.target.value, index);
-                      }}
+                  
                     />
                   </Form.Item>
                 </Col>
@@ -1003,9 +658,7 @@ export default function Solicitation({
                       size="large"
                       placeholder=""
                       value={selectedIten.quantity}
-                      onChange={(e) => {
-                        handleChangeQuantity(e.target.value, index);
-                      }}
+                  
                     />
                   </Form.Item>
                 </Col>
@@ -1043,14 +696,12 @@ export default function Solicitation({
                       placeholder="EX: Pç, unidade"
                       value={selectedIten.unit_of_measurement}
                       style={{ width: '85%', marginRight: '5%' }}
-                      onChange={(e) => {
-                        handleChangeUnit(e.target.value, index);
-                      }}
+                     
                     />
-                    {productsAdded.length != 1 && (
+                    {products.length != 1 && (
                       <MinusCircleOutlined
                         style={{ color: 'red' }}
-                        onClick={() => removeProduct(index)}
+                     
                       />
                     )}
                     <Divider />
@@ -1059,7 +710,7 @@ export default function Solicitation({
               </Row>
               <Row>
                 <Col span={24}>
-                  {productsAdded.length - 1 === index && (
+                  {products.length - 1 === index && (
                     <Button
                       key="primary"
                       title="Novo insumo"
@@ -1068,7 +719,7 @@ export default function Solicitation({
                         color: 'white',
                         backgroundColor: 'rgb(5, 155, 50)',
                       }}
-                      onClick={addNewProduct}
+                     
                     >
                       <PlusOutlined />
                       Adicionar Produto
@@ -1172,7 +823,7 @@ export default function Solicitation({
                   placeholder=""
                   value={installments}
                   onChange={(e) => {
-                    setInstallments(Number(e.target.value));
+                    setInstallments(e.target.value);
                   }}
                 />
               </Form.Item>
@@ -1243,7 +894,7 @@ export default function Solicitation({
           </Row>
           <Divider />
           <h2>Produtos</h2>
-          {productsAdded.map((selectedIten, index) => (
+          {products.map((selectedIten, index) => (
             <>
               <Row gutter={5}>
                 <Col span={10}>
@@ -1385,7 +1036,7 @@ export default function Solicitation({
                         handleChangeUnit(e.target.value, index);
                       }}
                     />
-                    {productsAdded.length != 1 && (
+                    {products.length != 1 && (
                       <MinusCircleOutlined
                         style={{ color: 'red' }}
                         onClick={() => removeProduct(index)}
@@ -1397,7 +1048,7 @@ export default function Solicitation({
               </Row>
               <Row>
                 <Col span={24}>
-                  {productsAdded.length - 1 === index && (
+                  {products.length - 1 === index && (
                     <Button
                       key="primary"
                       title="Novo insumo"
@@ -1418,42 +1069,8 @@ export default function Solicitation({
           ))}
         </>
       ),
-    },
+    },*/
   ];
-
-  const next = () => {
-    setCurrent(current + 1);
-    setBudgetSeller('');
-    setBudgetProvider('');
-    setPaymentTypeId('');
-    setBudgetObservation('');
-    setInstallments(1);
-    setFreight(0);
-  };
-
-  const prev = () => {
-    setCurrent(current - 1);
-    setLoading(false);
-  };
-
-  async function handleClose() {
-    setIsModalOpen(false);
-    setCurrent(0);
-    setDescription('');
-    setSolicitationTypeId('');
-    setAccountPlanId('');
-    setProductsAdded([
-      {
-        name: '',
-        unit_of_measurement: '',
-        utilization: '',
-        requester: '',
-        unitary_value: '',
-        quantity: '',
-        total_value: '',
-      },
-    ]);
-  }
 
   class SearchTable extends React.Component {
     state = {
@@ -1565,27 +1182,28 @@ export default function Solicitation({
           sorter: (a, b) => a.description.length - b.description.length,
         },
         {
-          title: 'Situação',
+          title: 'Visualizar',
           key: 'situation',
           width: '30%',
           render: (record, index) => {
             return (
               <>
-                {record.is_approved && (
-                  <Tag color={'green'} key={record.id}>
-                    Aprovado
-                  </Tag>
-                )}
-                {record.is_approved === null && (
-                  <Tag color={'yellow'} key={record.id}>
-                    Em Análise
-                  </Tag>
-                )}
-                {record.is_approved === 0 && (
-                  <Tag color={'green'} key={record.id}>
-                    Reprovado
-                  </Tag>
-                )}
+                <Button
+                  className={styles.button}
+                  style={{
+                    borderRadius: '26px',
+                    marginTop: '10px',
+                    marginLeft: '10px',
+                    borderColor: '#1c3030',
+                    color: '#1c3030',
+                    backgroundColor: 'white',
+                  }}
+                  onClick={() => {
+                    handleChangeSolicitation(record);
+                  }}
+                >
+                  <EyeOutlined />
+                </Button>
               </>
             );
           },
@@ -1604,79 +1222,83 @@ export default function Solicitation({
               size={'large'}
               className={styles.button}
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsOpenModal(true)}
             >
               Nova Solicitação
             </Button>
           </Col>
         </Row>
         <SearchTable />
-      </Layout>
-      <Modal
-        title="Solicitação"
-        width={900}
-        visible={isOpenModal}
-        onCancel={() => {
-          handleClose();
-        }}
-        footer={[]}
-      >
-        <Row gutter={5} align={'middle'}>
-          <Col span={20}>
-            <Form.Item
-              key="nameFormItem"
-              labelCol={{ span: 20 }}
-              label="Nome do Status:"
-              labelAlign={'left'}
-              style={{
-                backgroundColor: 'white',
-              }}
-              required
-            >
-              <Steps current={current}>
-                {steps.map((item) => (
-                  <Step key={item.title} title={item.title} />
-                ))}
-              </Steps>
-              <div className={localStyles.stepsContent}>
-                {steps[current].content}
-              </div>
-              <div className={localStyles.stepsAction}>
-                {current < steps.length - 1 && (
+        <Modal
+          title="Solicitação"
+          width={900}
+          visible={isOpenModal}
+          onCancel={() => {
+            handleClose();
+          }}
+          footer={[]}
+        >
+          <Row gutter={5} align={'middle'}>
+            <Col span={20}>
+              <Form.Item
+                key="nameFormItem"
+                labelCol={{ span: 20 }}
+                label="Nome do Status:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Steps current={current}>
+                  {steps.map((item) => (
+                    <Step key={item.title} title={item.title} />
+                  ))}
+                </Steps>
+                <div className={localStyles.stepsContent}>
+                  {steps[current].content}
+                </div>
+                <div className={localStyles.stepsAction}>
+                  {current < steps.length - 1 && (
+                    <Button
+                      type="primary"
+                      onClick={(e) => next()}
+                      loading={loading}
+                    >
+                      Next
+                    </Button>
+                  )}
+                  {current === steps.length - 1 && (
+                    <Button
+                      type="primary"
+                      onClick={(e) => {
+                        console.log('e');
+                      }}
+                    >
+                      Done
+                    </Button>
+                  )}
+                  {current > 0 && (
+                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                      Previous
+                    </Button>
+                  )}
+
                   <Button
-                    type="primary"
-                    onClick={(e) =>
-                      current === 0
-                        ? handleCreateSolicitation(e)
-                        : handleCreateBudget(e)
-                    }
-                    loading={loading}
-                  >
-                    Next
-                  </Button>
-                )}
-                {current === steps.length - 1 && (
-                  <Button
-                    type="primary"
-                    onClick={(e) => {
-                      current === 0
-                        ? handleCreateSolicitation(e)
-                        : handleCreateBudget(e);
+                    style={{
+                      margin: '0 8px',
+                      backgroundColor: '#059b32',
                     }}
+                    onClick={() => prev()}
                   >
-                    Done
+                    Aprovar
                   </Button>
-                )}
-                {current > 0 && (
-                  <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-                    Previous
-                  </Button>
-                )}
-              </div>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Modal>
+                </div>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Modal>
+      </Layout>
     </>
   );
 }
@@ -1684,18 +1306,12 @@ export default function Solicitation({
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
-    const { data } = await apiClient.get('/financial/solicitation-type');
-    const paymentTypeResponse = await apiClient.get('/financial/payment-type');
-    const costCenter = await apiClient.get('/financial/cost-center');
-    const accountPlansResponse = await apiClient.get('financial/account-plan');
-    const solicitation = await apiClient.get('financial/solicitation/me');
+    const solicitation = await apiClient.get(
+      '/financial/solicitation/to-approve'
+    );
 
     return {
       props: {
-        solicitationTypes: data,
-        accountPlans: accountPlansResponse.data,
-        costCenters: costCenter.data,
-        paymentTypes: paymentTypeResponse.data,
         solicitations: solicitation.data,
       },
     };
@@ -1703,10 +1319,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error(error);
     return {
       props: {
-        solicitationTypes: [],
-        accountPlans: [],
-        costCenters: [],
-        paymentTypes: [],
+        solicitations: [],
       },
     };
   }

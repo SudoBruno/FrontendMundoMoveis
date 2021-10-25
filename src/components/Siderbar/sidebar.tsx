@@ -177,6 +177,9 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                 >
                   <Link href="/Financial/Solicitation/">Solicitação</Link>
                 </Menu.Item>
+                <Menu.Item key="approvatMenuItem" icon={<ProfileOutlined />}>
+                  <Link href="/Financial/Approve/">Aprovação</Link>
+                </Menu.Item>
               </SubMenu>
 
               <Menu.Item key="Exit" icon={<ExportOutlined />}>
