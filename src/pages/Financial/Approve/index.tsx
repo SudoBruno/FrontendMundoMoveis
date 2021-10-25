@@ -24,17 +24,17 @@ import { Notification } from '../../../components/Notification';
 import { getAPIClient } from '../../../services/axios';
 import Highlighter from 'react-highlight-words';
 import styles from '../../../styles/app.module.scss';
+import '../../../styles/app.module.scss';
 import { api } from '../../../services/api';
 import {
   PlusOutlined,
-  DeleteOutlined,
-  EditFilled,
   EyeOutlined,
   SearchOutlined,
 } from '@ant-design/icons/lib/icons/';
 import localStyles from './styles.module.scss';
 import MinusCircleOutlined from '@ant-design/icons/lib/icons/MinusCircleOutlined';
 import TextArea from 'antd/lib/input/TextArea';
+import moment from 'moment';
 
 const { Option } = Select;
 const { Step } = Steps;
@@ -76,30 +76,59 @@ export default function Approve({
     try {
       setIsOpenModal(true);
       setDescription(data.description);
-      console.log(data.id);
 
       const response = await api.get(`/financial/budget/${data.id}`);
       setBudget(response.data);
 
-      console.log(response.data);
+      changeProductsOfBudgets(response.data[0].id);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async function approveBudget(current) {
+  async function changeProductsOfBudgets(budgetId: string) {
+    try {
+      const productsResponse = await api.get(
+        `/financial/budget/product/${budgetId}`
+      );
+
+      setProducts(productsResponse.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function approveBudget(current: number, is_approved: boolean) {
     try {
       const budgetId = budget[current].id;
       const financialSolicitationId = budget[current].financial_solicitation_id;
+      console.log(budget[current].financial_solicitation_id);
+
+      console.log('budgetId: ' + budgetId);
+      console.log('Financial: ', financialSolicitationId);
 
       const response = await api.put(
-        `/financial/solicitation/approve/${budgetId}`,
+        `/financial/solicitation/approve/${financialSolicitationId}`,
         {
-          financial_solicitation_id: financialSolicitationId,
-          is_approved: true,
+          budget_id: budgetId,
+          is_approved,
         }
       );
-    } catch (error) {}
+
+      handleClose();
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Solicitação Aprovada',
+      });
+    } catch (error) {
+      console.log(error.response);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: `${error.response.data.message}`,
+      });
+    }
   }
 
   function handleClose() {
@@ -108,969 +137,16 @@ export default function Approve({
 
   const next = () => {
     setCurrent(current + 1);
+    setLoading(true);
+    changeProductsOfBudgets(budget[current + 1].id);
+    setLoading(false);
   };
 
   const prev = () => {
     setCurrent(current - 1);
+    changeProductsOfBudgets(budget[current - 1].id);
     setLoading(false);
   };
-
-  const steps = [
-    {
-      title: 'Solicitação',
-      content: (
-        <>
-          {' '}
-          <Row gutter={5} align={'middle'}>
-            <Col span={19}>
-              <Form.Item
-                key="descriptionFormItem"
-                labelCol={{ span: 20 }}
-                label="Descrição:"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  size="large"
-                  placeholder="Ex: Compra de Teclados..."
-                  value={description}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </>
-      ),
-    },
-    budget.map((item) => ({
-      title: 'Orçamento 1',
-      content: (
-        <>
-          <Row gutter={5} align={'middle'}>
-            <Col span={10}>
-              <Form.Item
-                key="ProviderFormItem"
-                labelCol={{ span: 20 }}
-                label="Fornecedor(a):"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  size="large"
-                  placeholder="Ex: Mercado Livre, Pontofrio..."
-                  value={item.provider}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={10}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Vendedor(a):"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  size="large"
-                  placeholder="Ex: Francisca, André, Gilberto..."
-                  value={item.seller}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={10}>
-              <Form.Item
-                key="PaymentTypeFormItem"
-                labelCol={{ span: 23 }}
-                label="Selecione o tipo de pagamento"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Select value={item.payment_type_id}></Select>
-              </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item
-                key="freightFormItem"
-                labelCol={{ span: 20 }}
-                label="Qtd Parcelas"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  defaultValue={0}
-                  placeholder=""
-                  value={item.installments}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={5}>
-              <Form.Item
-                key="freightFormItem"
-                labelCol={{ span: 20 }}
-                label="Valor do Frete"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  defaultValue={0}
-                  placeholder=""
-                  value={item.freight}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Data de Vencimento:"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <DatePicker format="DD/MM/YYYY" value={item.due_date} />
-              </Form.Item>
-            </Col>
-
-            <Col span={10}>
-              <Form.Item
-                key="observationFormItem"
-                labelCol={{ span: 20 }}
-                label="Observações"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-              >
-                <TextArea key="nameKey" size="large" value={item.observation} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Divider />
-          <h2>Produtos</h2>
-          {products.map((selectedIten, index) => (
-            <>
-              <Row gutter={5}>
-                <Col span={10}>
-                  <Form.Item
-                    key="requesterItem"
-                    labelCol={{ span: 23 }}
-                    label="Solicitante"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="requesterName"
-                      size="large"
-                      placeholder="EX: José Dirceu da Silva"
-                      value={selectedIten.requester}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
-                    key="utilizationFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Utilização"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="utilization"
-                      size="large"
-                      placeholder="EX: Escritorio, Almoxarifado"
-                      value={selectedIten.utilization}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={20}>
-                  <Form.Item
-                    key="productNameFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Nome"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="productName"
-                      size="large"
-                      placeholder="Ex: Notebook I5 8gb"
-                      value={selectedIten.name}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={6}>
-                  <Form.Item
-                    key="unitaryValueFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Valor Unitário"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      type="number"
-                      key="unitaryValue"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.unitary_value}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    key="quantityFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Quantidade"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      type="number"
-                      key="Quantity"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.quantity}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    key="totalValueFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Valor Total"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      disabled={true}
-                      type="number"
-                      key="total"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.total_value}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={6}>
-                  <Form.Item
-                    key="unitFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Unidade de medida"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="unitName"
-                      size="large"
-                      placeholder="EX: Pç, unidade"
-                      value={selectedIten.unit_of_measurement}
-                      style={{ width: '85%', marginRight: '5%' }}
-                    />
-                    {products.length != 1 && (
-                      <MinusCircleOutlined style={{ color: 'red' }} />
-                    )}
-                    <Divider />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </>
-          ))}
-        </>
-      ),
-    })),
-    /*{
-      title: 'Orçamento 2',
-      content: (
-        <>
-          <Row gutter={5} align={'middle'}>
-            <Col span={10}>
-              <Form.Item
-                key="ProviderFormItem"
-                labelCol={{ span: 20 }}
-                label="Fornecedor(a):"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  size="large"
-                  placeholder="Ex: Mercado Livre, Pontofrio..."
-                  value={budgetProvider}
-                  onChange={(e) => {
-                    setBudgetProvider(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={10}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Vendedor(a):"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  size="large"
-                  placeholder="Ex: Francisca, André, Gilberto..."
-                  value={budgetSeller}
-                  onChange={(e) => {
-                    setBudgetSeller(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={10}>
-              <Form.Item
-                key="PaymentTypeFormItem"
-                labelCol={{ span: 23 }}
-                label="Selecione o tipo de pagamento"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Select
-                  value={paymentTypeId}
-                  onChange={(e) => setPaymentTypeId(e.toString())}
-                >
-                  {paymentType.map((item) => (
-                    <>
-                      <Option key={item.id} value={item.id}>
-                        {item.name}
-                      </Option>
-                    </>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item
-                key="freightFormItem"
-                labelCol={{ span: 20 }}
-                label="Qtd Parcelas"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  defaultValue={0}
-                  placeholder=""
-                  value={installments}
-                  onChange={(e) => {
-                    setInstallments(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={5}>
-              <Form.Item
-                key="freightFormItem"
-                labelCol={{ span: 20 }}
-                label="Valor do Frete"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  defaultValue={0}
-                  placeholder=""
-                  value={freight}
-                  onChange={(e) => {
-                    setFreight(Number(e.target.value));
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Data de Vencimento:"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <DatePicker
-                  format="DD/MM/YYYY"
-                  onChange={(e) => {
-                    setDueDate(e);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={10}>
-              <Form.Item
-                key="observationFormItem"
-                labelCol={{ span: 20 }}
-                label="Observações"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-              >
-                <TextArea
-                  key="nameKey"
-                  size="large"
-                  value={}
-              
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Divider />
-          <h2>Produtos</h2>
-          {products.map((selectedIten, index) => (
-            <>
-              <Row gutter={5}>
-                <Col span={10}>
-                  <Form.Item
-                    key="requesterItem"
-                    labelCol={{ span: 23 }}
-                    label="Solicitante"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="requesterName"
-                      size="large"
-                      placeholder="EX: José Dirceu da Silva"
-                      value={selectedIten.requester}
-                    
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
-                    key="utilizationFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Utilização"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="utilization"
-                      size="large"
-                      placeholder="EX: Escritorio, Almoxarifado"
-                      value={selectedIten.utilization}
-                    
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={20}>
-                  <Form.Item
-                    key="productNameFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Nome"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="productName"
-                      size="large"
-                      placeholder="Ex: Notebook I5 8gb"
-                      value={selectedIten.name}
-                  
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={6}>
-                  <Form.Item
-                    key="unitaryValueFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Valor Unitário"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      type="number"
-                      key="unitaryValue"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.unitary_value}
-                  
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    key="quantityFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Quantidade"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      type="number"
-                      key="Quantity"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.quantity}
-                  
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    key="totalValueFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Valor Total"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      disabled={true}
-                      type="number"
-                      key="total"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.total_value}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={6}>
-                  <Form.Item
-                    key="unitFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Unidade de medida"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="unitName"
-                      size="large"
-                      placeholder="EX: Pç, unidade"
-                      value={selectedIten.unit_of_measurement}
-                      style={{ width: '85%', marginRight: '5%' }}
-                     
-                    />
-                    {products.length != 1 && (
-                      <MinusCircleOutlined
-                        style={{ color: 'red' }}
-                     
-                      />
-                    )}
-                    <Divider />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={24}>
-                  {products.length - 1 === index && (
-                    <Button
-                      key="primary"
-                      title="Novo insumo"
-                      style={{
-                        width: '100%',
-                        color: 'white',
-                        backgroundColor: 'rgb(5, 155, 50)',
-                      }}
-                     
-                    >
-                      <PlusOutlined />
-                      Adicionar Produto
-                    </Button>
-                  )}
-                </Col>
-              </Row>
-            </>
-          ))}
-        </>
-      ),
-    },
-    {
-      title: 'Orçamento 3',
-      content: (
-        <>
-          <Row gutter={5} align={'middle'}>
-            <Col span={10}>
-              <Form.Item
-                key="ProviderFormItem"
-                labelCol={{ span: 20 }}
-                label="Fornecedor(a):"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  size="large"
-                  placeholder="Ex: Mercado Livre, Pontofrio..."
-                  value={budgetProvider}
-                  onChange={(e) => {
-                    setBudgetProvider(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={10}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Vendedor(a):"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  size="large"
-                  placeholder="Ex: Francisca, André, Gilberto..."
-                  value={budgetSeller}
-                  onChange={(e) => {
-                    setBudgetSeller(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={10}>
-              <Form.Item
-                key="PaymentTypeFormItem"
-                labelCol={{ span: 23 }}
-                label="Selecione o tipo de pagamento"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Select
-                  value={paymentTypeId}
-                  onChange={(e) => setPaymentTypeId(e.toString())}
-                >
-                  {paymentType.map((item) => (
-                    <>
-                      <Option key={item.id} value={item.id}>
-                        {item.name}
-                      </Option>
-                    </>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item
-                key="freightFormItem"
-                labelCol={{ span: 20 }}
-                label="Qtd Parcelas"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  defaultValue={0}
-                  placeholder=""
-                  value={installments}
-                  onChange={(e) => {
-                    setInstallments(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={5}>
-              <Form.Item
-                key="freightFormItem"
-                labelCol={{ span: 20 }}
-                label="Valor do Frete"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Input
-                  key="nameKey"
-                  defaultValue={0}
-                  placeholder=""
-                  value={freight}
-                  onChange={(e) => {
-                    setFreight(Number(e.target.value));
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item
-                key="sellerFormItem"
-                labelCol={{ span: 20 }}
-                label="Data de Vencimento:"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <DatePicker
-                  format="DD/MM/YYYY"
-                  onChange={(e) => {
-                    setDueDate(e);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={10}>
-              <Form.Item
-                key="observationFormItem"
-                labelCol={{ span: 20 }}
-                label="Observações"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-              >
-                <TextArea
-                  key="nameKey"
-                  size="large"
-                  value={budgetObservation}
-                  onChange={(e) => {
-                    setBudgetObservation(e.target.value);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Divider />
-          <h2>Produtos</h2>
-          {products.map((selectedIten, index) => (
-            <>
-              <Row gutter={5}>
-                <Col span={10}>
-                  <Form.Item
-                    key="requesterItem"
-                    labelCol={{ span: 23 }}
-                    label="Solicitante"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="requesterName"
-                      size="large"
-                      placeholder="EX: José Dirceu da Silva"
-                      value={selectedIten.requester}
-                      onChange={(e) => {
-                        handleChangeRequester(e.target.value, index);
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
-                    key="utilizationFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Utilização"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="utilization"
-                      size="large"
-                      placeholder="EX: Escritorio, Almoxarifado"
-                      value={selectedIten.utilization}
-                      onChange={(e) => {
-                        handleChangeUtilization(e.target.value, index);
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={20}>
-                  <Form.Item
-                    key="productNameFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Nome"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="productName"
-                      size="large"
-                      placeholder="Ex: Notebook I5 8gb"
-                      value={selectedIten.name}
-                      onChange={(e) => {
-                        handleChangeProductName(e.target.value, index);
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={6}>
-                  <Form.Item
-                    key="unitaryValueFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Valor Unitário"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      type="number"
-                      key="unitaryValue"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.unitary_value}
-                      onChange={(e) => {
-                        handleChangeUnitaryValue(e.target.value, index);
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    key="quantityFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Quantidade"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      type="number"
-                      key="Quantity"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.quantity}
-                      onChange={(e) => {
-                        handleChangeQuantity(e.target.value, index);
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    key="totalValueFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Valor Total"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      disabled={true}
-                      type="number"
-                      key="total"
-                      size="large"
-                      placeholder=""
-                      value={selectedIten.total_value}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={5}>
-                <Col span={6}>
-                  <Form.Item
-                    key="unitFormItem"
-                    labelCol={{ span: 23 }}
-                    label="Unidade de medida"
-                    labelAlign={'left'}
-                    style={{ backgroundColor: 'white' }}
-                  >
-                    <Input
-                      key="unitName"
-                      size="large"
-                      placeholder="EX: Pç, unidade"
-                      value={selectedIten.unit_of_measurement}
-                      style={{ width: '85%', marginRight: '5%' }}
-                      onChange={(e) => {
-                        handleChangeUnit(e.target.value, index);
-                      }}
-                    />
-                    {products.length != 1 && (
-                      <MinusCircleOutlined
-                        style={{ color: 'red' }}
-                        onClick={() => removeProduct(index)}
-                      />
-                    )}
-                    <Divider />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={24}>
-                  {products.length - 1 === index && (
-                    <Button
-                      key="primary"
-                      title="Novo insumo"
-                      style={{
-                        width: '100%',
-                        color: 'white',
-                        backgroundColor: 'rgb(5, 155, 50)',
-                      }}
-                      onClick={addNewProduct}
-                    >
-                      <PlusOutlined />
-                      Adicionar Produto
-                    </Button>
-                  )}
-                </Col>
-              </Row>
-            </>
-          ))}
-        </>
-      ),
-    },*/
-  ];
 
   class SearchTable extends React.Component {
     state = {
@@ -1250,16 +326,303 @@ export default function Approve({
                 }}
                 required
               >
+                <Row gutter={5} align={'middle'}>
+                  <Col span={19}>
+                    <Form.Item
+                      key="descriptionFormItem"
+                      labelCol={{ span: 20 }}
+                      label="Descrição:"
+                      labelAlign={'left'}
+                      style={{
+                        backgroundColor: 'white',
+                      }}
+                      required
+                    >
+                      <Input
+                        key="nameKey"
+                        size="large"
+                        placeholder="Ex: Compra de Teclados..."
+                        value={description}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
                 <Steps current={current}>
-                  {steps.map((item) => (
-                    <Step key={item.title} title={item.title} />
+                  {[1, 2, 3].map((item) => (
+                    <Step key={item} title={item} />
                   ))}
                 </Steps>
+
                 <div className={localStyles.stepsContent}>
-                  {steps[current].content}
+                  <>
+                    <Row gutter={5} align={'middle'}>
+                      <Col span={10}>
+                        <Form.Item
+                          key="ProviderFormItem"
+                          labelCol={{ span: 20 }}
+                          label="Fornecedor(a):"
+                          labelAlign={'left'}
+                          style={{
+                            backgroundColor: 'white',
+                          }}
+                          required
+                        >
+                          <Input
+                            key="nameKey"
+                            size="large"
+                            placeholder="Ex: Mercado Livre, Pontofrio..."
+                            value={budget[current].provider}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={10}>
+                        <Form.Item
+                          key="sellerFormItem"
+                          labelCol={{ span: 20 }}
+                          label="Vendedor(a):"
+                          labelAlign={'left'}
+                          style={{
+                            backgroundColor: 'white',
+                          }}
+                          required
+                        >
+                          <Input
+                            key="nameKey"
+                            size="large"
+                            placeholder="Ex: Francisca, André, Gilberto..."
+                            value={budget[current].seller}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={10}>
+                        <Form.Item
+                          key="PaymentTypeFormItem"
+                          labelCol={{ span: 23 }}
+                          label="Selecione o tipo de pagamento"
+                          labelAlign={'left'}
+                          style={{
+                            backgroundColor: 'white',
+                          }}
+                          required
+                        >
+                          <Select
+                            value={budget[current].payment_type_id}
+                          ></Select>
+                        </Form.Item>
+                      </Col>
+                      <Col span={4}>
+                        <Form.Item
+                          key="freightFormItem"
+                          labelCol={{ span: 20 }}
+                          label="Qtd Parcelas"
+                          labelAlign={'left'}
+                          style={{
+                            backgroundColor: 'white',
+                          }}
+                          required
+                        >
+                          <Input
+                            key="nameKey"
+                            defaultValue={0}
+                            placeholder=""
+                            value={budget[current].installments}
+                          />
+                        </Form.Item>
+                      </Col>
+
+                      <Col span={5}>
+                        <Form.Item
+                          key="freightFormItem"
+                          labelCol={{ span: 20 }}
+                          label="Valor do Frete"
+                          labelAlign={'left'}
+                          style={{
+                            backgroundColor: 'white',
+                          }}
+                          required
+                        >
+                          <Input
+                            key="nameKey"
+                            defaultValue={0}
+                            placeholder=""
+                            value={budget[current].freight}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={6}>
+                        <Form.Item
+                          key="sellerFormItem"
+                          labelCol={{ span: 20 }}
+                          label="Data de Vencimento:"
+                          labelAlign={'left'}
+                          style={{
+                            backgroundColor: 'white',
+                          }}
+                          required
+                        >
+                          <DatePicker
+                            format="DD/MM/YYYY"
+                            value={moment(budget[current].due_date)}
+                          />
+                        </Form.Item>
+                      </Col>
+
+                      <Col span={10}>
+                        <Form.Item
+                          key="observationFormItem"
+                          labelCol={{ span: 20 }}
+                          label="Observações"
+                          labelAlign={'left'}
+                          style={{
+                            backgroundColor: 'white',
+                          }}
+                        >
+                          <TextArea
+                            key="nameKey"
+                            size="large"
+                            value={budget[current].observation}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Divider />
+                    <h2>Produtos</h2>
+                    {products.map((selectedIten, index) => (
+                      <>
+                        <Row gutter={5}>
+                          <Col span={10}>
+                            <Form.Item
+                              key="requesterItem"
+                              labelCol={{ span: 23 }}
+                              label="Solicitante"
+                              labelAlign={'left'}
+                              style={{ backgroundColor: 'white' }}
+                            >
+                              <Input
+                                key="requesterName"
+                                size="large"
+                                placeholder="EX: José Dirceu da Silva"
+                                value={selectedIten.requester}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={8}>
+                            <Form.Item
+                              key="utilizationFormItem"
+                              labelCol={{ span: 23 }}
+                              label="Utilização"
+                              labelAlign={'left'}
+                              style={{ backgroundColor: 'white' }}
+                            >
+                              <Input
+                                key="utilization"
+                                size="large"
+                                placeholder="EX: Escritorio, Almoxarifado"
+                                value={selectedIten.utilization}
+                              />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                        <Row gutter={5}>
+                          <Col span={20}>
+                            <Form.Item
+                              key="productNameFormItem"
+                              labelCol={{ span: 23 }}
+                              label="Nome"
+                              labelAlign={'left'}
+                              style={{ backgroundColor: 'white' }}
+                            >
+                              <Input
+                                key="productName"
+                                size="large"
+                                placeholder="Ex: Notebook I5 8gb"
+                                value={selectedIten.name}
+                              />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                        <Row gutter={5}>
+                          <Col span={6}>
+                            <Form.Item
+                              key="unitaryValueFormItem"
+                              labelCol={{ span: 23 }}
+                              label="Valor Unitário"
+                              labelAlign={'left'}
+                              style={{ backgroundColor: 'white' }}
+                            >
+                              <Input
+                                type="number"
+                                key="unitaryValue"
+                                size="large"
+                                placeholder=""
+                                value={selectedIten.unitary_value}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={6}>
+                            <Form.Item
+                              key="quantityFormItem"
+                              labelCol={{ span: 23 }}
+                              label="Quantidade"
+                              labelAlign={'left'}
+                              style={{ backgroundColor: 'white' }}
+                            >
+                              <Input
+                                type="number"
+                                key="Quantity"
+                                size="large"
+                                placeholder=""
+                                value={selectedIten.quantity}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={6}>
+                            <Form.Item
+                              key="totalValueFormItem"
+                              labelCol={{ span: 23 }}
+                              label="Valor Total"
+                              labelAlign={'left'}
+                              style={{ backgroundColor: 'white' }}
+                            >
+                              <Input
+                                disabled={true}
+                                type="number"
+                                key="total"
+                                size="large"
+                                placeholder=""
+                                value={selectedIten.total_value}
+                              />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                        <Row gutter={5}>
+                          <Col span={6}>
+                            <Form.Item
+                              key="unitFormItem"
+                              labelCol={{ span: 23 }}
+                              label="Unidade de medida"
+                              labelAlign={'left'}
+                              style={{ backgroundColor: 'white' }}
+                            >
+                              <Input
+                                key="unitName"
+                                size="large"
+                                placeholder="EX: Pç, unidade"
+                                value={selectedIten.unit_of_measurement}
+                                style={{ width: '85%', marginRight: '5%' }}
+                              />
+
+                              <Divider />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </>
+                    ))}
+                  </>
                 </div>
+
                 <div className={localStyles.stepsAction}>
-                  {current < steps.length - 1 && (
+                  {current < budget.length - 1 && (
                     <Button
                       type="primary"
                       onClick={(e) => next()}
@@ -1268,7 +631,7 @@ export default function Approve({
                       Next
                     </Button>
                   )}
-                  {current === steps.length - 1 && (
+                  {current === budget.length - 1 && (
                     <Button
                       type="primary"
                       onClick={(e) => {
@@ -1279,19 +642,30 @@ export default function Approve({
                     </Button>
                   )}
                   {current > 0 && (
-                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                    <Button
+                      style={{ margin: '0 8px' }}
+                      loading={loading}
+                      onClick={() => prev()}
+                    >
                       Previous
                     </Button>
                   )}
 
                   <Button
-                    style={{
-                      margin: '0 8px',
-                      backgroundColor: '#059b32',
-                    }}
-                    onClick={() => prev()}
+                    className={styles.button_approve}
+                    style={{ marginLeft: '29.3rem' }}
+                    onClick={(e) => approveBudget(current, true)}
+                    loading={loading}
                   >
                     Aprovar
+                  </Button>
+                  <Button
+                    className={styles.button_reprove}
+                    style={{ marginLeft: '10px' }}
+                    onClick={(e) => approveBudget(current, false)}
+                    loading={loading}
+                  >
+                    Reprovar
                   </Button>
                 </div>
               </Form.Item>
