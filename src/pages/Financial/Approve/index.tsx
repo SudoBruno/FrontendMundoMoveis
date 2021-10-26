@@ -204,9 +204,9 @@ export default function Approve({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -292,18 +292,7 @@ export default function Approve({
   return (
     <>
       <Layout>
-        <Row justify="end">
-          <Col>
-            <Button
-              size={'large'}
-              className={styles.button}
-              icon={<PlusOutlined style={{ fontSize: '16px' }} />}
-              onClick={() => setIsOpenModal(true)}
-            >
-              Nova Solicitação
-            </Button>
-          </Col>
-        </Row>
+
         <SearchTable />
         <Modal
           title="Solicitação"
