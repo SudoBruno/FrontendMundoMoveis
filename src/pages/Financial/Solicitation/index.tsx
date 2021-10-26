@@ -97,7 +97,7 @@ export default function Solicitation({
   const [budgetProvider, setBudgetProvider] = useState<string>('');
   const [budgetSeller, setBudgetSeller] = useState<string>('');
   const [dueDate, setDueDate] = useState('');
-  const [freight, setFreight] = useState<number>();
+  const [freight, setFreight] = useState<string>('');
   const [installments, setInstallments] = useState<number>(1);
   const [situationDescription, setSituationDescription] = useState<string>('');
   const [productsAdded, setProductsAdded] = useState<any[]>([
@@ -523,7 +523,7 @@ export default function Solicitation({
                   placeholder=""
                   value={freight}
                   onChange={(e) => {
-                    setFreight(Number(e.target.value));
+                    setFreight(e.target.value.replaceAll(',', '.'));
                   }}
                 />
               </Form.Item>
@@ -1515,9 +1515,9 @@ export default function Solicitation({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -1569,7 +1569,7 @@ export default function Solicitation({
           sorter: (a, b) => a.description.length - b.description.length,
         },
         {
-          title: 'Gerente',
+          title: 'Gestor',
           key: 'situation',
           width: '30%',
           render: (record, index) => {
@@ -1627,31 +1627,30 @@ export default function Solicitation({
           render: (record, index) => {
             return (
               <>
-                {
-                  record.status_director !== undefined ? (
-                    <>
-                      {record.status_director && (
-                        <Tag color={'green'} key={record.id}>
-                          Aprovado
-                        </Tag>
-                      )}
-                      {record.status_director === null && (
-                        <Tag color={'yellow'} key={record.id}>
-                          Em Análise
-                        </Tag>
-                      )}
-                      {record.status_director === 0 && (
-                        <Tag color={'green'} key={record.id}>
-                          Reprovado
-                        </Tag>
-                      )}
-                    </>
-                  ) : (
-                    <Tag color={'gray'} key={record.id}>
-                      sem necessidade
-                    </Tag>)}
+                {record.status_director !== undefined ? (
+                  <>
+                    {record.status_director && (
+                      <Tag color={'green'} key={record.id}>
+                        Aprovado
+                      </Tag>
+                    )}
+                    {record.status_director === null && (
+                      <Tag color={'yellow'} key={record.id}>
+                        Em Análise
+                      </Tag>
+                    )}
+                    {record.status_director === 0 && (
+                      <Tag color={'green'} key={record.id}>
+                        Reprovado
+                      </Tag>
+                    )}
+                  </>
+                ) : (
+                  <Tag color={'gray'} key={record.id}>
+                    sem necessidade
+                  </Tag>
+                )}
               </>
-
             );
           },
         },
@@ -1760,7 +1759,7 @@ export default function Solicitation({
                 )}
                 {current > 0 && (
                   <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-                    Previous
+                    Voltar
                   </Button>
                 )}
               </div>

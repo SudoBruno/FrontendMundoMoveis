@@ -204,9 +204,9 @@ export default function Approve({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -284,6 +284,118 @@ export default function Approve({
             );
           },
         },
+        {
+          title: 'Gestor',
+          key: 'situation',
+          width: '30%',
+          render: (record, index) => {
+            return (
+              <>
+                {record.status_manager && (
+                  <Tag color={'green'} key={record.id}>
+                    Aprovado
+                  </Tag>
+                )}
+                {record.status_manager === null && (
+                  <Tag color={'yellow'} key={record.id}>
+                    Em Análise
+                  </Tag>
+                )}
+                {record.status_manager === 0 && (
+                  <Tag color={'green'} key={record.id}>
+                    Reprovado
+                  </Tag>
+                )}
+              </>
+            );
+          },
+        },
+        {
+          title: 'Autoridade competente',
+          key: 'situation',
+          width: '30%',
+          render: (record, index) => {
+            return (
+              <>
+                {record.status_competent_authority && (
+                  <Tag color={'green'} key={record.id}>
+                    Aprovado
+                  </Tag>
+                )}
+                {record.status_competent_authority === null && (
+                  <Tag color={'yellow'} key={record.id}>
+                    Em Análise
+                  </Tag>
+                )}
+                {record.status_competent_authority === 0 && (
+                  <Tag color={'green'} key={record.id}>
+                    Reprovado
+                  </Tag>
+                )}
+              </>
+            );
+          },
+        },
+        {
+          title: 'Diretor',
+          key: 'situation',
+          width: '30%',
+          render: (record, index) => {
+            return (
+              <>
+                {record.status_director !== undefined ? (
+                  <>
+                    {record.status_director && (
+                      <Tag color={'green'} key={record.id}>
+                        Aprovado
+                      </Tag>
+                    )}
+                    {record.status_director === null && (
+                      <Tag color={'yellow'} key={record.id}>
+                        Em Análise
+                      </Tag>
+                    )}
+                    {record.status_director === 0 && (
+                      <Tag color={'green'} key={record.id}>
+                        Reprovado
+                      </Tag>
+                    )}
+                  </>
+                ) : (
+                  <Tag color={'gray'} key={record.id}>
+                    sem necessidade
+                  </Tag>
+                )}
+              </>
+            );
+          },
+        },
+        {
+          title: 'Financeiro',
+          key: 'situation',
+          width: '30%',
+          render: (record, index) => {
+            return (
+              <>
+                {record.status_financial && (
+                  <Tag color={'green'} key={record.id}>
+                    Aprovado
+                  </Tag>
+                )}
+                {record.status_financial === null && (
+                  <Tag color={'yellow'} key={record.id}>
+                    Em Análise
+                  </Tag>
+                )}
+                {record.status_financial === 0 && (
+                  <Tag color={'green'} key={record.id}>
+                    Reprovado
+                  </Tag>
+                )}
+              </>
+            );
+          },
+        },
       ];
       return <Table columns={columns} dataSource={solicitation} />;
     }
@@ -292,7 +404,6 @@ export default function Approve({
   return (
     <>
       <Layout>
-
         <SearchTable />
         <Modal
           title="Solicitação"
@@ -308,7 +419,6 @@ export default function Approve({
               <Form.Item
                 key="nameFormItem"
                 labelCol={{ span: 20 }}
-                label="Nome do Status:"
                 labelAlign={'left'}
                 style={{
                   backgroundColor: 'white',
@@ -636,13 +746,13 @@ export default function Approve({
                       loading={loading}
                       onClick={() => prev()}
                     >
-                      Previous
+                      Voltar
                     </Button>
                   )}
 
                   <Button
                     className={styles.button_approve}
-                    style={{ marginLeft: '29.3rem' }}
+                    style={{ marginLeft: '22.5rem' }}
                     onClick={(e) => approveBudget(current, true)}
                     loading={loading}
                   >
@@ -650,7 +760,7 @@ export default function Approve({
                   </Button>
                   <Button
                     className={styles.button_reprove}
-                    style={{ marginLeft: '10px' }}
+                    style={{ marginLeft: '5px' }}
                     onClick={(e) => approveBudget(current, false)}
                     loading={loading}
                   >
