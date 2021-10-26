@@ -29,6 +29,7 @@ import MinusCircleOutlined from '@ant-design/icons/lib/icons/MinusCircleOutlined
 import Highlighter from 'react-highlight-words';
 import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
 import moment from 'moment';
+
 import PaymentType from '../PaymentType/index';
 
 const { Option } = Select;
@@ -145,6 +146,9 @@ export default function Solicitation({
       );
 
       message.success('Tudo OK. Prosseguindo...');
+
+      //   const  = response.data;
+      //   paymentTypes.push(newAccountPlanRegistered);
 
       setLoading(false);
       next();
@@ -1214,7 +1218,7 @@ export default function Solicitation({
                 <DatePicker
                   format="DD/MM/YYYY"
                   onChange={(e) => {
-                    setDueDate(e);
+                    setDueDate(moment(e));
                   }}
                 />
               </Form.Item>
@@ -1652,7 +1656,7 @@ export default function Solicitation({
                     }
                     loading={loading}
                   >
-                    Next
+                    Próximo
                   </Button>
                 )}
                 {current === steps.length - 1 && (

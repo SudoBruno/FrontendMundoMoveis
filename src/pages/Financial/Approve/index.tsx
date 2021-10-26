@@ -19,7 +19,7 @@ import {
   Divider,
   DatePicker,
 } from 'antd';
-import next, { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { Notification } from '../../../components/Notification';
 import { getAPIClient } from '../../../services/axios';
 import Highlighter from 'react-highlight-words';
@@ -628,7 +628,7 @@ export default function Approve({
                       onClick={(e) => next()}
                       loading={loading}
                     >
-                      Next
+                      Próximo
                     </Button>
                   )}
                   {current === budget.length - 1 && (
@@ -638,7 +638,7 @@ export default function Approve({
                         console.log('e');
                       }}
                     >
-                      Done
+                      Finalizar
                     </Button>
                   )}
                   {current > 0 && (

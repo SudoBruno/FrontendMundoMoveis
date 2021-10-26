@@ -361,7 +361,6 @@ export default function CenterCost({ centerCosts }: IProp) {
               required
             >
               <Input
-                type="number"
                 key="codeKey"
                 size="large"
                 value={code}
