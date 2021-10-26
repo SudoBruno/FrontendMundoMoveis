@@ -1515,9 +1515,9 @@ export default function Solicitation({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -1569,23 +1569,110 @@ export default function Solicitation({
           sorter: (a, b) => a.description.length - b.description.length,
         },
         {
-          title: 'Situação',
+          title: 'Gerente',
           key: 'situation',
           width: '30%',
           render: (record, index) => {
             return (
               <>
-                {record.is_approved && (
+                {record.status_manager && (
                   <Tag color={'green'} key={record.id}>
                     Aprovado
                   </Tag>
                 )}
-                {record.is_approved === null && (
+                {record.status_manager === null && (
                   <Tag color={'yellow'} key={record.id}>
                     Em Análise
                   </Tag>
                 )}
-                {record.is_approved === 0 && (
+                {record.status_manager === 0 && (
+                  <Tag color={'green'} key={record.id}>
+                    Reprovado
+                  </Tag>
+                )}
+              </>
+            );
+          },
+        },
+        {
+          title: 'Autoridade competente',
+          key: 'situation',
+          width: '30%',
+          render: (record, index) => {
+            return (
+              <>
+                {record.status_competent_authority && (
+                  <Tag color={'green'} key={record.id}>
+                    Aprovado
+                  </Tag>
+                )}
+                {record.status_competent_authority === null && (
+                  <Tag color={'yellow'} key={record.id}>
+                    Em Análise
+                  </Tag>
+                )}
+                {record.status_competent_authority === 0 && (
+                  <Tag color={'green'} key={record.id}>
+                    Reprovado
+                  </Tag>
+                )}
+              </>
+            );
+          },
+        },
+        {
+          title: 'Diretor',
+          key: 'situation',
+          width: '30%',
+          render: (record, index) => {
+            return (
+              <>
+                {
+                  record.status_director !== undefined ? (
+                    <>
+                      {record.status_director && (
+                        <Tag color={'green'} key={record.id}>
+                          Aprovado
+                        </Tag>
+                      )}
+                      {record.status_director === null && (
+                        <Tag color={'yellow'} key={record.id}>
+                          Em Análise
+                        </Tag>
+                      )}
+                      {record.status_director === 0 && (
+                        <Tag color={'green'} key={record.id}>
+                          Reprovado
+                        </Tag>
+                      )}
+                    </>
+                  ) : (
+                    <Tag color={'gray'} key={record.id}>
+                      sem necessidade
+                    </Tag>)}
+              </>
+
+            );
+          },
+        },
+        {
+          title: 'Financeiro',
+          key: 'situation',
+          width: '30%',
+          render: (record, index) => {
+            return (
+              <>
+                {record.status_financial && (
+                  <Tag color={'green'} key={record.id}>
+                    Aprovado
+                  </Tag>
+                )}
+                {record.status_financial === null && (
+                  <Tag color={'yellow'} key={record.id}>
+                    Em Análise
+                  </Tag>
+                )}
+                {record.status_financial === 0 && (
                   <Tag color={'green'} key={record.id}>
                     Reprovado
                   </Tag>
