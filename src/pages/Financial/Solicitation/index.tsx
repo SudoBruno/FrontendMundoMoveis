@@ -145,6 +145,9 @@ export default function Solicitation({
         { financial_cost_centers: costCentersAdded }
       );
 
+      await api.post(
+        `/financial/solicitation/status/${solicitationIdResponse.data.id}`
+      );
       message.success('Tudo OK. Prosseguindo...');
 
       //   const  = response.data;
@@ -181,7 +184,10 @@ export default function Solicitation({
         products: productsAdded,
       });
 
-      await api.post(`/financial/solicitation/status/${solicitationId}`);
+      if (current === 2) {
+        await api.post(`/financial/solicitation/status/${solicitationId}`);
+      }
+
       message.success('Tudo OK. Prosseguindo...');
       setLoading(false);
       closeModal(current);
@@ -1585,7 +1591,7 @@ export default function Solicitation({
                     Em Análise
                   </Tag>
                 )}
-                {record.status_manager === 0 && (
+                {record.status_manager === false && (
                   <Tag color={'green'} key={record.id}>
                     Reprovado
                   </Tag>
@@ -1611,8 +1617,8 @@ export default function Solicitation({
                     Em Análise
                   </Tag>
                 )}
-                {record.status_competent_authority === 0 && (
-                  <Tag color={'green'} key={record.id}>
+                {record.status_competent_authority === false && (
+                  <Tag color={'red'} key={record.id}>
                     Reprovado
                   </Tag>
                 )}
@@ -1639,7 +1645,7 @@ export default function Solicitation({
                         Em Análise
                       </Tag>
                     )}
-                    {record.status_director === 0 && (
+                    {record.status_director === false && (
                       <Tag color={'green'} key={record.id}>
                         Reprovado
                       </Tag>
@@ -1671,8 +1677,8 @@ export default function Solicitation({
                     Em Análise
                   </Tag>
                 )}
-                {record.status_financial === 0 && (
-                  <Tag color={'green'} key={record.id}>
+                {record.status_financial === false && (
+                  <Tag color={'red'} key={record.id}>
                     Reprovado
                   </Tag>
                 )}
@@ -1779,6 +1785,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const costCenter = await apiClient.get('/financial/cost-center');
     const accountPlansResponse = await apiClient.get('financial/account-plan');
     const solicitation = await apiClient.get('financial/solicitation/me');
+
+    console.log(solicitation.data);
 
     return {
       props: {
