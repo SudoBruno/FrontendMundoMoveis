@@ -15,22 +15,28 @@ import {
   Space,
   Divider,
   Table,
+  Popconfirm,
 } from 'antd';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import React, { FormEvent, useState } from 'react';
 import styles from '../../../styles/app.module.scss';
 import localStyles from './styles.module.scss';
 import { getAPIClient } from '../../../services/axios';
-import SolicitationType from '../SolicitationType/index';
-import CenterCost from '../CostCenter/index';
+import { Notification } from '../../../components/Notification';
+
 import { api } from '../../../services/api';
 import TextArea from 'antd/lib/input/TextArea';
-import MinusCircleOutlined from '@ant-design/icons/lib/icons/MinusCircleOutlined';
-import Highlighter from 'react-highlight-words';
-import SearchOutlined from '@ant-design/icons/lib/icons/SearchOutlined';
+import {
+  MinusCircleOutlined,
+  SearchOutlined,
+  SettingOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons/lib/icons/';
 import moment from 'moment';
 
 import PaymentType from '../PaymentType/index';
+import Highlighter from 'react-highlight-words';
 
 const { Option } = Select;
 const { Step } = Steps;
@@ -145,9 +151,6 @@ export default function Solicitation({
         { financial_cost_centers: costCentersAdded }
       );
 
-      await api.post(
-        `/financial/solicitation/status/${solicitationIdResponse.data.id}`
-      );
       message.success('Tudo OK. Prosseguindo...');
 
       //   const  = response.data;
@@ -184,7 +187,9 @@ export default function Solicitation({
         products: productsAdded,
       });
 
-      if (current === 2) {
+      if (current === 3) {
+        console.log('entrei');
+
         await api.post(`/financial/solicitation/status/${solicitationId}`);
       }
 
@@ -1465,6 +1470,55 @@ export default function Solicitation({
     ]);
   }
 
+  async function acceptPurchase(solicitationId: string, index: number) {
+    try {
+      await api.put(`/financial/solicitation/purchase/${solicitationId}`, {
+        is_purchased: true,
+      });
+
+      Notification({
+        type: 'success',
+        title: 'Concluído',
+        description: 'Pedido Confirmado',
+      });
+
+      let newArray = [...solicitation];
+      newArray.splice(index, 1);
+      setSolicitation(newArray);
+    } catch (error) {
+      console.error(error);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Pedido NÃO Confirmado',
+      });
+    }
+  }
+
+  async function declinePurchase(solicitationId: string, index: number) {
+    try {
+      await api.put(`/financial/solicitation/purchase/${solicitationId}`, {
+        is_purchased: false,
+      });
+
+      Notification({
+        type: 'success',
+        title: 'Concluído',
+        description: 'Pedido Excluído',
+      });
+
+      let newArray = [...solicitation];
+      newArray.splice(index, 1);
+      setSolicitation(newArray);
+    } catch (error) {
+      console.error(error);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Pedido NÃO excluído',
+      });
+    }
+  }
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -1562,7 +1616,7 @@ export default function Solicitation({
           title: 'Nome',
           dataIndex: 'user_name',
           key: 'user_name',
-          width: '20%',
+          width: '10%',
           ...this.getColumnSearchProps('user_name'),
           sorter: (a, b) => a.user_name.length - b.user_name.length,
         },
@@ -1570,14 +1624,14 @@ export default function Solicitation({
           title: 'Descrição',
           dataIndex: 'description',
           key: 'description',
-          width: '80%',
+          width: '30%',
           ...this.getColumnSearchProps('description'),
           sorter: (a, b) => a.description.length - b.description.length,
         },
         {
           title: 'Gestor',
           key: 'situation',
-          width: '30%',
+          width: '5%',
           render: (record, index) => {
             return (
               <>
@@ -1592,7 +1646,7 @@ export default function Solicitation({
                   </Tag>
                 )}
                 {record.status_manager === false && (
-                  <Tag color={'green'} key={record.id}>
+                  <Tag color={'red'} key={record.id}>
                     Reprovado
                   </Tag>
                 )}
@@ -1603,7 +1657,7 @@ export default function Solicitation({
         {
           title: 'Autoridade competente',
           key: 'situation',
-          width: '30%',
+          width: '15%',
           render: (record, index) => {
             return (
               <>
@@ -1629,7 +1683,7 @@ export default function Solicitation({
         {
           title: 'Diretor',
           key: 'situation',
-          width: '30%',
+          width: '10%',
           render: (record, index) => {
             return (
               <>
@@ -1663,7 +1717,7 @@ export default function Solicitation({
         {
           title: 'Financeiro',
           key: 'situation',
-          width: '30%',
+          width: '15%',
           render: (record, index) => {
             return (
               <>
@@ -1682,6 +1736,39 @@ export default function Solicitation({
                     Reprovado
                   </Tag>
                 )}
+              </>
+            );
+          },
+        },
+        {
+          title: 'status',
+          key: 'situation',
+          width: '40%',
+          render: (record, index) => {
+            return (
+              <>
+                <Popconfirm
+                  onConfirm={(e) => acceptPurchase(record.id, index)}
+                  title="Confirmar Compra"
+                >
+                  <a
+                    href="#"
+                    style={{ marginLeft: 6, fontSize: '17px', color: 'green' }}
+                  >
+                    <CheckCircleOutlined />
+                  </a>
+                </Popconfirm>
+                <Popconfirm
+                  onConfirm={(e) => declinePurchase(record.id, index)}
+                  title="Confirmar remoção?"
+                >
+                  <a
+                    href="#"
+                    style={{ marginLeft: 9, fontSize: '17px', color: 'red' }}
+                  >
+                    <CloseCircleOutlined />
+                  </a>
+                </Popconfirm>
               </>
             );
           },
@@ -1785,8 +1872,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const costCenter = await apiClient.get('/financial/cost-center');
     const accountPlansResponse = await apiClient.get('financial/account-plan');
     const solicitation = await apiClient.get('financial/solicitation/me');
-
-    console.log(solicitation.data);
 
     return {
       props: {
