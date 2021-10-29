@@ -1501,6 +1501,7 @@ export default function Solicitation({
     setSolicitationTypeId('');
     setAccountPlanId('');
     setIsCheckedBudget(false);
+    setFinalizeIsClicked(false);
     setProductsAdded([
       {
         name: '',
