@@ -108,6 +108,7 @@ export default function Solicitation({
   const [installments, setInstallments] = useState<number>(1);
   const [isCheckedBudget, setIsCheckedBudget] = useState<boolean>(false);
   const [situationDescription, setSituationDescription] = useState<string>('');
+  const [finalizeIsClicked, setFinalizeIsClicked] = useState<boolean>(false);
   const [productsAdded, setProductsAdded] = useState<any[]>([
     {
       name: '',
@@ -190,10 +191,8 @@ export default function Solicitation({
         products: productsAdded,
       });
 
-      if (current === 3) {
-        console.log('entrei');
-
-        await api.post(`/financial/solicitation/status/${solicitationId}`);
+      if (current === 3 || finalizeIsClicked === true) {
+        finalizeSolicitation;
       }
 
       message.success('Tudo OK. Prosseguindo...');
@@ -203,6 +202,26 @@ export default function Solicitation({
       console.error(error.response);
       message.error('Etapa não concluida');
       setLoading(false);
+    }
+  }
+
+  async function finalizeSolicitation() {
+    try {
+      await api.post(`/financial/solicitation/status/${solicitationId}`);
+
+      Notification({
+        type: 'success',
+        title: 'Concluído',
+        description: 'Solicitação Confirmada',
+      });
+      handleClose();
+    } catch (error) {
+      console.error(error);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Solicitação NÃO Confirmado',
+      });
     }
   }
 
@@ -1481,6 +1500,7 @@ export default function Solicitation({
     setDescription('');
     setSolicitationTypeId('');
     setAccountPlanId('');
+    setIsCheckedBudget(false);
     setProductsAdded([
       {
         name: '',
@@ -1877,6 +1897,20 @@ export default function Solicitation({
                 {current > 0 && (
                   <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
                     Voltar
+                  </Button>
+                )}
+                {current >= 1 && (
+                  <Button
+                    type="primary"
+                    style={{ marginLeft: '24rem', backgroundColor: '#277c41' }}
+                    className={styles.button_approve}
+                    loading={loading}
+                    onClick={(e) => {
+                      setFinalizeIsClicked(true);
+                      finalizeSolicitation();
+                    }}
+                  >
+                    Finalizar Solicitação
                   </Button>
                 )}
               </div>
