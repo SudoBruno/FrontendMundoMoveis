@@ -6,7 +6,10 @@ import {
   SearchOutlined,
   ShoppingCartOutlined,
   ExportOutlined,
+  ProfileOutlined,
+  DollarCircleOutlined,
 } from '@ant-design/icons';
+import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { Button, Layout, Menu, Result } from 'antd';
 import 'antd/dist/antd.css';
 import Link from 'next/link';
@@ -127,6 +130,58 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
                 </SubMenu>
               </SubMenu>
+
+              <SubMenu
+                key="WnsInsumosSearches"
+                title="Financeiro"
+                icon={<DollarCircleOutlined />}
+              >
+                <SubMenu
+                  key="subFinancialRegister"
+                  title="Cadastros"
+                  icon={<PlusOutlined />}
+                >
+                  <Menu.Item
+                    key="FinancialMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/AccountPlan/">Plano de Conta</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="FinancialCostCenterMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/CostCenter/">Centro de custo</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="SolicitationTypeMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/SolicitationType/">
+                      Tipo de Solicitação
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="PaymentTypeMenuItem"
+                    icon={<FaRegMoneyBillAlt />}
+                  >
+                    <Link href="/Financial/PaymentType/">
+                      Tipo de Pagamento
+                    </Link>
+                  </Menu.Item>
+                </SubMenu>
+
+                <Menu.Item
+                  key="SolicitationMenuItem"
+                  icon={<ProfileOutlined />}
+                >
+                  <Link href="/Financial/Solicitation/">Solicitação</Link>
+                </Menu.Item>
+                <Menu.Item key="approvatMenuItem" icon={<ProfileOutlined />}>
+                  <Link href="/Financial/Approve/">Aprovação</Link>
+                </Menu.Item>
+              </SubMenu>
+
               <Menu.Item key="Exit" icon={<ExportOutlined />}>
                 <Link href="/">Sair</Link>
               </Menu.Item>

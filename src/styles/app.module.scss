@@ -23,3 +23,37 @@
     color: #fff;
   }
 }
+
+.button_approve {
+  margin-bottom: 1rem;
+  background-color: rgb(5, 155, 50);
+  color: #fff;
+  border-color: transparent;
+
+  &:hover {
+    background-color: rgb(5, 155, 50);
+    color: #fff;
+  }
+
+  &:focus {
+    background-color: rgb(5, 155, 50);
+    color: #fff;
+  }
+}
+
+.button_reprove {
+  margin-bottom: 1rem;
+  background-color: rgb(211, 16, 16);
+  color: #fff;
+  border-color: transparent;
+
+  &:hover {
+    background-color: rgb(211, 16, 16);
+    color: #fff;
+  }
+
+  &:focus {
+    background-color: rgb(211, 16, 16);
+    color: #fff;
+  }
+}
