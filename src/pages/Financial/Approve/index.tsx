@@ -79,7 +79,6 @@ export default function Approve({
       setDescription(data.description);
 
       const response = await api.get(`/financial/budget/${data.id}`);
-      console.log(response.data);
 
       setBudget(response.data);
 
