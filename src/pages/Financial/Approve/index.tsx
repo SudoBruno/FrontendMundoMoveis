@@ -32,7 +32,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons/lib/icons/';
 import localStyles from './styles.module.scss';
-import MinusCircleOutlined from '@ant-design/icons/lib/icons/MinusCircleOutlined';
+
 import TextArea from 'antd/lib/input/TextArea';
 import moment from 'moment';
 
@@ -69,6 +69,7 @@ export default function Approve({
       installments: 0,
       due_date: '',
       freight: 0,
+      is_approved: false,
     },
   ]);
 
@@ -78,6 +79,8 @@ export default function Approve({
       setDescription(data.description);
 
       const response = await api.get(`/financial/budget/${data.id}`);
+      console.log(response.data);
+
       setBudget(response.data);
 
       changeProductsOfBudgets(response.data[0].id);
@@ -454,6 +457,16 @@ export default function Approve({
 
                 <div className={localStyles.stepsContent}>
                   <>
+                    {budget[current].is_approved === true && (
+                      <div
+                        style={{
+                          backgroundColor: 'green',
+                          color: 'white',
+                        }}
+                      >
+                        Este é o Orçamento escolhido do solicitante
+                      </div>
+                    )}
                     <Row gutter={5} align={'middle'}>
                       <Col span={10}>
                         <Form.Item
@@ -464,7 +477,6 @@ export default function Approve({
                           style={{
                             backgroundColor: 'white',
                           }}
-                          required
                         >
                           <Input
                             key="nameKey"
@@ -483,7 +495,6 @@ export default function Approve({
                           style={{
                             backgroundColor: 'white',
                           }}
-                          required
                         >
                           <Input
                             key="nameKey"
@@ -502,7 +513,6 @@ export default function Approve({
                           style={{
                             backgroundColor: 'white',
                           }}
-                          required
                         >
                           <Select
                             value={budget[current].payment_type_id}
@@ -518,7 +528,6 @@ export default function Approve({
                           style={{
                             backgroundColor: 'white',
                           }}
-                          required
                         >
                           <Input
                             key="nameKey"
@@ -538,7 +547,6 @@ export default function Approve({
                           style={{
                             backgroundColor: 'white',
                           }}
-                          required
                         >
                           <Input
                             key="nameKey"
@@ -557,7 +565,6 @@ export default function Approve({
                           style={{
                             backgroundColor: 'white',
                           }}
-                          required
                         >
                           <DatePicker
                             format="DD/MM/YYYY"

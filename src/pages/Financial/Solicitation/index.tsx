@@ -16,6 +16,7 @@ import {
   Divider,
   Table,
   Popconfirm,
+  Checkbox,
 } from 'antd';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import React, { FormEvent, useState } from 'react';
@@ -102,9 +103,10 @@ export default function Solicitation({
   const [budgetObservation, setBudgetObservation] = useState<string>('');
   const [budgetProvider, setBudgetProvider] = useState<string>('');
   const [budgetSeller, setBudgetSeller] = useState<string>('');
-  const [dueDate, setDueDate] = useState('');
+  const [dueDate, setDueDate] = useState<any>();
   const [freight, setFreight] = useState<string>('');
   const [installments, setInstallments] = useState<number>(1);
+  const [isCheckedBudget, setIsCheckedBudget] = useState<boolean>(false);
   const [situationDescription, setSituationDescription] = useState<string>('');
   const [productsAdded, setProductsAdded] = useState<any[]>([
     {
@@ -177,6 +179,7 @@ export default function Solicitation({
         due_date: dueDate,
         freight: freight,
         installments: installments,
+        is_approved: isCheckedBudget,
       };
 
       setLoading(true);
@@ -286,15 +289,6 @@ export default function Solicitation({
     let newArray = [...productsAdded];
     newArray.splice(indexOfItem, 1);
     setProductsAdded(newArray);
-  }
-
-  function FunctionIsAproved() {
-    setSituationDescription('APROVADO');
-    return 'green';
-  }
-
-  function FunctionNotAprovedOrOnHold() {
-    return 'green';
   }
 
   const steps = [
@@ -553,7 +547,7 @@ export default function Solicitation({
                 <DatePicker
                   format="DD/MM/YYYY"
                   onChange={(e) => {
-                    setDueDate(e);
+                    setDueDate(moment(e));
                   }}
                 />
               </Form.Item>
@@ -579,6 +573,16 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={5} align={'middle'}>
+            <Checkbox
+              value={isCheckedBudget}
+              onChange={(e) => {
+                setIsCheckedBudget(true);
+              }}
+            >
+              Sinalizar Orçamento como Pré-indicado
+            </Checkbox>
           </Row>
           <Divider />
           <h2>Produtos</h2>
@@ -872,7 +876,7 @@ export default function Solicitation({
                   placeholder=""
                   value={freight}
                   onChange={(e) => {
-                    setFreight(Number(e.target.value));
+                    setFreight(e.target.value.replaceAll(',', '.'));
                   }}
                 />
               </Form.Item>
@@ -891,7 +895,7 @@ export default function Solicitation({
                 <DatePicker
                   format="DD/MM/YYYY"
                   onChange={(e) => {
-                    setDueDate(e);
+                    setDueDate(moment(e));
                   }}
                 />
               </Form.Item>
@@ -917,6 +921,16 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={5} align={'middle'}>
+            <Checkbox
+              value={isCheckedBudget}
+              onChange={(e) => {
+                setIsCheckedBudget(true);
+              }}
+            >
+              Sinalizar Orçamento como Pré-indicado
+            </Checkbox>
           </Row>
           <Divider />
           <h2>Produtos</h2>
@@ -1210,7 +1224,7 @@ export default function Solicitation({
                   placeholder=""
                   value={freight}
                   onChange={(e) => {
-                    setFreight(Number(e.target.value));
+                    setFreight(e.target.value.replaceAll(',', '.'));
                   }}
                 />
               </Form.Item>
@@ -1255,6 +1269,16 @@ export default function Solicitation({
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={5} align={'middle'}>
+            <Checkbox
+              value={isCheckedBudget}
+              onChange={(e) => {
+                setIsCheckedBudget(true);
+              }}
+            >
+              Sinalizar Orçamento como Pré-indicado
+            </Checkbox>
           </Row>
           <Divider />
           <h2>Produtos</h2>
@@ -1443,7 +1467,7 @@ export default function Solicitation({
     setPaymentTypeId('');
     setBudgetObservation('');
     setInstallments(1);
-    setFreight(0);
+    setFreight('');
   };
 
   const prev = () => {
