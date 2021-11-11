@@ -108,7 +108,6 @@ export default function Solicitation({
   const [installments, setInstallments] = useState<number>(1);
   const [isCheckedBudget, setIsCheckedBudget] = useState<boolean>(false);
   const [situationDescription, setSituationDescription] = useState<string>('');
-  const [finalizeIsClicked, setFinalizeIsClicked] = useState<boolean>(false);
   const [productsAdded, setProductsAdded] = useState<any[]>([
     {
       name: '',
@@ -168,7 +167,7 @@ export default function Solicitation({
     }
   }
 
-  async function handleCreateBudget(e: FormEvent) {
+  async function handleCreateBudget(e: FormEvent, isFinalize: boolean) {
     e.preventDefault();
     try {
       const data = {
@@ -191,8 +190,8 @@ export default function Solicitation({
         products: productsAdded,
       });
 
-      if (current === 3 || finalizeIsClicked === true) {
-        finalizeSolicitation;
+      if (current === 3 || isFinalize === true) {
+        finalizeSolicitation(e);
       }
 
       message.success('Tudo OK. Prosseguindo...');
@@ -205,7 +204,7 @@ export default function Solicitation({
     }
   }
 
-  async function finalizeSolicitation() {
+  async function finalizeSolicitation(e) {
     try {
       await api.post(`/financial/solicitation/status/${solicitationId}`);
 
@@ -1501,7 +1500,6 @@ export default function Solicitation({
     setSolicitationTypeId('');
     setAccountPlanId('');
     setIsCheckedBudget(false);
-    setFinalizeIsClicked(false);
     setProductsAdded([
       {
         name: '',
@@ -1876,7 +1874,7 @@ export default function Solicitation({
                     onClick={(e) =>
                       current === 0
                         ? handleCreateSolicitation(e)
-                        : handleCreateBudget(e)
+                        : handleCreateBudget(e, false)
                     }
                     loading={loading}
                   >
@@ -1889,7 +1887,7 @@ export default function Solicitation({
                     onClick={(e) => {
                       current === 0
                         ? handleCreateSolicitation(e)
-                        : handleCreateBudget(e);
+                        : handleCreateBudget(e, false);
                     }}
                   >
                     Done
@@ -1907,8 +1905,7 @@ export default function Solicitation({
                     className={styles.button_approve}
                     loading={loading}
                     onClick={(e) => {
-                      setFinalizeIsClicked(true);
-                      finalizeSolicitation();
+                      handleCreateBudget(e, true);
                     }}
                   >
                     Finalizar Solicitação

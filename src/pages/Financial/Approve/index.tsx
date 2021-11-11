@@ -79,6 +79,8 @@ export default function Approve({
       setDescription(data.description);
 
       const response = await api.get(`/financial/budget/${data.id}`);
+      console.log('DT:', response.data);
+      console.log('Soli:', response.data);
 
       setBudget(response.data);
 
@@ -93,7 +95,6 @@ export default function Approve({
       const productsResponse = await api.get(
         `/financial/budget/product/${budgetId}`
       );
-
       setProducts(productsResponse.data);
     } catch (error) {
       console.log(error);
