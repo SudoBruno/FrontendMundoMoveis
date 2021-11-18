@@ -32,6 +32,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const response = await api.post('/sessions', data);
 
+      api.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
+
       setCookie(undefined, 'token', response.data.token, {
         maxAge: 60 * 60 * 24, //24 horas
         path: '/',
