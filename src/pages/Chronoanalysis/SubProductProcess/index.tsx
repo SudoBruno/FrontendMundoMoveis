@@ -19,31 +19,28 @@ import {
 } from 'antd';
 import React, { FormEvent, useState } from 'react';
 import Highlighter from 'react-highlight-words';
-import styles from '../../../../styles/app.module.scss';
+import styles from '../../../styles/app.module.scss';
 
-import { Notification } from '../../../../components/Notification';
-import { api } from '../../../../services/api';
+import { Notification } from '../../../components/Notification';
+import { api } from '../../../services/api';
 import { GetServerSideProps } from 'next';
-import { getAPIClient } from '../../../../services/axios';
+import { getAPIClient } from '../../../services/axios';
 
 const { Option } = Select;
 
-interface ICategorie {
+interface ISubProduct {
   id: string;
   name: string;
   created_at: Date;
-  active: boolean;
-  user_id: string;
-  updated_at: Date;
 }
 
 interface IProps {
-  categorie: ICategorie[];
+  subProduct: ISubProduct[];
   notFound: boolean;
 }
 
-export default function categories({ categorie, notFound }: IProps) {
-  const [categories, setCategories] = useState(categorie);
+export default function SubProductProcess({ subProduct }: IProps) {
+  const [subProducts, setsubProducts] = useState(subProduct);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState('');
@@ -65,7 +62,7 @@ export default function categories({ categorie, notFound }: IProps) {
           return Notification({
             type: 'error',
             title: 'Erro',
-            description: 'Não foi possível editar a categoria',
+            description: 'Não foi possível editar o Sub-Produto',
           });
         }
         const data = {
@@ -73,19 +70,19 @@ export default function categories({ categorie, notFound }: IProps) {
           name: name,
         };
         setLoading(true);
-        await api.put(`/warehouse/categories/${id}`, data);
+        await api.put(`/warehouse/subProducts/${id}`, data);
         setLoading(false);
         Notification({
           type: 'success',
           title: 'Enviado',
-          description: 'Categoria Editada com sucesso',
+          description: 'Sub-Produto Editado com sucesso',
         });
       } catch (error) {
         console.error(error);
         Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível Editar a Categoria',
+          description: 'Não foi possível Editar o Sub-Produto',
         });
         setLoading(false);
       }
@@ -96,7 +93,7 @@ export default function categories({ categorie, notFound }: IProps) {
           return Notification({
             type: 'error',
             title: 'Erro',
-            description: 'Não foi possível cadastrar a categoria',
+            description: 'Não foi possível cadastrar o Sub-Produto',
           });
         }
 
@@ -105,25 +102,25 @@ export default function categories({ categorie, notFound }: IProps) {
         };
 
         setLoading(true);
-        const response = await api.post('/warehouse/categories', data);
+        const response = await api.post('/warehouse/subProducts', data);
         setLoading(false);
 
         Notification({
           type: 'success',
           title: 'Enviado',
-          description: 'Categoria Cadastrada com sucesso',
+          description: 'Sub-Produto Cadastrado com sucesso',
         });
 
         const newCategorieRegistered = response.data;
 
-        categorie.push(newCategorieRegistered);
+        subProduct.push(newCategorieRegistered);
         setIsModalOpen(false);
       } catch (error) {
         console.error(error);
         Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível cadastrar a Categoria',
+          description: 'Não foi possível cadastrar a Sub-Produto',
         });
         setLoading(false);
       }
@@ -134,31 +131,31 @@ export default function categories({ categorie, notFound }: IProps) {
 
   async function handleDelete(id: string) {
     try {
-      await api.delete(`/warehouse/categories/${id}`);
+      await api.delete(`/warehouse/subProducts/${id}`);
 
-      const filterCategories = categories.filter((iten) => {
+      const filtersubProducts = subProducts.filter((iten) => {
         if (iten.id !== id) {
           return iten;
         }
       });
 
-      setCategories(filterCategories);
+      setsubProducts(filtersubProducts);
       Notification({
         type: 'success',
         title: 'Sucesso',
-        description: 'Unidade Deletada com sucesso',
+        description: 'Sub-Produto Deletado com sucesso',
       });
     } catch (error) {
       console.error(error);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível Deletar a unidade',
+        description: 'Não foi possível Deletar o Sub-Produto',
       });
     }
   }
 
-  function handleEdit(data: ICategorie) {
+  function handleEdit(data: ISubProduct) {
     setIsModalOpen(true);
     setId(data.id);
     setName(data.name);
@@ -166,7 +163,7 @@ export default function categories({ categorie, notFound }: IProps) {
 
   class SearchTable extends React.Component {
     state = {
-      searchText: 'a',
+      searchText: '',
       searchedColumn: '',
     };
     searchInput: Input;
@@ -258,7 +255,7 @@ export default function categories({ categorie, notFound }: IProps) {
     render() {
       const columns = [
         {
-          title: 'Nome da Categoria',
+          title: 'Nome da Sub-Produto',
           dataIndex: 'name',
           key: 'name',
           width: '40%',
@@ -303,7 +300,7 @@ export default function categories({ categorie, notFound }: IProps) {
       ];
       return (
         <>
-          <Table columns={columns} dataSource={categories} />
+          <Table columns={columns} dataSource={subProducts} />
         </>
       );
     }
@@ -320,14 +317,14 @@ export default function categories({ categorie, notFound }: IProps) {
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
               onClick={() => setIsModalOpen(true)}
             >
-              Cadastrar Categoria
+              Cadastrar Sub-Produto
             </Button>
           </Col>
         </Row>
         <SearchTable />
       </Layout>
       <Modal
-        title="Cadastro de Categoria"
+        title="Cadastro de Sub-Produto"
         visible={isModalOpen}
         onCancel={handleClose}
         footer={[
@@ -355,7 +352,7 @@ export default function categories({ categorie, notFound }: IProps) {
             key="categorieName"
             size="large"
             style={{ width: 400, marginBottom: '10px' }}
-            placeholder="Nome da categoria"
+            placeholder="Nome da Sub-Produto"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -370,18 +367,18 @@ export default function categories({ categorie, notFound }: IProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
-    const { data } = await apiClient.get('/warehouse/categories');
+    const { data } = await apiClient.get('/warehouse/subProducts');
 
     return {
       props: {
-        categorie: data,
+        subProduct: data,
       },
     };
   } catch (error) {
     console.error(error);
     return {
       props: {
-        categorie: [],
+        subProduct: [],
       },
     };
   }

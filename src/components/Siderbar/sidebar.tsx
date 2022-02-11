@@ -131,8 +131,8 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                 </SubMenu>
               </SubMenu>
 
-              <SubMenu
-                key="WnsInsumosSearches"
+              {/* <SubMenu
+                key="FinancialMenu"
                 title="Financeiro"
                 icon={<DollarCircleOutlined />}
               >
@@ -180,7 +180,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                 <Menu.Item key="approvatMenuItem" icon={<ProfileOutlined />}>
                   <Link href="/Financial/Approve/">Aprovação</Link>
                 </Menu.Item>
-              </SubMenu>
+              </SubMenu> */}
 
               <Menu.Item key="Exit" icon={<ExportOutlined />}>
                 <Link href="/">Sair</Link>
