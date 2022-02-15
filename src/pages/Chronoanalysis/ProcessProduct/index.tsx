@@ -3,6 +3,7 @@ import {
   EditFilled,
   PlusOutlined,
   SearchOutlined,
+  MinusCircleOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -25,26 +26,36 @@ import { Notification } from '../../../components/Notification';
 import { api } from '../../../services/api';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../services/axios';
+import SubProductProcess from '../SubProductProcess';
+import { Divider } from 'antd';
 
 const { Option } = Select;
 
-interface ISubProduct {
+interface IProcessSubProduct {
   id: string;
   name: string;
   created_at: Date;
 }
 
+interface IProduct {
+  id: string;
+  name: string;
+}
+
 interface IProps {
-  subProduct: ISubProduct[];
+  processSubProduct: IProcessSubProduct[];
+  product: IProduct[],
   notFound: boolean;
 }
 
-export default function SubProductProcess({ subProduct }: IProps) {
-  const [subProducts, setSubProducts] = useState(subProduct);
+export default function ProcessProduct({ processSubProduct, product }: IProps) {
+  const [processSubProducts, setProcessSubProducts] = useState(processSubProduct);
+  const [products, setProducts] = useState(product);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState('');
   const [name, setName] = useState('');
+  const [subProductsAdded, setSubProductsAdded] = useState([{ id: '', name: '', quantity: 0 }])
 
   function handleClose() {
     setName('');
@@ -62,7 +73,7 @@ export default function SubProductProcess({ subProduct }: IProps) {
           return Notification({
             type: 'error',
             title: 'Erro',
-            description: 'Não foi possível editar o Sub-Produto',
+            description: 'Não foi possível editar o Produto de Processo',
           });
         }
         const data = {
@@ -70,29 +81,29 @@ export default function SubProductProcess({ subProduct }: IProps) {
           name: name,
         };
         setLoading(true);
-        const response = await api.put(`/chronoanalysis/process-sub-product/${id}`, data);
+        const response = await api.put(`/chronoanalysis/process-product/${id}`, data);
 
-        const filterSubProducts = subProduct.filter((iten) => {
-          if (iten.id !== id) {
+        const filterProcessProduct = product.filter((iten) => {
+          if (iten.id == id) {
             return iten;
           }
         });
-        filterSubProducts.push(response.data)
 
-        setSubProducts(filterSubProducts)
+        filterProcessProduct.push(response.data);
+
+        setProducts(products);
         setLoading(false);
-        setIsModalOpen(false);
         Notification({
           type: 'success',
           title: 'Enviado',
-          description: 'Sub-Produto Editado com sucesso',
+          description: 'Produto de Processo Editado com sucesso',
         });
       } catch (error) {
         console.error(error);
         Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível Editar o Sub-Produto',
+          description: 'Não foi possível Editar o Produto de Processo',
         });
         setLoading(false);
       }
@@ -103,7 +114,7 @@ export default function SubProductProcess({ subProduct }: IProps) {
           return Notification({
             type: 'error',
             title: 'Erro',
-            description: 'Não foi possível cadastrar o Sub-Produto',
+            description: 'Não foi possível cadastrar o Produto de Processo',
           });
         }
 
@@ -112,25 +123,25 @@ export default function SubProductProcess({ subProduct }: IProps) {
         };
 
         setLoading(true);
-        const response = await api.post('/chronoanalysis/process-sub-product', data);
+        const response = await api.post('/chronoanalysis/process-product', data);
         setLoading(false);
 
         Notification({
           type: 'success',
           title: 'Enviado',
-          description: 'Sub-Produto Cadastrado com sucesso',
+          description: 'Produto de Processo Cadastrado com sucesso',
         });
 
-        const newSubProductRegistered = response.data;
+        const newProcessProductRegistered = response.data;
 
-        subProduct.push(newSubProductRegistered);
+        processSubProduct.push(newProcessProductRegistered);
         setIsModalOpen(false);
       } catch (error) {
         console.error(error);
         Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível cadastrar a Sub-Produto',
+          description: 'Não foi possível cadastrar a Produto de Processo',
         });
         setLoading(false);
       }
@@ -141,36 +152,80 @@ export default function SubProductProcess({ subProduct }: IProps) {
 
   async function handleDelete(id: string) {
     try {
-      await api.delete(`/chronoanalysis/process-sub-product/${id}`);
+      await api.delete(`/chronoanalysis/process-product/${id}`);
 
-      const filtersubProducts = subProducts.filter((iten) => {
+      const filterprocessSubProducts = processSubProducts.filter((iten) => {
         if (iten.id !== id) {
           return iten;
         }
       });
 
-      setSubProducts(filtersubProducts);
+      setProcessSubProducts(filterprocessSubProducts);
       Notification({
         type: 'success',
         title: 'Sucesso',
-        description: 'Sub-Produto Deletado com sucesso',
+        description: 'Produto de Processo Deletado com sucesso',
       });
     } catch (error) {
       console.error(error);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível Deletar o Sub-Produto',
+        description: 'Não foi possível Deletar o Produto de Processo',
       });
     }
   }
 
-  function handleEdit(data: ISubProduct) {
+  function handleEdit(data: IProcessSubProduct) {
+    setIsModalOpen(true);
     console.log(data);
 
-    setIsModalOpen(true);
     setId(data.id);
     setName(data.name);
+  }
+
+  function addNewSubProduct(e) {
+    e.preventDefault();
+
+    const newArray = [
+      ...subProductsAdded,
+      {
+        id: '',
+        name: '',
+        quantity: 0,
+      },
+    ];
+
+    setSubProductsAdded(newArray);
+  }
+
+  function removeSubProducts(indexOfItem: number) {
+
+    let newArray = [...subProductsAdded];
+    newArray.splice(indexOfItem, 1);
+    setSubProductsAdded(newArray);
+  }
+
+  function handleChangeSubProduct(index, id) {
+    let newArray = [...subProductsAdded];
+    const values = processSubProducts.find(
+      (test) => test.id === id
+    );
+    newArray[index].id = values.id;
+    newArray[index].name = values.name;
+
+    setSubProductsAdded(newArray);
+
+  }
+
+  function handleChangeQuantity(index, value) {
+    let newArray = [...subProductsAdded];
+
+    newArray[index].quantity = Number(value);
+
+    console.log(newArray);
+
+    setSubProductsAdded(newArray);
   }
 
   class SearchTable extends React.Component {
@@ -312,11 +367,12 @@ export default function SubProductProcess({ subProduct }: IProps) {
       ];
       return (
         <>
-          <Table columns={columns} dataSource={subProducts} />
+          <Table columns={columns} dataSource={products} />
         </>
       );
     }
   }
+
 
   return (
     <div>
@@ -329,14 +385,15 @@ export default function SubProductProcess({ subProduct }: IProps) {
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
               onClick={() => setIsModalOpen(true)}
             >
-              Cadastrar Sub-Produto
+              Cadastrar Produto de Processo
             </Button>
           </Col>
         </Row>
+
         <SearchTable />
       </Layout>
       <Modal
-        title="Cadastro de Sub-Produto"
+        title="Cadastro de Produto de Processo"
         visible={isModalOpen}
         onCancel={handleClose}
         footer={[
@@ -353,24 +410,124 @@ export default function SubProductProcess({ subProduct }: IProps) {
           </Button>,
         ]}
       >
-        <Form.Item
-          labelCol={{ span: 23 }}
-          label="Nome:"
-          labelAlign={'left'}
-          style={{ backgroundColor: 'white', fontWeight: 'bold' }}
-          required
-        >
-          <Input
-            key="categorieName"
-            size="large"
-            style={{ width: 400, marginBottom: '10px' }}
-            placeholder="Nome do Sub-Produto"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-          />
-        </Form.Item>
+        <Row>
+          <Col span={20}>
+            <Form.Item
+              key="productFormItem"
+              labelCol={{ span: 23 }}
+              label="Produto:"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
+              }}
+              required
+            >
+              <Select
+                key="managerName"
+                size="large"
+
+                onChange={(e) => {
+                  setId(e.toString());
+
+                }}
+              >
+                {product.map((item) => (
+                  <>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  </>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Divider />
+
+        {subProductsAdded.map((selectedIten, index) => (
+          <Row gutter={10}>
+            <Col span={12}>
+              <Form.Item
+                key="subProductFormItem"
+                labelCol={{ span: 23 }}
+                label="Sub-Produto:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Select
+                  key="subProductName"
+                  size="large"
+                  value={selectedIten.name}
+                  onChange={(e) => {
+                    handleChangeSubProduct(index, e)
+                  }}
+                >
+                  {processSubProduct.map((item) => (
+                    <>
+                      <Option key={item.id} value={item.id}>
+                        {item.name}
+                      </Option>
+                    </>
+                  ))}
+                </Select>
+              </Form.Item>
+
+            </Col>
+
+            <Col span={6}>
+              <Form.Item
+                key="removeFormItem"
+                label="Qtd: "
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  type="number"
+                  key="totalKey"
+                  size="large"
+                  placeholder="0"
+                  value={selectedIten.quantity}
+                  style={{ width: '80%', marginRight: '5%' }}
+                  onChange={(e) => handleChangeQuantity(index, e.target.value)}
+                />
+                {subProductsAdded.length != 1 && (
+                  <MinusCircleOutlined
+                    style={{ color: 'red' }}
+                    onClick={() => removeSubProducts(index)}
+                  />
+
+                )}
+
+              </Form.Item>
+            </Col>
+
+            {subProductsAdded.length - 1 === index && (
+              <Button
+                key="primary"
+                title="Novo Sub-Produto"
+                style={{
+
+                  width: '100%',
+                  color: 'white',
+                  backgroundColor: 'rgb(5, 155, 50)',
+                }}
+                onClick={addNewSubProduct}
+              >
+                <PlusOutlined />
+                Novo Sub-Produto
+              </Button>
+            )}
+          </Row>
+        ))}
+
+
+
       </Modal>
     </div>
   );
@@ -379,18 +536,21 @@ export default function SubProductProcess({ subProduct }: IProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
-    const { data } = await apiClient.get('/chronoanalysis/process-sub-product');
+    const { data } = await apiClient.get('/chronoanalysis/process-product');
+    const product = await apiClient.get('/chronoanalysis/process-product');
 
     return {
       props: {
-        subProduct: data,
+        processSubProduct: data,
+        product: product,
       },
     };
   } catch (error) {
     console.error(error);
     return {
       props: {
-        subProduct: [],
+        processSubProduct: [],
+        product: []
       },
     };
   }
