@@ -17,6 +17,7 @@ import {
   Select,
   Space,
   Table,
+  Upload,
 } from 'antd';
 import React, { FormEvent, useState } from 'react';
 import Highlighter from 'react-highlight-words';
@@ -26,9 +27,9 @@ import { Notification } from '../../../components/Notification';
 import { api } from '../../../services/api';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../services/axios';
-import SubProductProcess from '../SubProductProcess';
-import { Divider } from 'antd';
 
+import { Divider } from 'antd';
+import getBase64 from './utils/index';
 const { Option } = Select;
 
 interface IProcessSubProduct {
@@ -48,14 +49,27 @@ interface IProps {
   notFound: boolean;
 }
 
+
 export default function ProcessProduct({ processSubProduct, product }: IProps) {
   const [processSubProducts, setProcessSubProducts] = useState(processSubProduct);
   const [products, setProducts] = useState(product);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productId, setProductId] = useState('');
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState('');
   const [name, setName] = useState('');
-  const [subProductsAdded, setSubProductsAdded] = useState([{ id: '', name: '', quantity: 0 }])
+  const [subProductsAdded, setSubProductsAdded] = useState([{ process_sub_product_id: '', name: '', quantity: 0 }])
+  const [previewImage, setPreviewImage] = useState();
+  const [previewVisible, setPreviewVisible] = useState<boolean>();
+  const [previewTitle, setPreviewTitle] = useState();
+  const [fileList, setFileList] = useState([]);
+
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
 
   function handleClose() {
     setName('');
@@ -190,7 +204,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
     const newArray = [
       ...subProductsAdded,
       {
-        id: '',
+        process_sub_product_id: '',
         name: '',
         quantity: 0,
       },
@@ -211,7 +225,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
     const values = processSubProducts.find(
       (test) => test.id === id
     );
-    newArray[index].id = values.id;
+    newArray[index].process_sub_product_id = values.id;
     newArray[index].name = values.name;
 
     setSubProductsAdded(newArray);
@@ -228,6 +242,26 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
     setSubProductsAdded(newArray);
   }
 
+
+  async function handlePreview(file) {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+
+    setPreviewImage(file.url || file.preview);
+    setPreviewVisible(true);
+    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1))
+  };
+
+  function handleCancel() {
+    setPreviewVisible(false)
+  };
+
+  function handleChange({ fileList }) {
+    console.log(fileList);
+
+    setFileList(fileList)
+  };
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -393,6 +427,15 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
         <SearchTable />
       </Layout>
       <Modal
+        key="previewImageModal"
+        visible={previewVisible}
+        title={previewTitle}
+        footer={null}
+        onCancel={handleCancel}
+      >
+        <img alt="example" style={{ width: '100%' }} src={previewImage} />
+      </Modal>
+      <Modal
         title="Cadastro de Produto de Processo"
         visible={isModalOpen}
         onCancel={handleClose}
@@ -427,11 +470,10 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                 size="large"
 
                 onChange={(e) => {
-                  setId(e.toString());
-
+                  setProductId(e.toString());
                 }}
               >
-                {product.map((item) => (
+                {[{ id: 1, name: 'Lubeck 1,80' }, { id: 2, name: 'Living 2L' }].map((item) => (
                   <>
                     <Option key={item.id} value={item.id}>
                       {item.name}
@@ -440,6 +482,16 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                 ))}
               </Select>
             </Form.Item>
+            <p>Selecione uma foto do Produto</p>
+            <Upload
+
+              listType="picture-card"
+              fileList={fileList}
+              onPreview={handlePreview}
+              onChange={handleChange}
+            >
+              {fileList.length > 0 ? null : uploadButton}
+            </Upload>
           </Col>
         </Row>
         <Divider />
@@ -525,9 +577,6 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
             )}
           </Row>
         ))}
-
-
-
       </Modal>
     </div>
   );

@@ -8,6 +8,7 @@ import {
   ExportOutlined,
   ProfileOutlined,
   DollarCircleOutlined,
+  FieldTimeOutlined
 } from '@ant-design/icons';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { Button, Layout, Menu, Result } from 'antd';
@@ -130,7 +131,30 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
                 </SubMenu>
               </SubMenu>
+              <SubMenu
+                key="ChronoanalysisMenu"
+                title="Cronoanálise"
+                icon={<FieldTimeOutlined />}
+              >
+                <SubMenu
+                  key="FinancialRegister"
+                  title="Cadastros"
+                  icon={<PlusOutlined />}
+                >
+                  <Menu.Item
+                    key="subProductProcessMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/SubProductProcess">Sub-Produto de Processo</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="ProductProcessMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/ProcessProduct">Produto de Processo</Link>
+                  </Menu.Item>
+                </SubMenu>
 
+
+              </SubMenu>
               {/* <SubMenu
                 key="FinancialMenu"
                 title="Financeiro"

@@ -124,6 +124,7 @@ export default function SubProductProcess({ subProduct }: IProps) {
         const newSubProductRegistered = response.data;
 
         subProduct.push(newSubProductRegistered);
+        setSubProducts(subProduct);
         setIsModalOpen(false);
       } catch (error) {
         console.error(error);
