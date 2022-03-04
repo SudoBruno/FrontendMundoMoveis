@@ -4,6 +4,8 @@ import {
   PlusOutlined,
   SearchOutlined,
   MinusCircleOutlined,
+  EyeOutlined,
+  CloseOutlined
 } from '@ant-design/icons';
 import {
   Button,
@@ -19,9 +21,12 @@ import {
   Table,
   Upload,
 } from 'antd';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import Highlighter from 'react-highlight-words';
 import styles from '../../../styles/app.module.scss';
+import { Typography } from 'antd';
+
+const { Title } = Typography;
 
 import { Notification } from '../../../components/Notification';
 import { api } from '../../../services/api';
@@ -29,6 +34,10 @@ import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../services/axios';
 
 import { Divider } from 'antd';
+import FormData from 'form-data'
+
+
+
 import getBase64 from './utils/index';
 const { Option } = Select;
 
@@ -57,24 +66,75 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
   const [productId, setProductId] = useState('');
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState('');
-  const [name, setName] = useState('');
   const [subProductsAdded, setSubProductsAdded] = useState([{ process_sub_product_id: '', name: '', quantity: 0 }])
-  const [previewImage, setPreviewImage] = useState();
+  const [previewImage, setPreviewImage] = useState<string>();
   const [previewVisible, setPreviewVisible] = useState<boolean>();
   const [previewTitle, setPreviewTitle] = useState();
-  const [fileList, setFileList] = useState([]);
+  const [imageIsDefined, setImageIsDefined] = useState<boolean>();
+  const fileList = useRef<any>();
+  const [image, setImage] = useState();
+  const [processProductName, setProcessProductName] = useState<string>('');
+
+  useEffect(() => {
+    if (image) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPreviewImage(reader.result as string);
+      }
+      reader.readAsDataURL(image);
+    } else {
+      setPreviewImage(null);
+    }
+
+  }, [image])
 
   const uploadButton = (
     <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
+      <div style={styles}>
+        <label className={styles.custom_file_upload}>
+          <p><b>UPLOAD +</b></p>
+          <input type="file" accept="image/*" ref={fileList} onChange={() => {
+            setImage(fileList.current.files[0])
+            setImageIsDefined(true)
+          }} />
+        </label>
+      </div>
+
     </div>
   );
 
+  const imageUploadSucces = (
+    <div>
+      <div style={styles}>
+
+        <Title level={5} style={{ color: 'green' }}>Imagem Carregada</Title>
+        <Button shape="circle" style={{ color: 'black' }} onClick={() => {
+
+          handlePreview(image)
+
+        }}>
+          <EyeOutlined />
+        </Button>
+        <Button shape="circle" style={{ color: 'red', marginLeft: 5, }} onClick={() => {
+          setImage(null)
+          setImageIsDefined(false)
+        }}>
+          <CloseOutlined />
+        </Button>
+      </div>
+
+    </div>
+  );
   function handleClose() {
-    setName('');
+    console.log('close');
+
     setId('');
+    setProductId('');
+    setPreviewImage(null);
+    setImage(null);
+    setImageIsDefined(false);
     setIsModalOpen(false);
+    setSubProductsAdded([{ process_sub_product_id: '', name: '', quantity: 0 }])
   }
 
   async function handleRegister(e) {
@@ -82,7 +142,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
 
     if (id) {
       try {
-        if (name === '') {
+        if (false) {
           setLoading(false);
           return Notification({
             type: 'error',
@@ -91,11 +151,13 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
           });
         }
         const data = {
-          id: id,
-          name: name,
+          product_id: productId,
+          process_sub_product: subProductsAdded
         };
         setLoading(true);
-        const response = await api.put(`/chronoanalysis/process-product/${id}`, data);
+        const response = await api.put(`/chronoanalysis/product-process-sub-product`, data);
+        console.log('AAAAAAA: ', response.data);
+
 
         const filterProcessProduct = product.filter((iten) => {
           if (iten.id == id) {
@@ -123,7 +185,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
       }
     } else {
       try {
-        if (name === '') {
+        if (false) {
           setLoading(false);
           return Notification({
             type: 'error',
@@ -133,11 +195,35 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
         }
 
         const data = {
-          name: name,
+          product_id: productId,
+          process_sub_product: subProductsAdded
         };
-
         setLoading(true);
-        const response = await api.post('/chronoanalysis/process-product', data);
+        const response = await api.post(`/chronoanalysis/product-process-sub-product`, data);
+        console.log('AAAAAAA: ', response.data);
+
+        const dataForm = new FormData();
+        dataForm.append('image', image);
+
+
+        const responseImage = await api.post(`/product/image/${response.data.id}`, dataForm, {
+          headers: {
+            "Content-Type": `multipart/form-data`,
+          },
+        });
+
+        console.log('bbbbb: ', responseImage.data);
+
+
+        const filterProcessProduct = product.filter((iten) => {
+          if (iten.id == id) {
+            return iten;
+          }
+        });
+
+        filterProcessProduct.push(response.data);
+
+        setProducts(products);
         setLoading(false);
 
         Notification({
@@ -151,6 +237,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
         processSubProduct.push(newProcessProductRegistered);
         setIsModalOpen(false);
       } catch (error) {
+        console.log(error);
         console.error(error);
         Notification({
           type: 'error',
@@ -160,7 +247,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
         setLoading(false);
       }
     }
-    setName('');
+
     setId('');
   }
 
@@ -190,12 +277,12 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
     }
   }
 
-  function handleEdit(data: IProcessSubProduct) {
+  function handleEdit(data) {
     setIsModalOpen(true);
     console.log(data);
 
     setId(data.id);
-    setName(data.name);
+
   }
 
   function addNewSubProduct(e) {
@@ -244,24 +331,22 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
 
 
   async function handlePreview(file) {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
+    if (file && file.type.substring(0, 5) === "image") {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => setPreviewImage(reader.result as string);
+    } else {
+      setPreviewImage(null);
     }
 
-    setPreviewImage(file.url || file.preview);
     setPreviewVisible(true);
-    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1))
+    setPreviewTitle(file.name)
   };
 
   function handleCancel() {
     setPreviewVisible(false)
   };
 
-  function handleChange({ fileList }) {
-    console.log(fileList);
-
-    setFileList(fileList)
-  };
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -456,6 +541,28 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
         <Row>
           <Col span={20}>
             <Form.Item
+              key="productFormName"
+              labelCol={{ span: 23 }}
+              label="Nome do Produto de Processo:"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
+              }}
+              required
+            >
+              <Input
+                key="totalKey"
+                size="large"
+                value={processProductName}
+                style={{ width: '80%', marginRight: '5%' }}
+                onChange={(e) => setProcessProductName(e.target.value)}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={20}>
+            <Form.Item
               key="productFormItem"
               labelCol={{ span: 23 }}
               label="Produto:"
@@ -468,12 +575,12 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
               <Select
                 key="managerName"
                 size="large"
-
+                value={productId}
                 onChange={(e) => {
                   setProductId(e.toString());
                 }}
               >
-                {[{ id: 1, name: 'Lubeck 1,80' }, { id: 2, name: 'Living 2L' }].map((item) => (
+                {product.map((item) => (
                   <>
                     <Option key={item.id} value={item.id}>
                       {item.name}
@@ -483,15 +590,8 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
               </Select>
             </Form.Item>
             <p>Selecione uma foto do Produto</p>
-            <Upload
-
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
-            >
-              {fileList.length > 0 ? null : uploadButton}
-            </Upload>
+            {imageIsDefined != true && uploadButton}
+            {imageIsDefined === true && imageUploadSucces}
           </Col>
         </Row>
         <Divider />
@@ -502,7 +602,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
               <Form.Item
                 key="subProductFormItem"
                 labelCol={{ span: 23 }}
-                label="Sub-Produto:"
+                label="Sub Produto:"
                 labelAlign={'left'}
                 style={{
                   backgroundColor: 'white',
@@ -528,7 +628,36 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
               </Form.Item>
 
             </Col>
+            <Col span={12}>
+              <Form.Item
+                key="subProductFormItem"
+                labelCol={{ span: 23 }}
+                label="Sub Linha:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Select
+                  key="subProductName"
+                  size="large"
+                  value={selectedIten.name}
+                  onChange={(e) => {
+                    handleChangeSubProduct(index, e)
+                  }}
+                >
+                  {processSubProduct.map((item) => (
+                    <>
+                      <Option key={item.id} value={item.id}>
+                        {item.name}
+                      </Option>
+                    </>
+                  ))}
+                </Select>
+              </Form.Item>
 
+            </Col>
             <Col span={6}>
               <Form.Item
                 key="removeFormItem"
@@ -562,7 +691,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
             {subProductsAdded.length - 1 === index && (
               <Button
                 key="primary"
-                title="Novo Sub-Produto"
+                title="Novo Sub Produto"
                 style={{
 
                   width: '100%',
@@ -572,7 +701,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                 onClick={addNewSubProduct}
               >
                 <PlusOutlined />
-                Novo Sub-Produto
+                Novo Sub Produto
               </Button>
             )}
           </Row>
@@ -585,13 +714,15 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
-    const { data } = await apiClient.get('/chronoanalysis/process-product');
-    const product = await apiClient.get('/chronoanalysis/process-product');
+    const { data } = await apiClient.get('/chronoanalysis/process-sub-product');
+    const product = await apiClient.get('/product/product-mirror');
+    console.log(data);
+
 
     return {
       props: {
         processSubProduct: data,
-        product: product,
+        product: product.data,
       },
     };
   } catch (error) {
