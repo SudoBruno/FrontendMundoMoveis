@@ -352,7 +352,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
