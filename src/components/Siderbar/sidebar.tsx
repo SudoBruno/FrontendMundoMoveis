@@ -151,6 +151,11 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   >
                     <Link href="/Chronoanalysis/ProcessProduct">Produto de Processo</Link>
                   </Menu.Item>
+                  <Menu.Item
+                    key="WorkElementMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/WorkElement">Elemento de Trabalho</Link>
+                  </Menu.Item>
                 </SubMenu>
 
 
