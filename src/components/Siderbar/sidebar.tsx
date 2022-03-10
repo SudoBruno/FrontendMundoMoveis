@@ -142,6 +142,16 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   icon={<PlusOutlined />}
                 >
                   <Menu.Item
+                    key="SubLineMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/SubLine">Sub Linha</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="WorkElementMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/WorkElement">Elemento de Trabalho</Link>
+                  </Menu.Item>
+                  <Menu.Item
                     key="subProductProcessMenuItem"
                   >
                     <Link href="/Chronoanalysis/SubProductProcess">Sub-Produto de Processo</Link>
@@ -150,11 +160,6 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                     key="ProductProcessMenuItem"
                   >
                     <Link href="/Chronoanalysis/ProcessProduct">Produto de Processo</Link>
-                  </Menu.Item>
-                  <Menu.Item
-                    key="WorkElementMenuItem"
-                  >
-                    <Link href="/Chronoanalysis/WorkElement">Elemento de Trabalho</Link>
                   </Menu.Item>
                 </SubMenu>
 

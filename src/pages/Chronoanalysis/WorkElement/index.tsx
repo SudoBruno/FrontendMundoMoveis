@@ -43,15 +43,19 @@ interface ITolerance {
   factor: number,
 }
 
+interface IWorkElement {
+  id: string,
+  name: string
+}
 interface IProps {
   tolerance: ITolerance[];
+  workElement: IWorkElement[];
 }
 
-export default function WorkElement({ tolerance }: IProps) {
+export default function WorkElement({ tolerance, workElement }: IProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tolerances, setTolerances] = useState<ITolerance[]>(tolerance);
-  console.log(tolerances);
 
   const [toleranceAdded, setToleranceAdded] = useState(
     [
@@ -63,7 +67,7 @@ export default function WorkElement({ tolerance }: IProps) {
       { id: '', type: '', classification: '' },
       { id: '', type: '', classification: '' },
     ])
-  const [workElements, setWorkElements] = useState([]);
+  const [workElements, setWorkElements] = useState(workElement);
   const [workElementName, setWorkElementName] = useState<string>('');
   const [tolerancesTypes, setTolerancesTypes] = useState(
     [
@@ -147,12 +151,13 @@ export default function WorkElement({ tolerance }: IProps) {
           factor: toleranceAdded,
         };
 
+        console.log('dasdaadasda', data);
 
-        const responseReult = await api.post(`/chronoanalysis/work-element-factor`, data);
+        const responseResult = await api.post(`/chronoanalysis/work-element-factor/`, data);
 
         const newWorkElementRegistered = response.data;
 
-        workElements.push(response.data);
+        workElements.push(newWorkElementRegistered);
 
         setWorkElements(workElements);
         setLoading(false);
@@ -165,7 +170,7 @@ export default function WorkElement({ tolerance }: IProps) {
 
         setIsModalOpen(false);
       } catch (error) {
-        console.log(error);
+        console.log('aaaa: ', error);
         console.error(error);
         Notification({
           type: 'error',
@@ -179,7 +184,19 @@ export default function WorkElement({ tolerance }: IProps) {
     setWorkElementId('');
   }
 
-  function handleClose() { }
+  function handleClose() {
+    setIsModalOpen(false);
+
+    setToleranceAdded([
+      { id: '', type: '', classification: '' },
+      { id: '', type: '', classification: '' },
+      { id: '', type: '', classification: '' },
+      { id: '', type: '', classification: '' },
+      { id: '', type: '', classification: '' },
+      { id: '', type: '', classification: '' },
+      { id: '', type: '', classification: '' },
+    ])
+  }
 
   function handleChangeToleranceType(index, id) {
     let newArray = [...toleranceAdded];
@@ -191,8 +208,6 @@ export default function WorkElement({ tolerance }: IProps) {
 
     var filteredItems = tolerances.filter(function (obj) { return obj.type == newArray[index].type; });
     setTolerancesClassification(filteredItems)
-
-    console.log(newArray);
 
     setToleranceAdded(newArray);
   }
@@ -211,7 +226,39 @@ export default function WorkElement({ tolerance }: IProps) {
 
   }
 
+  async function handleEdit(data) {
+    const responseResult = await api.get(`/chronoanalysis/work-element-factor/${data.id}`);
 
+
+  }
+
+  async function handleDelete(id) {
+    try {
+      const responseResult = await api.delete(`/chronoanalysis/work-element/${id}`);
+
+      const filteredWorkElements = workElements.filter((iten) => {
+        if (iten.id !== id) {
+          return iten;
+        }
+      });
+
+
+      setWorkElements(filteredWorkElements);
+
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Elemento de Trabalho Deletado com sucesso',
+      });
+    } catch (error) {
+      console.error(error);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Deletar o Elemento de Trabalho',
+      });
+    }
+  }
 
   class SearchTable extends React.Component {
     state = {
@@ -513,13 +560,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const tolerances = await apiClient.get('/chronoanalysis/tolerance-factor/');
     const { data } = await apiClient.get('/chronoanalysis/work-element');
 
-    console.log(tolerances);
-
-
-
     return {
       props: {
-        workelement: data,
+        workElement: data,
         tolerance: tolerances.data,
       },
     };
