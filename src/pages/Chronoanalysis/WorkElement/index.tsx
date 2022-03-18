@@ -32,7 +32,6 @@ import { api } from '../../../services/api';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../services/axios';
 
-import { Divider } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -59,13 +58,13 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
   const [toleranceAdded, setToleranceAdded] = useState(
     [
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
     ])
   const [workElements, setWorkElements] = useState(workElement);
   const [workElementName, setWorkElementName] = useState<string>('');
@@ -81,11 +80,11 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
     ]);
   const [tolerancesClassification, setTolerancesClassification] = useState([]);
   const [workElementId, setWorkElementId] = useState('');
-
+  const [workElementFactor, setWorkElementFactor] = useState([])
+  const [factorCalculated, setFactorCalculated] = useState(0);
 
   async function handleRegister(e) {
     e.preventDefault();
-
     if (workElementId) {
       try {
         if (workElementName == '') {
@@ -96,19 +95,40 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
             description: 'Não foi possível editar o Produto de Processo',
           });
         }
-        const data = {
-          work_element_id: workElementId,
-          factor: toleranceAdded,
-        };
+
+        let response;
+
         setLoading(true);
-        const response = await api.post(`/chronoanalysis/work-element/${workElementId}`, { name: workElementName });
+        try {
+          response = await api.put(`/chronoanalysis/work-element/${workElementId}`, { name: workElementName });
+        } catch (error) {
+          console.error(error.response.data.message);
+          Notification({
+            type: 'error',
+            title: 'Erro',
+            description: error.response.data.message,
+          });
+          setLoading(false);
+        }
 
-        const responseTolerance = await api.post(`/chronoanalysis/work-element-factor/${workElementId}`, { factor: data });
-        console.log('AAAAAAA: ', response.data);
 
+
+        workElementFactor.map(async (factor, index) => {
+          try {
+            const responseTolerance = await api.put(`/chronoanalysis/work-element-factor/${factor.id}`, { factor: [toleranceAdded[index]] });
+          } catch (error) {
+            console.error(error.response.data.message);
+            Notification({
+              type: 'error',
+              title: 'Erro',
+              description: 'Existem Elementos de Trabalho Vazios',
+            });
+            setLoading(false);
+          }
+        })
 
         const filterWorkElements = workElements.filter((iten) => {
-          if (iten.id == workElementId) {
+          if (iten.id != workElementId) {
             return iten;
           }
         });
@@ -117,13 +137,14 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
         setWorkElements(filterWorkElements);
         setLoading(false);
+        setIsModalOpen(false);
         Notification({
           type: 'success',
           title: 'Enviado',
           description: 'Elemento de Trabalho Editado com sucesso',
         });
       } catch (error) {
-        console.error(error);
+        console.error(error.response);
         Notification({
           type: 'error',
           title: 'Erro',
@@ -138,20 +159,19 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           return Notification({
             type: 'error',
             title: 'Erro',
-            description: 'Não foi possível cadastrar o Produto de Processo',
+            description: 'O Nome Não Pode Ser Vazio',
           });
         }
-
+        let response;
 
         setLoading(true);
-        const response = await api.post(`/chronoanalysis/work-element`, { name: workElementName });
+
+        response = await api.post(`/chronoanalysis/work-element`, { name: workElementName });
 
         const data = {
           work_element_id: response.data.id,
           factor: toleranceAdded,
         };
-
-        console.log('dasdaadasda', data);
 
         const responseResult = await api.post(`/chronoanalysis/work-element-factor/`, data);
 
@@ -165,70 +185,76 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
         Notification({
           type: 'success',
           title: 'Enviado',
-          description: 'Produto de Processo Cadastrado com sucesso',
+          description: 'Elemento de Trabalho Cadastrado com sucesso',
         });
 
         setIsModalOpen(false);
       } catch (error) {
-        console.log('aaaa: ', error);
-        console.error(error);
+        console.error(error.response.data.message);
         Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível cadastrar a Produto de Processo',
+          description: error.response.data.message,
         });
         setLoading(false);
       }
     }
 
-    setWorkElementId('');
   }
 
   function handleClose() {
     setIsModalOpen(false);
-
+    setWorkElementId('');
+    setWorkElementName('');
     setToleranceAdded([
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-      { id: '', type: '', classification: '' },
-    ])
-  }
-
-  function handleChangeToleranceType(index, id) {
-    let newArray = [...toleranceAdded];
-    const value = tolerances.find(
-      (toleranceItem) => toleranceItem.id === id
-    );
-
-    newArray[index].type = value.type;
-
-    var filteredItems = tolerances.filter(function (obj) { return obj.type == newArray[index].type; });
-    setTolerancesClassification(filteredItems)
-
-    setToleranceAdded(newArray);
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+      { id: '', type: '', classification: '', factor: 0, },
+    ]);
   }
 
   function handleChangeToleranceClassification(index, id) {
     let newArray = [...toleranceAdded];
+    const lastItemOfArray = 6;
     const value = tolerances.find(
       (toleranceItem) => toleranceItem.id === id
     );
 
     newArray[index].classification = value.classification;
     newArray[index].id = value.id;
+    newArray[index].factor = value.factor;
+
+    calculateResultOfMultiplyingFactors(toleranceAdded);
+
 
     setToleranceAdded(newArray);
-    console.log(newArray);
 
   }
 
   async function handleEdit(data) {
     const responseResult = await api.get(`/chronoanalysis/work-element-factor/${data.id}`);
 
+    const filteredItems = responseResult.data.map((item) => {
+      return item.factor
+    })
+
+    setWorkElementFactor(responseResult.data);
+
+    const filteredTypes = filteredItems.map((item) => {
+      return item.type
+    });
+
+    calculateResultOfMultiplyingFactors(filteredItems);
+
+    setTolerancesTypes(filteredTypes);
+    setWorkElementId(data.id);
+    setWorkElementName(data.name);
+    setToleranceAdded(filteredItems);
+    setIsModalOpen(true);
 
   }
 
@@ -242,7 +268,6 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
         }
       });
 
-
       setWorkElements(filteredWorkElements);
 
       Notification({
@@ -251,7 +276,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
         description: 'Elemento de Trabalho Deletado com sucesso',
       });
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data.message);
       Notification({
         type: 'error',
         title: 'Erro',
@@ -260,6 +285,17 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
     }
   }
 
+  function calculateResultOfMultiplyingFactors(data: Array<any>) {
+    console.log(data);
+
+    let result = 1;
+    for (let index = 0; index < data.length; index++) {
+      result = result + data[index].factor;
+    }
+
+    setFactorCalculated(result);
+
+  }
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -425,6 +461,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
       <Modal
         title="Cadastrar Elemento de Trabalho"
         visible={isModalOpen}
+        width={700}
         onCancel={handleClose}
         footer={[
           <Button key="back" onClick={handleClose} type="default">
@@ -461,7 +498,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
         {toleranceAdded.map((selectedIten, index) => (
           <Row gutter={10}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 key="TypeFormItem"
                 labelCol={{ span: 23 }}
@@ -470,9 +507,9 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                 style={{
                   backgroundColor: 'white',
                 }}
-                required
               >
                 <Input
+                  disabled={true}
                   key="toleranceTypeName"
                   size="large"
                   value={tolerancesTypes[index]}
@@ -481,7 +518,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
               </Form.Item>
 
             </Col>
-            <Col span={12}>
+            <Col span={11}>
               <Form.Item
                 key="classificationFormItem"
                 labelCol={{ span: 23 }}
@@ -529,7 +566,26 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
               </Form.Item>
 
             </Col>
+            <Col span={3}>
+              <Form.Item
+                key="TypeFormItem"
+                labelCol={{ span: 23 }}
+                label="Tipo:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+              >
+                <Input
+                  disabled={true}
+                  key="toleranceTypeName"
+                  size="large"
+                  value={selectedIten.factor}
+                  contentEditable={false}
+                />
+              </Form.Item>
 
+            </Col>
             {/* {toleranceAdded.length - 1 === index && (
               <Button
                 key="primary"
@@ -548,6 +604,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
             )} */}
           </Row>
         ))}
+        <Title style={{ textAlign: 'center' }} level={3}>Fator: {factorCalculated.toFixed(2)}</Title>
       </Modal>
     </div >
   )
@@ -567,7 +624,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   } catch (error) {
-    console.error(error);
+    console.error(error.response);
     return {
       props: {
         workelement: [],

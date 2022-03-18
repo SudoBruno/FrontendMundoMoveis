@@ -191,8 +191,6 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
     setProductionLineId(data.production_line_id);
 
     const productionLineData = productionLines.find(line => line.id === data.production_line_id)
-    console.log(productionLineData);
-
 
     setProductionLineName(productionLineData.name);
   }
@@ -202,7 +200,6 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
     setProductionLineName(productionLineValue.name);
 
   }
-
   class SearchTable extends React.Component {
     state = {
       searchText: '',
