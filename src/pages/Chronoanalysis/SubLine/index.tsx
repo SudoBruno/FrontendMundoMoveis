@@ -25,6 +25,8 @@ import { Notification } from '../../../components/Notification';
 import { api } from '../../../services/api';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../services/axios';
+import isequal from "lodash.isequal";
+import get from "lodash.get";
 
 const { Option } = Select;
 
@@ -206,76 +208,74 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
       searchedColumn: '',
     };
     searchInput;
-    getColumnSearchProps = (dataIndex) => ({
+    getColumnSearchProps = dataIndex => ({
       filterDropdown: ({
         setSelectedKeys,
         selectedKeys,
         confirm,
-        clearFilters,
+        clearFilters
       }) => (
         <div style={{ padding: 8 }}>
           <Input
-            ref={(node) => {
+            ref={node => {
               this.searchInput = node;
             }}
             placeholder={`Search ${dataIndex}`}
             value={selectedKeys[0]}
-            onChange={(e) =>
+            onChange={e =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
             onPressEnter={() =>
               this.handleSearch(selectedKeys, confirm, dataIndex)
             }
-            style={{ marginBottom: 8, display: 'block' }}
+            style={{ width: 188, marginBottom: 8, display: "block" }}
           />
           <Space>
             <Button
               type="primary"
-              onClick={() =>
-                this.handleSearch(selectedKeys, confirm, dataIndex)
-              }
+              onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
               icon={<SearchOutlined />}
               size="small"
               style={{ width: 90 }}
             >
-              Buscar
+              Search
             </Button>
             <Button
               onClick={() => this.handleReset(clearFilters)}
               size="small"
               style={{ width: 90 }}
             >
-              Limpar
+              Reset
             </Button>
           </Space>
         </div>
       ),
-      filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      filterIcon: filtered => (
+        <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
       ),
-      onFilter: (value, record) =>
-        record[dataIndex]
-          ? record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
-          : '',
-      onFilterDropdownVisibleChange: (visible) => {
+      onFilter: (value, record) => {
+        return get(record, dataIndex)
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase());
+      },
+      onFilterDropdownVisibleChange: visible => {
         if (visible) {
-          setTimeout(() => this.searchInput.select(), 100);
+          setTimeout(() => this.searchInput.select());
         }
       },
-      render: (text) =>
-        this.state.searchedColumn === dataIndex ? (
+      render: text => {
+        return isequal(this.state.searchedColumn, dataIndex) ? (
           <Highlighter
-            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
             searchWords={[this.state.searchText]}
             autoEscape
-            textToHighlight={text ? text.toString() : ''}
+            textToHighlight={text.toString()}
           />
         ) : (
           text
-        ),
+        );
+      }
     });
 
     handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -301,7 +301,15 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
           ...this.getColumnSearchProps('name'),
           sorter: (a, b) => a.name.length - b.name.length,
         },
+        {
+          title: 'Linha de Produção',
+          dataIndex: ['production_line', 'name'],
+          key: 'name',
+          width: '40%',
+          ...this.getColumnSearchProps(['production_line', 'name']),
+          sorter: (a, b) => a.name.length - b.name.length,
 
+        },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
@@ -310,7 +318,6 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
           ...this.getColumnSearchProps('created_at'),
           sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
-
         {
           title: 'Operação',
           key: 'aaa',
@@ -319,7 +326,8 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
               <>
                 <EditFilled
                   style={{ cursor: 'pointer', fontSize: '16px' }}
-                  onClick={() => handleEdit(record)}
+                  onClick={() => console.log(record.production_line.name)
+                  }
                 />
                 {/* onClick={() => handleEdit(record)} */}
                 <Popconfirm
@@ -445,6 +453,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const { data } = await apiClient.get('/production-line/mirror/');
     const subLine = await apiClient.get('/chronoanalysis/sub-production-line/');
+
+
     return {
       props: {
         productionLine: data,
