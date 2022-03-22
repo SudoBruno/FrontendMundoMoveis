@@ -32,6 +32,7 @@
     "reqwest": "^2.0.5",
     "sass": "^1.37.0",
     "styled-components": "^5.3.0",
+    "video-react": "^0.15.0",
     "xhr2": "^0.2.1"
   },
   "devDependencies": {

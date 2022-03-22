@@ -3,6 +3,9 @@ import {
   EditFilled,
   PlusOutlined,
   SearchOutlined,
+  MinusCircleOutlined,
+  EyeOutlined,
+  CloseOutlined
 } from '@ant-design/icons';
 import {
   Button,
@@ -16,40 +19,133 @@ import {
   Select,
   Space,
   Table,
+  Upload,
 } from 'antd';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import Highlighter from 'react-highlight-words';
 import styles from '../../../styles/app.module.scss';
+import { Typography } from 'antd';
+
+const { Title } = Typography;
 
 import { Notification } from '../../../components/Notification';
 import { api } from '../../../services/api';
 import { GetServerSideProps } from 'next';
 import { getAPIClient } from '../../../services/axios';
 
+import { Player } from "video-react";
+
+import { Divider } from 'antd';
+import FormData from 'form-data'
+
 const { Option } = Select;
 
+interface ISubLine {
+  id: string;
+  name: string;
+}
 interface ISubProduct {
   id: string;
   name: string;
   created_at: Date;
 }
-
 interface IProps {
   subProduct: ISubProduct[];
+  subLine: ISubLine[];
   notFound: boolean;
 }
 
-export default function SubProductProcess({ subProduct }: IProps) {
+export default function SubProductProcess({ subProduct, subLine }: IProps) {
   const [subProducts, setSubProducts] = useState(subProduct);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState('');
   const [name, setName] = useState('');
+  const [subLines, setSubLines] = useState(subLine);
+  const [subLineId, setSubLineId] = useState('');
+  const [subLineName, setSubLineName] = useState('');
+  const fileList = useRef<any>();
+  const [videoIsDefined, setVideoIsDefined] = useState(false);
+  const [previewVideo, setPreviewVideo] = useState<any>()
+  const [video, setVideo] = useState();
+  const [previewVisible, setPreviewVisible] = useState<boolean>();
+  const [previewTitle, setPreviewTitle] = useState();
+
+
+  useEffect(() => {
+    if (video) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPreviewVideo(reader.result as string);
+      }
+      reader.readAsDataURL(video);
+    } else {
+      setPreviewVideo(null);
+    }
+
+  }, [video]);
+
+  const uploadButton = (
+    <div>
+      <div style={styles}>
+        <label className={styles.custom_file_upload}>
+          <p><b>UPLOAD +</b></p>
+          <input type="file" accept="video/*" ref={fileList} onChange={() => {
+            setVideo(fileList.current.files[0])
+            setVideoIsDefined(true)
+          }} />
+        </label>
+      </div>
+
+    </div>
+  );
+
+  const videoUploadSucces = (
+    <div>
+      <div style={styles}>
+
+        <Title level={5} style={{ color: 'green' }}>Video Carregado</Title>
+        <Button shape="circle" style={{ color: 'black' }} onClick={() => {
+          handlePreview(video)
+        }}>
+          <EyeOutlined />
+        </Button>
+        <Button shape="circle" style={{ color: 'red', marginLeft: 5, }} onClick={() => {
+          setVideo(null)
+          setVideoIsDefined(false)
+        }}>
+          <CloseOutlined />
+        </Button>
+      </div>
+
+    </div>
+  );
+
+
+  async function handlePreview(file) {
+    if (file && file.type.substring(0, 5) === "video") {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => setPreviewVideo(reader.result as string);
+    } else {
+      setPreviewVideo(null);
+    }
+
+    setPreviewVisible(true);
+    setPreviewTitle(file.name)
+  };
+
+  function handleCancel() {
+    setPreviewVisible(false)
+  };
 
   function handleClose() {
     setName('');
     setId('');
     setIsModalOpen(false);
+    setPreviewVideo(null);
+    setVideo(null);
+    setVideoIsDefined(false);
   }
 
   async function handleRegister(e) {
@@ -337,9 +433,19 @@ export default function SubProductProcess({ subProduct }: IProps) {
         <SearchTable />
       </Layout>
       <Modal
+        key="previewVideoModal"
+        visible={previewVisible}
+        title={previewTitle}
+        footer={null}
+        onCancel={handleCancel}
+      >
+        <video controls src={previewVideo} width="460em"></video>
+      </Modal>
+      <Modal
         title="Cadastro de Sub-Produto"
         visible={isModalOpen}
         onCancel={handleClose}
+        width={600}
         footer={[
           <Button key="back" onClick={handleClose} type="default">
             Cancelar
@@ -361,16 +467,59 @@ export default function SubProductProcess({ subProduct }: IProps) {
           style={{ backgroundColor: 'white', fontWeight: 'bold' }}
           required
         >
-          <Input
-            key="categorieName"
-            size="large"
-            style={{ width: 400, marginBottom: '10px' }}
-            placeholder="Nome do Sub-Produto"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-          />
+          <Row>
+            <Col span={20}>
+              <Input
+                key="sub-productName"
+                size="large"
+                style={{ width: 400, marginBottom: '10px' }}
+                placeholder="Nome do Sub-Produto"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+              />
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span={10}>
+              <p>Selecione o Video do Produto</p>
+              {videoIsDefined != true && uploadButton}
+              {videoIsDefined === true && videoUploadSucces}
+            </Col>
+            <Col span={13}>
+              <Form.Item
+                key="productFormItem"
+                labelCol={{ span: 23 }}
+                label="Produto:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Select
+                  key="managerName"
+                  size="large"
+                  value={subLineId}
+                  onChange={(e) => {
+                    setSubLineId(e.toString());
+                  }}
+                >
+                  {subLines.map((item) => (
+                    <>
+                      <Option key={item.id} value={item.id}>
+                        {item.name}
+                      </Option>
+                    </>
+                  ))}
+                </Select>
+              </Form.Item>
+
+            </Col>
+          </Row>
+
         </Form.Item>
       </Modal>
     </div>
@@ -381,10 +530,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
     const { data } = await apiClient.get('/chronoanalysis/process-sub-product');
+    const subLine = await apiClient.get('/chronoanalysis/sub-production-line/');
 
     return {
       props: {
         subProduct: data,
+        subLine: subLine.data,
       },
     };
   } catch (error) {
@@ -392,6 +543,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         subProduct: [],
+        subLine: [],
       },
     };
   }

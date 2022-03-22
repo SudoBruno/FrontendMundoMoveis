@@ -86,7 +86,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
       setPreviewImage(null);
     }
 
-  }, [image])
+  }, [image]);
 
   const uploadButton = (
     <div>

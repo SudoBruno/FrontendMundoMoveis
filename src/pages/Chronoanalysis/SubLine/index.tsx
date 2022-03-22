@@ -326,10 +326,10 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
               <>
                 <EditFilled
                   style={{ cursor: 'pointer', fontSize: '16px' }}
-                  onClick={() => console.log(record.production_line.name)
-                  }
+                  onClick={() => handleEdit(record)}
+
                 />
-                {/* onClick={() => handleEdit(record)} */}
+
                 <Popconfirm
                   title="Confirmar remoção?"
                   onConfirm={() => handleDelete(record.id)}
