@@ -3,7 +3,7 @@ import {
   EditFilled,
   PlusOutlined,
   SearchOutlined,
-  MinusCircleOutlined,
+  FormOutlined,
   EyeOutlined,
   CloseOutlined
 } from '@ant-design/icons';
@@ -19,9 +19,9 @@ import {
   Select,
   Space,
   Table,
-  Upload,
+  TimePicker
 } from 'antd';
-import React, { FormEvent, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Highlighter from 'react-highlight-words';
 import styles from '../../../styles/app.module.scss';
 import { Typography } from 'antd';
@@ -37,9 +37,14 @@ import { Player } from "video-react";
 
 import { Divider } from 'antd';
 import FormData from 'form-data'
+import moment from 'moment';
+
 
 const { Option } = Select;
-
+interface IWorkElement {
+  id: string;
+  name: string;
+}
 interface ISubLine {
   id: string;
   name: string;
@@ -52,14 +57,16 @@ interface ISubProduct {
 interface IProps {
   subProduct: ISubProduct[];
   subLine: ISubLine[];
+  workElement: IWorkElement[];
   notFound: boolean;
 }
 
-export default function SubProductProcess({ subProduct, subLine }: IProps) {
-  const [subProducts, setSubProducts] = useState(subProduct);
+export default function SubProductProcess({ subProduct, subLine, workElement }: IProps) {
+  const [subProducts, setSubProducts] = useState<ISubProduct[]>(subProduct);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [id, setId] = useState('');
+  const [subProductId, setSubProductId] = useState('');
+  const [isEdit, setIsEdit] = useState(false);
   const [name, setName] = useState('');
   const [subLines, setSubLines] = useState(subLine);
   const [subLineId, setSubLineId] = useState('');
@@ -70,6 +77,18 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
   const [video, setVideo] = useState();
   const [previewVisible, setPreviewVisible] = useState<boolean>();
   const [previewTitle, setPreviewTitle] = useState();
+  const [workElementsAdded, setWorkElementsAdded] = useState([{
+    process_sub_product_id: '',
+    work_element_id: '',
+    work_element_name: '',
+    sequential_order: 0,
+    initial_time_video: '00:00:00',
+    initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+    finish_time_video: '00:00:00',
+    finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+    isEditable: false,
+  }]);
+  const [workElements, setWorkElements] = useState<IWorkElement[]>(workElement);
 
 
   useEffect(() => {
@@ -141,99 +160,113 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
 
   function handleClose() {
     setName('');
-    setId('');
+    setSubProductId('');
     setIsModalOpen(false);
     setPreviewVideo(null);
     setVideo(null);
     setVideoIsDefined(false);
+
+    setWorkElementsAdded([{
+      process_sub_product_id: '',
+      work_element_id: '',
+      work_element_name: '',
+      sequential_order: 0,
+      initial_time_video: '00:00:00',
+      initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+      finish_time_video: '00:00:00',
+      finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+      isEditable: false,
+    }]);
   }
 
   async function handleRegister(e) {
     e.preventDefault();
 
-    if (id) {
-      try {
-        if (name === '') {
-          setLoading(false);
-          return Notification({
-            type: 'error',
-            title: 'Erro',
-            description: 'Não foi possível editar o Sub-Produto',
-          });
-        }
-        const data = {
-          id: id,
-          name: name,
-        };
-        setLoading(true);
-        const response = await api.put(`/chronoanalysis/process-sub-product/${id}`, data);
-
-        const filterSubProducts = subProduct.filter((iten) => {
-          if (iten.id !== id) {
-            return iten;
-          }
-        });
-        filterSubProducts.push(response.data)
-
-        setSubProducts(filterSubProducts)
+    try {
+      if (name === '') {
         setLoading(false);
-        setIsModalOpen(false);
-        Notification({
-          type: 'success',
-          title: 'Enviado',
-          description: 'Sub-Produto Editado com sucesso',
-        });
-      } catch (error) {
-        console.error(error);
-        Notification({
+        return Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível Editar o Sub-Produto',
+          description: 'Não foi possível cadastrar o Sub-Produto',
         });
-        setLoading(false);
       }
-    } else {
-      try {
-        if (name === '') {
-          setLoading(false);
-          return Notification({
-            type: 'error',
-            title: 'Erro',
-            description: 'Não foi possível cadastrar o Sub-Produto',
-          });
-        }
 
-        const data = {
-          name: name,
-        };
+      const data = {
+        name: name,
+      };
 
-        setLoading(true);
-        const response = await api.post('/chronoanalysis/process-sub-product', data);
-        setLoading(false);
+      setLoading(true);
+      const response = await api.post('/chronoanalysis/process-sub-product', data);
+      setLoading(false);
 
-        Notification({
-          type: 'success',
-          title: 'Enviado',
-          description: 'Sub-Produto Cadastrado com sucesso',
-        });
+      Notification({
+        type: 'success',
+        title: 'Enviado',
+        description: 'Sub-Produto Cadastrado com sucesso',
+      });
 
-        const newSubProductRegistered = response.data;
+      const newSubProductRegistered = response.data;
 
-        subProduct.push(newSubProductRegistered);
-        setSubProducts(subProduct);
-        setIsModalOpen(false);
-      } catch (error) {
-        console.error(error);
-        Notification({
-          type: 'error',
-          title: 'Erro',
-          description: 'Não foi possível cadastrar a Sub-Produto',
-        });
-        setLoading(false);
-      }
+      subProduct.push(newSubProductRegistered);
+      setSubProducts(subProduct);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error(error.response.data.message);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível cadastrar a Sub-Produto',
+      });
+      setLoading(false);
     }
+
     setName('');
-    setId('');
+    setSubProductId('');
+  }
+
+  async function handleEdit() {
+    try {
+      if (name === '') {
+        setLoading(false);
+        return Notification({
+          type: 'error',
+          title: 'Erro',
+          description: 'Não foi possível editar o Sub-Produto',
+        });
+      }
+      const data = {
+        id: subProductId,
+        name: name,
+      };
+      setLoading(true);
+      const response = await api.put(`/chronoanalysis/process-sub-product/${subProductId}`, data);
+
+      const filterSubProducts = subProduct.filter((iten) => {
+        if (iten.id !== subProductId) {
+          return iten;
+        }
+      });
+      filterSubProducts.push(response.data)
+
+      setSubProducts(filterSubProducts)
+      setLoading(false);
+      setIsModalOpen(false);
+      Notification({
+        type: 'success',
+        title: 'Enviado',
+        description: 'Sub-Produto Editado com sucesso',
+      });
+    } catch (error) {
+      console.error(error);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Editar o Sub-Produto',
+      });
+      setLoading(false);
+    }
+
   }
 
   async function handleDelete(id: string) {
@@ -262,14 +295,135 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
     }
   }
 
-  function handleEdit(data: ISubProduct) {
-    console.log(data);
+  async function handleFilterSubProductProcessById(data) {
 
+    const responseResult = await api.get(`/chronoanalysis/process-sub-product-work-element/${data.id}`);
+
+    console.log(responseResult.data);
+
+    setIsEdit(true);
     setIsModalOpen(true);
-    setId(data.id);
+    setSubProductId(data.id);
     setName(data.name);
   }
 
+  function addNewSubProduct(e) {
+    e.preventDefault();
+
+    const newArray = [
+      ...workElementsAdded,
+      {
+        process_sub_product_id: '',
+        work_element_id: '',
+        work_element_name: '',
+        sequential_order: 0,
+        initial_time_video: '00:00:00',
+        finish_time_video: '00:00:00',
+        finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+        initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+        isEditable: false,
+      }
+    ];
+
+    setWorkElementsAdded(newArray);
+  }
+
+  function handleChangeWorkElement(index, id) {
+    console.log(id);
+
+    let newArray = [...workElementsAdded];
+    const values = workElements.find(
+      (test) => test.id === id
+    );
+    newArray[index].work_element_id = values.id;
+    newArray[index].work_element_name = values.name;
+
+    setWorkElementsAdded(newArray);
+
+  }
+
+  function removeSubProducts(indexOfItem: number) {
+
+    let newArray = [...workElementsAdded];
+    newArray.splice(indexOfItem, 1);
+    setWorkElementsAdded(newArray);
+  }
+
+  function handleChangeOrder(index, value) {
+    let newArray = [...workElementsAdded];
+
+    newArray[index].sequential_order = Number(value);
+
+    console.log(newArray);
+
+    setWorkElementsAdded(newArray);
+  }
+
+  function handleChangeInitialTime(index, value) {
+
+
+    let newArray = [...workElementsAdded];
+
+    if (value === '') {
+      newArray[index].initial_time_video_to_show = moment('00:00:00', 'HH:mm:ss');
+      setWorkElementsAdded(newArray);
+      return
+    }
+
+    if (newArray[index].finish_time_video > '00:00:00' && value > newArray[index].finish_time_video) {
+      Notification({
+        type: 'error',
+        title: 'Inválido',
+        description: 'O Valor final não pode ser menor que o inical'
+      })
+      newArray[index].initial_time_video = newArray[index].finish_time_video;
+      newArray[index].initial_time_video_to_show = moment(value, 'HH:mm:ss');
+      newArray[index].finish_time_video = value;
+      newArray[index].finish_time_video_to_show = moment(value, 'HH:mm:ss');
+      setWorkElementsAdded(newArray);
+      return;
+    }
+
+    newArray[index].initial_time_video = value;
+    newArray[index].initial_time_video_to_show = moment(value, 'HH:mm:ss');
+    newArray[index].finish_time_video = value;
+    newArray[index].finish_time_video_to_show = moment(value, 'HH:mm:ss');
+
+    setWorkElementsAdded(newArray);
+  }
+
+  function handleChangeFinishTime(index, value) {
+    let newArray = [...workElementsAdded];
+
+    if (value === '') {
+      newArray[index].finish_time_video = newArray[index].initial_time_video;
+      newArray[index].finish_time_video_to_show = moment(newArray[index].initial_time_video, 'HH:mm:ss');
+      setWorkElementsAdded(newArray);
+      return
+    }
+
+    if (newArray[index].initial_time_video > value) {
+      Notification({
+        type: 'error',
+        title: 'Inválido',
+        description: 'O Valor final não pode ser menor que o inical'
+      })
+      newArray[index].finish_time_video = newArray[index].initial_time_video;
+      newArray[index].finish_time_video_to_show = moment(newArray[index].initial_time_video, 'HH:mm:ss');
+      setWorkElementsAdded(newArray);
+      return;
+    }
+
+    console.log('seguiu');
+
+    newArray[index].finish_time_video = value;
+    newArray[index].finish_time_video_to_show = moment(value, 'HH:mm:ss');
+
+
+    console.log(newArray);
+
+    setWorkElementsAdded(newArray);
+  }
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -389,9 +543,8 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
               <>
                 <EditFilled
                   style={{ cursor: 'pointer', fontSize: '16px' }}
-                  onClick={() => handleEdit(record)}
+                  onClick={() => handleFilterSubProductProcessById(record)}
                 />
-                {/* onClick={() => handleEdit(record)} */}
                 <Popconfirm
                   title="Confirmar remoção?"
                   onConfirm={() => handleDelete(record.id)}
@@ -444,8 +597,7 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
       <Modal
         title="Cadastro de Sub-Produto"
         visible={isModalOpen}
-        onCancel={handleClose}
-        width={600}
+        width={1000}
         footer={[
           <Button key="back" onClick={handleClose} type="default">
             Cancelar
@@ -454,25 +606,26 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
             key="submit"
             type="primary"
             loading={loading}
-            onClick={handleRegister}
+            onClick={isEdit ? handleEdit : handleRegister}
           >
             Salvar
           </Button>,
         ]}
       >
-        <Form.Item
-          labelCol={{ span: 23 }}
-          label="Nome:"
-          labelAlign={'left'}
-          style={{ backgroundColor: 'white', fontWeight: 'bold' }}
-          required
-        >
-          <Row>
+        <Row>
+          <Form.Item
+            labelCol={{ span: 23 }}
+            label="Nome:"
+            labelAlign={'left'}
+            style={{ backgroundColor: 'white', fontWeight: 'bold' }}
+            required
+          >
+
             <Col span={20}>
               <Input
                 key="sub-productName"
                 size="large"
-                style={{ width: 400, marginBottom: '10px' }}
+                style={{ width: 400 }}
                 placeholder="Nome do Sub-Produto"
                 value={name}
                 onChange={(e) => {
@@ -480,19 +633,79 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
                 }}
               />
             </Col>
-          </Row>
 
-          <Row>
-            <Col span={10}>
-              <p>Selecione o Video do Produto</p>
-              {videoIsDefined != true && uploadButton}
-              {videoIsDefined === true && videoUploadSucces}
-            </Col>
-            <Col span={13}>
+          </Form.Item>
+        </Row>
+
+        <Row>
+          <Col span={6}>
+            <p>Selecione o Video do Produto</p>
+            {videoIsDefined != true && uploadButton}
+            {videoIsDefined === true && videoUploadSucces}
+          </Col>
+          <Col span={9}>
+
+            <Form.Item
+              key="productFormItem"
+              labelCol={{ span: 23 }}
+              label="Sub Linha:"
+              labelAlign={'left'}
+              style={{
+                backgroundColor: 'white',
+              }}
+              required
+            >
+              <Select
+                key="subLineName"
+                size="large"
+                value={subLineId}
+                onChange={(e) => {
+                  setSubLineId(e.toString());
+                }}
+              >
+                {subLines.map((item) => (
+                  <>
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  </>
+                ))}
+              </Select>
+            </Form.Item>
+
+          </Col>
+        </Row>
+
+        <Divider />
+
+        {workElementsAdded.map((selectedIten, index) => (
+          <Row gutter={8}>
+            <Col span={2}>
               <Form.Item
-                key="productFormItem"
+                key="removeFormItem"
+                label="Ordem: "
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <Input
+                  type="number"
+                  key="totalKey"
+                  size="large"
+                  disabled={selectedIten.isEditable}
+                  placeholder="0"
+                  value={selectedIten.sequential_order}
+                  onChange={(e) => handleChangeOrder(index, e.target.value)}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={10}>
+              <Form.Item
+                key="workElementFormItem"
                 labelCol={{ span: 23 }}
-                label="Produto:"
+                label="Elemento de Trabalho:"
                 labelAlign={'left'}
                 style={{
                   backgroundColor: 'white',
@@ -500,14 +713,15 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
                 required
               >
                 <Select
-                  key="managerName"
+                  key="workElementName"
                   size="large"
-                  value={subLineId}
+                  disabled={selectedIten.isEditable}
+                  value={selectedIten.work_element_id}
                   onChange={(e) => {
-                    setSubLineId(e.toString());
+                    handleChangeWorkElement(index, e)
                   }}
                 >
-                  {subLines.map((item) => (
+                  {workElements.map((item) => (
                     <>
                       <Option key={item.id} value={item.id}>
                         {item.name}
@@ -515,12 +729,94 @@ export default function SubProductProcess({ subProduct, subLine }: IProps) {
                     </>
                   ))}
                 </Select>
+
               </Form.Item>
 
             </Col>
-          </Row>
+            <Col span={4}>
+              <Form.Item
+                key="startVideoFormItem"
+                labelCol={{ span: 23 }}
+                label="Início:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <TimePicker
+                  size="large"
+                  defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                  disabled={selectedIten.isEditable}
+                  value={selectedIten.initial_time_video_to_show}
+                  onChange={(e, timeAsString) => { handleChangeInitialTime(index, timeAsString) }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={4}>
+              <Form.Item
+                key="finalVideoFormItem"
+                labelCol={{ span: 23 }}
+                label="Final:"
+                labelAlign={'left'}
+                style={{
+                  backgroundColor: 'white',
+                }}
+                required
+              >
+                <TimePicker
+                  size="large"
+                  disabled={selectedIten.isEditable}
+                  value={selectedIten.finish_time_video_to_show}
+                  defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                  onChange={(e, timeAsString) => { handleChangeFinishTime(index, timeAsString) }}
+                />
 
-        </Form.Item>
+              </Form.Item>
+            </Col>
+
+            <Col>
+              {isEdit &&
+                <Button
+                  style={{ marginTop: 35, color: 'blue', borderColor: 'blue' }}
+                  onClick={() => removeSubProducts(index)}
+                >
+                  <FormOutlined />
+                </Button>
+
+              }
+            </Col>
+            <Col>
+              {(workElementsAdded.length != 1 || isEdit) && (
+                <Button danger style={{ marginTop: 35 }} onClick={() => removeSubProducts(index)}><DeleteOutlined /></Button>
+              )}
+            </Col>
+            {workElementsAdded.length - 1 === index &&
+              (
+                <Button
+                  key="primary"
+                  title="Novo Sub Produto"
+                  disabled={
+                    selectedIten.finish_time_video > '00:00:00' &&
+                      selectedIten.work_element_id !== '' &&
+                      selectedIten.sequential_order != 0 ? false : true
+                  }
+                  style={{
+
+                    width: '100%',
+                    color: 'white',
+                    backgroundColor: 'rgb(5, 155, 50)',
+                  }}
+                  onClick={addNewSubProduct}
+                >
+                  <PlusOutlined />
+                  Novo Elemento de Trabalho
+                </Button>
+              )}
+
+
+          </Row>
+        ))}
       </Modal>
     </div>
   );
@@ -531,11 +827,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const { data } = await apiClient.get('/chronoanalysis/process-sub-product');
     const subLine = await apiClient.get('/chronoanalysis/sub-production-line/');
+    const workElement = await apiClient.get('/chronoanalysis/work-element');
+
 
     return {
       props: {
         subProduct: data,
         subLine: subLine.data,
+        workElement: workElement.data,
       },
     };
   } catch (error) {
