@@ -88,9 +88,11 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
     finish_time_video: '00:00:00',
     finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
-    isEditable: !isEdit,
+    isEditable: true,
+    showSaveAndCancelButton: false,
   }]);
   const [auxWorkElementsAdded, setAuxWorkElementsAdded] = useState([{
+    id: '',
     process_sub_product_id: '',
     work_element_id: '',
     work_element_name: '',
@@ -99,7 +101,8 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
     finish_time_video: '00:00:00',
     finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
-    isEditable: !isEdit,
+    isEditable: true,
+    showSaveAndCancelButton: false,
   }]);
   const [workElements, setWorkElements] = useState<IWorkElement[]>(workElement);
 
@@ -178,6 +181,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     setPreviewVideo(null);
     setVideo(null);
     setVideoIsDefined(false);
+    setIsEdit(false);
 
     setWorkElementsAdded([{
       id: '',
@@ -189,7 +193,8 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
       finish_time_video: '00:00:00',
       finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
-      isEditable: false,
+      isEditable: true,
+      showSaveAndCancelButton: false,
     }]);
   }
 
@@ -208,11 +213,45 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
 
       const data = {
         name: name,
+        sub_production_line_id: subLineId,
       };
 
       setLoading(true);
       const response = await api.post('/chronoanalysis/process-sub-product', data);
+
+      const dataForm = new FormData();
+      dataForm.append('video', video);
+
+      const responseVideo = await api.post(`/chronoanalysis/process-sub-product/${response.data.id}`, dataForm, {
+        headers: {
+          "Content-Type": `multipart/form-data`,
+        },
+      });
+
+      workElementsAdded.map(async (item) => {
+        return item.process_sub_product_id = response.data.id;
+      })
+
+      workElementsAdded.map(async (item) => {
+        try {
+          await api.post(`/chronoanalysis/process-sub-product-work-element/`, item);
+        } catch (error) {
+          console.log('CADASTRO: ', error.response.data.message);
+          return Notification({
+            type: 'error',
+            title: 'Erro',
+            description: 'Não foi possível cadastrar o item do Sub-Produto',
+          });
+        }
+      })
       setLoading(false);
+
+      const newSubProductRegistered = response.data;
+      subProduct.push(newSubProductRegistered);
+      setSubProducts(subProduct);
+      setIsModalOpen(false);
+      setName('');
+      setSubProductId('');
 
       Notification({
         type: 'success',
@@ -220,11 +259,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
         description: 'Sub-Produto Cadastrado com sucesso',
       });
 
-      const newSubProductRegistered = response.data;
 
-      subProduct.push(newSubProductRegistered);
-      setSubProducts(subProduct);
-      setIsModalOpen(false);
     } catch (error) {
       console.error(error.response.data.message);
       Notification({
@@ -235,24 +270,24 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       setLoading(false);
     }
 
-    setName('');
-    setSubProductId('');
+
   }
 
   async function handleEdit() {
     try {
-      if (name === '') {
+      if (name === '' || subLineId === '') {
         setLoading(false);
         return Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível editar o Sub-Produto',
+          description: 'Não podem existir campos vazios',
         });
       }
       const data = {
-        id: subProductId,
         name: name,
+        sub_production_line_id: subLineId,
       };
+
       setLoading(true);
       const response = await api.put(`/chronoanalysis/process-sub-product/${subProductId}`, data);
 
@@ -285,7 +320,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
 
   async function handleDelete(id: string) {
     try {
-      await api.delete(`/chronoanalysis/process-sub-product/${id}`);
+      await api.delete(`/chronoanalysis/process-sub-product/${id} `);
 
       const filtersubProducts = subProducts.filter((iten) => {
         if (iten.id !== id) {
@@ -312,8 +347,19 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
   async function handleFilterSubProductProcessById(data) {
 
     const responseResult = await api.get(`/chronoanalysis/process-sub-product-work-element/${data.id}`);
+    console.log(responseResult.data);
 
-    setIsEdit(true);
+    responseResult.data.map(item => {
+      return Object.assign(item, {
+        isEditable: false,
+        showSaveAndCancelButton: false,
+        initial_time_video_to_show: moment(item.initial_time_video, 'HH:mm:ss'),
+        finish_time_video_to_show: moment(item.finish_time_video, 'HH:mm:ss'),
+      })
+    })
+
+    setWorkElementsAdded(responseResult.data);
+    setIsEdit(!isEdit);
     setIsModalOpen(true);
     setSubProductId(data.id);
     setName(data.name);
@@ -334,7 +380,8 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
         finish_time_video: '00:00:00',
         finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
         initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
-        isEditable: false,
+        isEditable: true,
+        showSaveAndCancelButton: isEdit ? true : false,
       }
     ];
 
@@ -365,7 +412,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
   function handleChangeOrder(index, value) {
     let newArray = [...workElementsAdded];
 
-    newArray[index].sequential_order = Number(value);
+    newArray[index].sequential_order = Number(value) > 0 ? Number(value) : 0;
 
     console.log(newArray);
 
@@ -466,35 +513,63 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     let newArray = [...workElementsAdded];
     let arrayForEdition = [...auxWorkElementsAdded];
 
-    newArray[index].isEditable = !newArray[index].isEditable;
-    arrayForEdition[index].sequential_order = newArray[index].sequential_order;
-    arrayForEdition[index].work_element_id = newArray[index].work_element_id;
-    arrayForEdition[index].work_element_name = newArray[index].work_element_name;
-    arrayForEdition[index].initial_time_video = newArray[index].initial_time_video;
-    arrayForEdition[index].initial_time_video_to_show = newArray[index].initial_time_video_to_show;
-    arrayForEdition[index].finish_time_video = newArray[index].finish_time_video;
-    arrayForEdition[index].finish_time_video_to_show = newArray[index].finish_time_video_to_show;
+    console.log(newArray);
+    console.log(arrayForEdition);
+
+    newArray[index].showSaveAndCancelButton = true;
+    newArray[index].isEditable = true;
+    arrayForEdition[0].id = newArray[index].id;
+    arrayForEdition[0].sequential_order = newArray[index].sequential_order;
+    arrayForEdition[0].work_element_id = newArray[index].work_element_id;
+    arrayForEdition[0].work_element_name = newArray[index].work_element_name;
+    arrayForEdition[0].initial_time_video = newArray[index].initial_time_video;
+    arrayForEdition[0].initial_time_video_to_show = newArray[index].initial_time_video_to_show;
+    arrayForEdition[0].finish_time_video = newArray[index].finish_time_video;
+    arrayForEdition[0].finish_time_video_to_show = newArray[index].finish_time_video_to_show;
+    arrayForEdition[0].isEditable = newArray[index].isEditable;
+
+    console.log(newArray[index].showSaveAndCancelButton, newArray[index].isEditable);
 
     setAuxWorkElementsAdded(arrayForEdition);
     setWorkElementsAdded(newArray);
   }
 
   async function saveEditedItemOfArrayOnEdition(index) {
-
     let newArray = [...workElementsAdded];
-    try {
-      const response = await api.put(`chronoanalysis/process-sub-product-work-element/${newArray[index].id}`, newArray[index]);
-      Notification({
-        type: 'success',
-        title: 'Sucesso',
-        description: 'Item Editado com sucesso',
-      });
-    } catch (error) {
-      console.error(error.response.data.message);
+
+    if (
+      newArray[index].work_element_id === '' ||
+      newArray[index].sequential_order === 0 ||
+      newArray[index].finish_time_video === '00:00:00'
+    ) {
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível Editar o Item',
+        description: 'Não podem existir itens vazios',
+      });
+      return;
+    }
+    workElementsAdded.map(async (item) => {
+      return item.process_sub_product_id = subProductId;
+    })
+
+    try {
+      const response = await api.post(`/chronoanalysis/process-sub-product-work-element/`, newArray[index]);
+      newArray[index].isEditable = false;
+      newArray[index].showSaveAndCancelButton = false;
+      newArray[index].id = response.data.id;
+      setWorkElementsAdded(newArray);
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Item Cadastrado com sucesso',
+      });
+    } catch (error) {
+      console.error(error);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Cadastrar o Item',
       });
     }
   }
@@ -503,14 +578,15 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     let newArray = [...workElementsAdded];
     let arrayOfLatestValueOnSpecificIndex = [...auxWorkElementsAdded];
 
-    newArray[index].sequential_order = arrayOfLatestValueOnSpecificIndex[index].sequential_order;
-    newArray[index].work_element_id = arrayOfLatestValueOnSpecificIndex[index].work_element_id;
-    newArray[index].work_element_name = arrayOfLatestValueOnSpecificIndex[index].work_element_name;
-    newArray[index].initial_time_video = arrayOfLatestValueOnSpecificIndex[index].initial_time_video;
-    newArray[index].initial_time_video_to_show = arrayOfLatestValueOnSpecificIndex[index].initial_time_video_to_show;
-    newArray[index].finish_time_video = arrayOfLatestValueOnSpecificIndex[index].finish_time_video;
-    newArray[index].finish_time_video_to_show = arrayOfLatestValueOnSpecificIndex[index].finish_time_video_to_show;
-    newArray[index].isEditable = arrayOfLatestValueOnSpecificIndex[index].isEditable;
+    newArray[index].sequential_order = arrayOfLatestValueOnSpecificIndex[0].sequential_order;
+    newArray[index].work_element_id = arrayOfLatestValueOnSpecificIndex[0].work_element_id;
+    newArray[index].work_element_name = arrayOfLatestValueOnSpecificIndex[0].work_element_name;
+    newArray[index].initial_time_video = arrayOfLatestValueOnSpecificIndex[0].initial_time_video;
+    newArray[index].initial_time_video_to_show = arrayOfLatestValueOnSpecificIndex[0].initial_time_video_to_show;
+    newArray[index].finish_time_video = arrayOfLatestValueOnSpecificIndex[0].finish_time_video;
+    newArray[index].finish_time_video_to_show = arrayOfLatestValueOnSpecificIndex[0].finish_time_video_to_show;
+    newArray[index].isEditable = false;
+    newArray[index].showSaveAndCancelButton = false;
 
     setWorkElementsAdded(newArray);
   }
@@ -532,7 +608,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
             ref={(node) => {
               this.searchInput = node;
             }}
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Search ${dataIndex} `}
             value={selectedKeys[0]}
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -784,7 +860,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                   type="number"
                   key="totalKey"
                   size="large"
-                  disabled={selectedIten.isEditable}
+                  disabled={!selectedIten.isEditable}
                   placeholder="0"
                   value={selectedIten.sequential_order}
                   onChange={(e) => handleChangeOrder(index, e.target.value)}
@@ -805,7 +881,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                 <Select
                   key="workElementName"
                   size="large"
-                  disabled={selectedIten.isEditable}
+                  disabled={!selectedIten.isEditable}
                   value={selectedIten.work_element_id}
                   onChange={(e) => {
                     handleChangeWorkElement(index, e)
@@ -836,8 +912,8 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
               >
                 <TimePicker
                   size="large"
-                  defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
-                  disabled={selectedIten.isEditable}
+                  defaultValue={moment('00:00:00', 'HH:mm:ss')}
+                  disabled={!selectedIten.isEditable}
                   value={selectedIten.initial_time_video_to_show}
                   onChange={(e, timeAsString) => { handleChangeInitialTime(index, timeAsString) }}
                 />
@@ -856,42 +932,59 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
               >
                 <TimePicker
                   size="large"
-                  disabled={selectedIten.isEditable}
+                  disabled={!selectedIten.isEditable}
                   value={selectedIten.finish_time_video_to_show}
-                  defaultOpenValue={moment('00:00:00', 'HH:mm:ss')}
+                  defaultValue={moment('00:00:00', 'HH:mm:ss')}
                   onChange={(e, timeAsString) => { handleChangeFinishTime(index, timeAsString) }}
                 />
 
               </Form.Item>
             </Col>
 
-            <Col>
-              {(!isEdit && selectedIten.isEditable) &&
+
+            {(isEdit && selectedIten.showSaveAndCancelButton === false) &&
+              <Col>
                 <Button
                   style={{ marginTop: 35, color: 'blue', borderColor: 'blue' }}
                   onClick={() => handleClickEditItemOfArrayOnEdition(index)}
                 >
                   <FormOutlined />
                 </Button>
+              </Col>
+            }
 
-              }
-            </Col>
-            <Col>
-              {(workElementsAdded.length != 1 || !isEdit && selectedIten.isEditable) && (
+
+            {(workElementsAdded.length != 1 && selectedIten.showSaveAndCancelButton === false && !isEdit) && (
+              <Col>
                 <Popconfirm
                   title="Confirmar remoção?"
                   onConfirm={() => {
-                    return isEdit ? handleDeleteItemOfArrayOnEdition(index) : removeSubProducts(index)
+                    removeSubProducts(index)
                   }}
                 >
                   <Button danger style={{ marginTop: 35 }}><DeleteOutlined /></Button>
                 </Popconfirm>
+              </Col>
+            )}
 
-              )}
-            </Col>
-            <Col>
-              {(workElementsAdded.length != 1 || !selectedIten.isEditable) &&
-                (
+
+            {(selectedIten.showSaveAndCancelButton === false && isEdit) && (
+              <Col>
+                <Popconfirm
+                  title="Confirmar remoção?"
+                  onConfirm={() => {
+                    handleDeleteItemOfArrayOnEdition(index)
+                  }}
+                >
+                  <Button danger style={{ marginTop: 35 }}><DeleteOutlined /></Button>
+                </Popconfirm>
+              </Col>
+            )}
+
+
+            {(selectedIten.showSaveAndCancelButton && selectedIten.isEditable) &&
+              (
+                <Col>
                   <Button
                     key="primary"
                     title="Salvar"
@@ -905,14 +998,15 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                     <SaveOutlined />
                     Salvar
                   </Button>
-                )}
-            </Col>
-            <Col>
-              {(workElementsAdded.length != 1 || !selectedIten.isEditable) &&
-                (
+                </Col>
+              )}
+
+
+            {(selectedIten.showSaveAndCancelButton && selectedIten.isEditable) &&
+              (
+                <Col>
                   <Button
                     danger
-                    title="Salvar"
                     style={{
                       marginTop: 35,
                       color: 'white',
@@ -923,8 +1017,9 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                     <DeleteOutlined />
                     Cancelar
                   </Button>
-                )}
-            </Col>
+                </Col>
+              )}
+
             {workElementsAdded.length - 1 === index &&
               (
                 <Button
