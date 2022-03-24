@@ -5,7 +5,8 @@ import {
   SearchOutlined,
   FormOutlined,
   EyeOutlined,
-  CloseOutlined
+  CloseOutlined,
+  SaveOutlined
 } from '@ant-design/icons';
 import {
   Button,
@@ -78,6 +79,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
   const [previewVisible, setPreviewVisible] = useState<boolean>();
   const [previewTitle, setPreviewTitle] = useState();
   const [workElementsAdded, setWorkElementsAdded] = useState([{
+    id: '',
     process_sub_product_id: '',
     work_element_id: '',
     work_element_name: '',
@@ -86,7 +88,18 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
     finish_time_video: '00:00:00',
     finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
-    isEditable: false,
+    isEditable: !isEdit,
+  }]);
+  const [auxWorkElementsAdded, setAuxWorkElementsAdded] = useState([{
+    process_sub_product_id: '',
+    work_element_id: '',
+    work_element_name: '',
+    sequential_order: 0,
+    initial_time_video: '00:00:00',
+    initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+    finish_time_video: '00:00:00',
+    finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
+    isEditable: !isEdit,
   }]);
   const [workElements, setWorkElements] = useState<IWorkElement[]>(workElement);
 
@@ -167,6 +180,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     setVideoIsDefined(false);
 
     setWorkElementsAdded([{
+      id: '',
       process_sub_product_id: '',
       work_element_id: '',
       work_element_name: '',
@@ -299,8 +313,6 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
 
     const responseResult = await api.get(`/chronoanalysis/process-sub-product-work-element/${data.id}`);
 
-    console.log(responseResult.data);
-
     setIsEdit(true);
     setIsModalOpen(true);
     setSubProductId(data.id);
@@ -313,6 +325,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     const newArray = [
       ...workElementsAdded,
       {
+        id: '',
         process_sub_product_id: '',
         work_element_id: '',
         work_element_name: '',
@@ -365,6 +378,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     let newArray = [...workElementsAdded];
 
     if (value === '') {
+      newArray[index].initial_time_video = '00:00:00';
       newArray[index].initial_time_video_to_show = moment('00:00:00', 'HH:mm:ss');
       setWorkElementsAdded(newArray);
       return
@@ -421,6 +435,82 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
 
 
     console.log(newArray);
+
+    setWorkElementsAdded(newArray);
+  }
+
+  async function handleDeleteItemOfArrayOnEdition(index) {
+    const newArray = [...workElementsAdded];
+
+    try {
+      const response = await api.delete(`/chronoanalysis/process-sub-product-work-element/${newArray[index].id}`);
+      removeSubProducts(index);
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Item Deletado com sucesso',
+      });
+    } catch (error) {
+      console.error(error.response.data.message);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Deletar o Item',
+      });
+    }
+
+
+  }
+
+  function handleClickEditItemOfArrayOnEdition(index) {
+    let newArray = [...workElementsAdded];
+    let arrayForEdition = [...auxWorkElementsAdded];
+
+    newArray[index].isEditable = !newArray[index].isEditable;
+    arrayForEdition[index].sequential_order = newArray[index].sequential_order;
+    arrayForEdition[index].work_element_id = newArray[index].work_element_id;
+    arrayForEdition[index].work_element_name = newArray[index].work_element_name;
+    arrayForEdition[index].initial_time_video = newArray[index].initial_time_video;
+    arrayForEdition[index].initial_time_video_to_show = newArray[index].initial_time_video_to_show;
+    arrayForEdition[index].finish_time_video = newArray[index].finish_time_video;
+    arrayForEdition[index].finish_time_video_to_show = newArray[index].finish_time_video_to_show;
+
+    setAuxWorkElementsAdded(arrayForEdition);
+    setWorkElementsAdded(newArray);
+  }
+
+  async function saveEditedItemOfArrayOnEdition(index) {
+
+    let newArray = [...workElementsAdded];
+    try {
+      const response = await api.put(`chronoanalysis/process-sub-product-work-element/${newArray[index].id}`, newArray[index]);
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Item Editado com sucesso',
+      });
+    } catch (error) {
+      console.error(error.response.data.message);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Editar o Item',
+      });
+    }
+  }
+
+  function cancelItemEdition(index) {
+    let newArray = [...workElementsAdded];
+    let arrayOfLatestValueOnSpecificIndex = [...auxWorkElementsAdded];
+
+    newArray[index].sequential_order = arrayOfLatestValueOnSpecificIndex[index].sequential_order;
+    newArray[index].work_element_id = arrayOfLatestValueOnSpecificIndex[index].work_element_id;
+    newArray[index].work_element_name = arrayOfLatestValueOnSpecificIndex[index].work_element_name;
+    newArray[index].initial_time_video = arrayOfLatestValueOnSpecificIndex[index].initial_time_video;
+    newArray[index].initial_time_video_to_show = arrayOfLatestValueOnSpecificIndex[index].initial_time_video_to_show;
+    newArray[index].finish_time_video = arrayOfLatestValueOnSpecificIndex[index].finish_time_video;
+    newArray[index].finish_time_video_to_show = arrayOfLatestValueOnSpecificIndex[index].finish_time_video_to_show;
+    newArray[index].isEditable = arrayOfLatestValueOnSpecificIndex[index].isEditable;
 
     setWorkElementsAdded(newArray);
   }
@@ -733,7 +823,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
               </Form.Item>
 
             </Col>
-            <Col span={4}>
+            <Col span={3}>
               <Form.Item
                 key="startVideoFormItem"
                 labelCol={{ span: 23 }}
@@ -753,7 +843,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                 />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col span={3}>
               <Form.Item
                 key="finalVideoFormItem"
                 labelCol={{ span: 23 }}
@@ -776,10 +866,10 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
             </Col>
 
             <Col>
-              {isEdit &&
+              {(!isEdit && selectedIten.isEditable) &&
                 <Button
                   style={{ marginTop: 35, color: 'blue', borderColor: 'blue' }}
-                  onClick={() => removeSubProducts(index)}
+                  onClick={() => handleClickEditItemOfArrayOnEdition(index)}
                 >
                   <FormOutlined />
                 </Button>
@@ -787,9 +877,53 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
               }
             </Col>
             <Col>
-              {(workElementsAdded.length != 1 || isEdit) && (
-                <Button danger style={{ marginTop: 35 }} onClick={() => removeSubProducts(index)}><DeleteOutlined /></Button>
+              {(workElementsAdded.length != 1 || !isEdit && selectedIten.isEditable) && (
+                <Popconfirm
+                  title="Confirmar remoção?"
+                  onConfirm={() => {
+                    return isEdit ? handleDeleteItemOfArrayOnEdition(index) : removeSubProducts(index)
+                  }}
+                >
+                  <Button danger style={{ marginTop: 35 }}><DeleteOutlined /></Button>
+                </Popconfirm>
+
               )}
+            </Col>
+            <Col>
+              {(workElementsAdded.length != 1 || !selectedIten.isEditable) &&
+                (
+                  <Button
+                    key="primary"
+                    title="Salvar"
+                    style={{
+                      marginTop: 35,
+                      color: 'white',
+                      backgroundColor: 'rgb(5, 155, 50)',
+                    }}
+                    onClick={() => saveEditedItemOfArrayOnEdition(index)}
+                  >
+                    <SaveOutlined />
+                    Salvar
+                  </Button>
+                )}
+            </Col>
+            <Col>
+              {(workElementsAdded.length != 1 || !selectedIten.isEditable) &&
+                (
+                  <Button
+                    danger
+                    title="Salvar"
+                    style={{
+                      marginTop: 35,
+                      color: 'white',
+                      backgroundColor: 'rgb(248, 75, 78)'
+                    }}
+                    onClick={() => cancelItemEdition(index)}
+                  >
+                    <DeleteOutlined />
+                    Cancelar
+                  </Button>
+                )}
             </Col>
             {workElementsAdded.length - 1 === index &&
               (
@@ -802,7 +936,6 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                       selectedIten.sequential_order != 0 ? false : true
                   }
                   style={{
-
                     width: '100%',
                     color: 'white',
                     backgroundColor: 'rgb(5, 155, 50)',
