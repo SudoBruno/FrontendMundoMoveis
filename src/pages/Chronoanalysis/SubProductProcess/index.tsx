@@ -90,6 +90,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
     isEditable: true,
     showSaveAndCancelButton: false,
+    toCreateOnModalEdit: false,
   }]);
   const [auxWorkElementsAdded, setAuxWorkElementsAdded] = useState([{
     id: '',
@@ -103,6 +104,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
     isEditable: true,
     showSaveAndCancelButton: false,
+    toCreateOnModalEdit: false,
   }]);
   const [workElements, setWorkElements] = useState<IWorkElement[]>(workElement);
 
@@ -195,6 +197,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       finish_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
       isEditable: true,
       showSaveAndCancelButton: false,
+      toCreateOnModalEdit: false,
     }]);
   }
 
@@ -355,6 +358,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
         showSaveAndCancelButton: false,
         initial_time_video_to_show: moment(item.initial_time_video, 'HH:mm:ss'),
         finish_time_video_to_show: moment(item.finish_time_video, 'HH:mm:ss'),
+        toCreateOnModalEdit: false,
       })
     })
 
@@ -382,6 +386,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
         initial_time_video_to_show: moment('00:00:00', 'HH:mm:ss'),
         isEditable: true,
         showSaveAndCancelButton: isEdit ? true : false,
+        toCreateOnModalEdit: isEdit ? true : false,
       }
     ];
 
@@ -513,9 +518,6 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     let newArray = [...workElementsAdded];
     let arrayForEdition = [...auxWorkElementsAdded];
 
-    console.log(newArray);
-    console.log(arrayForEdition);
-
     newArray[index].showSaveAndCancelButton = true;
     newArray[index].isEditable = true;
     arrayForEdition[0].id = newArray[index].id;
@@ -549,12 +551,39 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       });
       return;
     }
-    workElementsAdded.map(async (item) => {
-      return item.process_sub_product_id = subProductId;
-    })
+
+    if (newArray[index].toCreateOnModalEdit) {
+      try {
+        workElementsAdded.map(async (item) => {
+          return item.process_sub_product_id = subProductId;
+        })
+        const response = await api.post(`chronoanalysis/process-sub-product-work-element/`, newArray[index]);
+        newArray[index].isEditable = false;
+        newArray[index].showSaveAndCancelButton = false;
+        newArray[index].id = response.data.id;
+        newArray[index].toCreateOnModalEdit = false;
+        setWorkElementsAdded(newArray);
+        Notification({
+          type: 'success',
+          title: 'Sucesso',
+          description: 'Item Cadastrado com sucesso',
+        });
+        return;
+      } catch (error) {
+        console.error(error.response.data);
+        Notification({
+          type: 'error',
+          title: 'Erro',
+          description: 'Não foi possível Cadastrar o Item',
+        });
+      }
+
+      return;
+    }
+
 
     try {
-      const response = await api.post(`/chronoanalysis/process-sub-product-work-element/`, newArray[index]);
+      const response = await api.put(`chronoanalysis/process-sub-product-work-element/${newArray[index].id}`, newArray[index]);
       newArray[index].isEditable = false;
       newArray[index].showSaveAndCancelButton = false;
       newArray[index].id = response.data.id;
@@ -565,7 +594,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
         description: 'Item Cadastrado com sucesso',
       });
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data);
       Notification({
         type: 'error',
         title: 'Erro',
@@ -1035,7 +1064,20 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                     color: 'white',
                     backgroundColor: 'rgb(5, 155, 50)',
                   }}
-                  onClick={addNewSubProduct}
+                  onClick={(e) => {
+
+                    const newArray = [...workElementsAdded];
+                    isEdit ?
+                      () => {
+                        newArray[index].toCreateOnModalEdit = true;
+                      }
+                      :
+                      () => {
+                        newArray[index].toCreateOnModalEdit = false;
+                      }
+
+                    addNewSubProduct(e)
+                  }}
                 >
                   <PlusOutlined />
                   Novo Elemento de Trabalho
