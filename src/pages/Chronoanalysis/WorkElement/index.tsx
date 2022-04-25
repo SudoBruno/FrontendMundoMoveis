@@ -82,6 +82,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
   const [workElementId, setWorkElementId] = useState('');
   const [workElementFactor, setWorkElementFactor] = useState([])
   const [factorCalculated, setFactorCalculated] = useState(0);
+  const [numberPeopleNeeded, setNumberPeopleNeeded] = useState<number>(0);
 
   async function handleRegister(e) {
     e.preventDefault();
@@ -95,12 +96,25 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
             description: 'Não foi possível editar o Produto de Processo',
           });
         }
+        else if (numberPeopleNeeded <= 0) {
+          setLoading(false);
+          return Notification({
+            type: 'error',
+            title: 'Erro',
+            description: 'Número de pessoas não pode ser menor ou igual a zero',
+          });
+        }
 
         let response;
 
         setLoading(true);
         try {
-          response = await api.put(`/chronoanalysis/work-element/${workElementId}`, { name: workElementName });
+          response = await api.put(`/chronoanalysis/work-element/${workElementId}`,
+            {
+              name: workElementName,
+              number_people_needed: numberPeopleNeeded
+            }
+          );
         } catch (error) {
           console.error(error.response.data.message);
           Notification({
@@ -109,6 +123,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
             description: error.response.data.message,
           });
           setLoading(false);
+          return;
         }
 
 
@@ -124,6 +139,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
               description: 'Existem Elementos de Trabalho Vazios',
             });
             setLoading(false);
+            return;
           }
         })
 
@@ -135,9 +151,9 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
         filterWorkElements.push(response.data);
 
+
         setWorkElements(filterWorkElements);
-        setLoading(false);
-        setIsModalOpen(false);
+        handleClose();
         Notification({
           type: 'success',
           title: 'Enviado',
@@ -166,7 +182,12 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
         setLoading(true);
 
-        response = await api.post(`/chronoanalysis/work-element`, { name: workElementName });
+        response = await api.post(`/chronoanalysis/work-element`,
+          {
+            name: workElementName,
+            number_people_needed: numberPeopleNeeded
+          }
+        );
 
         const data = {
           work_element_id: response.data.id,
@@ -179,16 +200,17 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
         workElements.push(newWorkElementRegistered);
 
+        console.log(responseResult.data);
+
+
         setWorkElements(workElements);
-        setLoading(false);
+        handleClose();
 
         Notification({
           type: 'success',
           title: 'Enviado',
           description: 'Elemento de Trabalho Cadastrado com sucesso',
         });
-
-        setIsModalOpen(false);
       } catch (error) {
         console.error(error.response.data.message);
         Notification({
@@ -204,6 +226,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
   function handleClose() {
     setIsModalOpen(false);
+    setLoading(false);
     setWorkElementId('');
     setWorkElementName('');
     setToleranceAdded([
@@ -253,6 +276,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
     setTolerancesTypes(filteredTypes);
     setWorkElementId(data.id);
     setWorkElementName(data.name);
+    setNumberPeopleNeeded(Number(data.number_people_needed));
     setToleranceAdded(filteredItems);
     setIsModalOpen(true);
 
@@ -397,6 +421,14 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           ...this.getColumnSearchProps('name'),
           sorter: (a, b) => a.name.length - b.name.length,
         },
+        {
+          title: 'Número de pessoas',
+          dataIndex: 'number_people_needed',
+          key: 'number_people_needed',
+          width: '40%',
+          ...this.getColumnSearchProps('number_people_needed'),
+          sorter: (a, b) => a.number_people_needed.length - b.number_people_needed.length,
+        },
 
         {
           title: 'Criado Em',
@@ -477,24 +509,49 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           </Button>,
         ]}
       >
-        <Form.Item
-          labelCol={{ span: 23 }}
-          label="Nome:"
-          labelAlign={'left'}
-          style={{ backgroundColor: 'white', fontWeight: 'bold' }}
-          required
-        >
-          <Input
-            key="categorieName"
-            size="large"
-            style={{ width: 400, marginBottom: '10px' }}
-            placeholder="Nome do Sub-Produto"
-            value={workElementName}
-            onChange={(e) => {
-              setWorkElementName(e.target.value);
-            }}
-          />
-        </Form.Item>
+        <Row gutter={10}>
+          <Col span={12}>
+            <Form.Item
+              labelCol={{ span: 23 }}
+              label="Nome:"
+              labelAlign={'left'}
+              style={{ backgroundColor: 'white', fontWeight: 'bold' }}
+              required
+            >
+              <Input
+                key="categorieName"
+                size="large"
+                style={{ marginBottom: '10px' }}
+                placeholder="Nome do Elemento de Trabalho"
+                value={workElementName}
+                onChange={(e) => {
+                  setWorkElementName(e.target.value);
+                }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item
+              labelCol={{ span: 23 }}
+              label="Número de Pessoas:"
+              labelAlign={'left'}
+              style={{ backgroundColor: 'white', fontWeight: 'bold' }}
+              required
+            >
+              <Input
+                key="numberPeopleNeeded"
+                type="number"
+                size="large"
+                style={{ width: 70 }}
+                placeholder="0"
+                value={numberPeopleNeeded}
+                onChange={(e) => {
+                  setNumberPeopleNeeded(Number(e.target.value));
+                }}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
         {toleranceAdded.map((selectedIten, index) => (
           <Row gutter={10}>
@@ -509,9 +566,9 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                 }}
               >
                 <Input
-                  disabled={true}
                   key="toleranceTypeName"
                   size="large"
+                  readOnly
                   value={tolerancesTypes[index]}
                   contentEditable={false}
                 />
@@ -546,13 +603,13 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                     handleChangeToleranceClassification(index, e)
                   }}
                   filterOption={(input, option) =>
-                    option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
                     0
                   }
                   filterSort={(optionA, optionB) =>
-                    optionA.children
+                    optionA.props.children
                       .toLowerCase()
-                      .localeCompare(optionB.children.toLowerCase())
+                      .localeCompare(optionB.props.children.toLowerCase())
                   }
                 >
                   {tolerancesClassification.map((item) => (
@@ -568,7 +625,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
             </Col>
             <Col span={3}>
               <Form.Item
-                key="TypeFormItem"
+                key="FactorFormItem"
                 labelCol={{ span: 23 }}
                 label="Tipo:"
                 labelAlign={'left'}
@@ -577,11 +634,10 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                 }}
               >
                 <Input
-                  disabled={true}
-                  key="toleranceTypeName"
+                  key="toleranceFactorName"
                   size="large"
                   value={selectedIten.factor}
-                  contentEditable={false}
+                  readOnly
                 />
               </Form.Item>
 

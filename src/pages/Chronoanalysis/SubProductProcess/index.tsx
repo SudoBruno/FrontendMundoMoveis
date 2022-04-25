@@ -39,6 +39,7 @@ import { Player } from "video-react";
 import { Divider } from 'antd';
 import FormData from 'form-data'
 import moment from 'moment';
+import { format } from 'date-fns';
 
 
 const { Option } = Select;
@@ -107,7 +108,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     toCreateOnModalEdit: false,
   }]);
   const [workElements, setWorkElements] = useState<IWorkElement[]>(workElement);
-
+  const videoRef = useRef<any>();
 
   useEffect(() => {
     if (video) {
@@ -148,8 +149,9 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
           <EyeOutlined />
         </Button>
         <Button shape="circle" style={{ color: 'red', marginLeft: 5, }} onClick={() => {
-          setVideo(null)
-          setVideoIsDefined(false)
+          setVideo(null);
+          setVideoIsDefined(false);
+
         }}>
           <CloseOutlined />
         </Button>
@@ -157,7 +159,6 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
 
     </div>
   );
-
 
   async function handlePreview(file) {
     if (file && file.type.substring(0, 5) === "video") {
@@ -173,7 +174,8 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
   };
 
   function handleCancel() {
-    setPreviewVisible(false)
+    setPreviewVisible(false);
+    videoRef.current.pause();
   };
 
   function handleClose() {
@@ -184,6 +186,9 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     setVideo(null);
     setVideoIsDefined(false);
     setIsEdit(false);
+    setSubLineId('');
+    setSubLineName('');
+
 
     setWorkElementsAdded([{
       id: '',
@@ -222,14 +227,24 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       setLoading(true);
       const response = await api.post('/chronoanalysis/process-sub-product', data);
 
-      const dataForm = new FormData();
-      dataForm.append('video', video);
+      try {
+        const dataForm = new FormData();
+        dataForm.append('video', video);
 
-      const responseVideo = await api.post(`/chronoanalysis/process-sub-product/${response.data.id}`, dataForm, {
-        headers: {
-          "Content-Type": `multipart/form-data`,
-        },
-      });
+        const responseVideo = await api.post(`/chronoanalysis/process-sub-product/${response.data.id}`, dataForm, {
+          headers: {
+            "Content-Type": `multipart/form-data`,
+          },
+        });
+      } catch (error) {
+        await api.delete(`/chronoanalysis/process-sub-product/${response.data.id} `);
+        setLoading(false);
+        return Notification({
+          type: 'error',
+          title: 'Erro',
+          description: 'O Vídeo Não foi Carregado',
+        });
+      }
 
       workElementsAdded.map(async (item) => {
         return item.process_sub_product_id = response.data.id;
@@ -239,7 +254,6 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
         try {
           await api.post(`/chronoanalysis/process-sub-product-work-element/`, item);
         } catch (error) {
-          console.log('CADASTRO: ', error.response.data.message);
           return Notification({
             type: 'error',
             title: 'Erro',
@@ -299,6 +313,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
           return iten;
         }
       });
+
       filterSubProducts.push(response.data)
 
       setSubProducts(filterSubProducts)
@@ -350,7 +365,6 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
   async function handleFilterSubProductProcessById(data) {
 
     const responseResult = await api.get(`/chronoanalysis/process-sub-product-work-element/${data.id}`);
-    console.log(responseResult.data);
 
     responseResult.data.map(item => {
       return Object.assign(item, {
@@ -362,8 +376,13 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       })
     })
 
+    console.log(data);
+
+
     setWorkElementsAdded(responseResult.data);
-    setIsEdit(!isEdit);
+    setSubLineId(data.sub_production_line.id);
+    setSubLineName(data.sub_production_line.name);
+    setIsEdit(true);
     setIsModalOpen(true);
     setSubProductId(data.id);
     setName(data.name);
@@ -607,6 +626,11 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
     let newArray = [...workElementsAdded];
     let arrayOfLatestValueOnSpecificIndex = [...auxWorkElementsAdded];
 
+    if (!isEdit) {
+      removeSubProducts(index);
+      return
+    }
+
     newArray[index].sequential_order = arrayOfLatestValueOnSpecificIndex[0].sequential_order;
     newArray[index].work_element_id = arrayOfLatestValueOnSpecificIndex[0].work_element_id;
     newArray[index].work_element_name = arrayOfLatestValueOnSpecificIndex[0].work_element_name;
@@ -787,11 +811,12 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
         footer={null}
         onCancel={handleCancel}
       >
-        <video controls src={previewVideo} width="460em"></video>
+        <video controls src={previewVideo} ref={videoRef} width="460em" />
       </Modal>
       <Modal
         title="Cadastro de Sub-Produto"
         visible={isModalOpen}
+        closeIcon={<CloseOutlined onClick={() => { handleClose() }} />}
         width={1000}
         footer={[
           <Button key="back" onClick={handleClose} type="default">
@@ -911,7 +936,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                   key="workElementName"
                   size="large"
                   disabled={!selectedIten.isEditable}
-                  value={selectedIten.work_element_id}
+                  value={selectedIten.work_element_name}
                   onChange={(e) => {
                     handleChangeWorkElement(index, e)
                   }}
@@ -1065,17 +1090,6 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
                     backgroundColor: 'rgb(5, 155, 50)',
                   }}
                   onClick={(e) => {
-
-                    const newArray = [...workElementsAdded];
-                    isEdit ?
-                      () => {
-                        newArray[index].toCreateOnModalEdit = true;
-                      }
-                      :
-                      () => {
-                        newArray[index].toCreateOnModalEdit = false;
-                      }
-
                     addNewSubProduct(e)
                   }}
                 >
@@ -1099,6 +1113,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const subLine = await apiClient.get('/chronoanalysis/sub-production-line/');
     const workElement = await apiClient.get('/chronoanalysis/work-element');
 
+    data.forEach((item) => {
+      item.created_at = format(
+        new Date(item.created_at),
+        'dd/MM/yyyy HH:mm'
+      );
+    });
 
     return {
       props: {

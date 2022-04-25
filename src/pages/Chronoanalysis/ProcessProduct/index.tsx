@@ -4,8 +4,8 @@ import {
   PlusOutlined,
   SearchOutlined,
   MinusCircleOutlined,
-  EyeOutlined,
-  CloseOutlined
+  SaveOutlined,
+  FormOutlined
 } from '@ant-design/icons';
 import {
   Button,
@@ -36,15 +36,16 @@ import { getAPIClient } from '../../../services/axios';
 import { Divider } from 'antd';
 import FormData from 'form-data'
 
-
-
-import getBase64 from './utils/index';
 const { Option } = Select;
 
+
+interface IProcessProduct {
+  id: string;
+  name: string;
+}
 interface IProcessSubProduct {
   id: string;
   name: string;
-  created_at: Date;
 }
 
 interface IProduct {
@@ -54,19 +55,44 @@ interface IProduct {
 
 interface IProps {
   processSubProduct: IProcessSubProduct[];
+  processProduct: IProcessProduct[];
   product: IProduct[],
   notFound: boolean;
 }
 
 
-export default function ProcessProduct({ processSubProduct, product }: IProps) {
-  const [processSubProducts, setProcessSubProducts] = useState(processSubProduct);
-  const [products, setProducts] = useState(product);
+export default function ProcessProduct({ processSubProduct, product, processProduct }: IProps) {
+  const [processSubProducts, setProcessSubProducts] = useState<IProcessSubProduct[]>(processSubProduct);
+  const [processProducts, setProcessProducts] = useState<IProcessProduct[]>(processProduct);
+  const [products, setProducts] = useState<IProduct[]>(product);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productId, setProductId] = useState('');
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState('');
-  const [subProductsAdded, setSubProductsAdded] = useState([{ process_sub_product_id: '', name: '', quantity: 0 }])
+  const [subProductsAdded, setSubProductsAdded] = useState([
+    {
+      id: '',
+      name: '',
+      quantity: 0,
+      isEditable: true,
+      showSaveAndCancelButton: false,
+      toCreateOnModalEdit: false,
+      process_product_id: '',
+      process_sub_product_id: '',
+      process_sub_product_quantity: 0,
+    }]);
+  const [auxSubProductsAdded, setAuxSubProductsAdded] = useState([
+    {
+      id: '',
+      name: '',
+      quantity: 0,
+      isEditable: true,
+      showSaveAndCancelButton: false,
+      toCreateOnModalEdit: false,
+      process_product_id: '',
+      process_sub_product_id: '',
+      process_sub_product_quantity: 0,
+    }])
   const [previewImage, setPreviewImage] = useState<string>();
   const [previewVisible, setPreviewVisible] = useState<boolean>();
   const [previewTitle, setPreviewTitle] = useState();
@@ -74,67 +100,79 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
   const fileList = useRef<any>();
   const [image, setImage] = useState();
   const [processProductName, setProcessProductName] = useState<string>('');
+  const [isEdit, setIsEdit] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (image) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreviewImage(reader.result as string);
-      }
-      reader.readAsDataURL(image);
-    } else {
-      setPreviewImage(null);
-    }
+  // useEffect(() => {
+  //   if (image) {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       setPreviewImage(reader.result as string);
+  //     }
+  //     reader.readAsDataURL(image);
+  //   } else {
+  //     setPreviewImage(null);
+  //   }
 
-  }, [image]);
+  // }, [image]);
 
-  const uploadButton = (
-    <div>
-      <div style={styles}>
-        <label className={styles.custom_file_upload}>
-          <p><b>UPLOAD +</b></p>
-          <input type="file" accept="image/*" ref={fileList} onChange={() => {
-            setImage(fileList.current.files[0])
-            setImageIsDefined(true)
-          }} />
-        </label>
-      </div>
+  // const uploadButton = (
+  //   <div>
+  //     <div style={styles}>
+  //       <label className={styles.custom_file_upload}>
+  //         <p><b>UPLOAD +</b></p>
+  //         <input type="file" accept="image/*" ref={fileList} onChange={() => {
+  //           setImage(fileList.current.files[0])
+  //           setImageIsDefined(true)
+  //         }} />
+  //       </label>
+  //     </div>
 
-    </div>
-  );
+  //   </div>
+  // );
 
-  const imageUploadSucces = (
-    <div>
-      <div style={styles}>
+  // const imageUploadSucces = (
+  //   <div>
+  //     <div style={styles}>
 
-        <Title level={5} style={{ color: 'green' }}>Imagem Carregada</Title>
-        <Button shape="circle" style={{ color: 'black' }} onClick={() => {
+  //       <Title level={5} style={{ color: 'green' }}>Imagem Carregada</Title>
+  //       <Button shape="circle" style={{ color: 'black' }} onClick={() => {
 
-          handlePreview(image)
+  //         handlePreview(image)
 
-        }}>
-          <EyeOutlined />
-        </Button>
-        <Button shape="circle" style={{ color: 'red', marginLeft: 5, }} onClick={() => {
-          setImage(null)
-          setImageIsDefined(false)
-        }}>
-          <CloseOutlined />
-        </Button>
-      </div>
+  //       }}>
+  //         <EyeOutlined />
+  //       </Button>
+  //       <Button shape="circle" style={{ color: 'red', marginLeft: 5, }} onClick={() => {
+  //         setImage(null)
+  //         setImageIsDefined(false)
+  //       }}>
+  //         <CloseOutlined />
+  //       </Button>
+  //     </div>
 
-    </div>
-  );
+  //   </div>
+  // );
+
   function handleClose() {
-    console.log('close');
-
     setId('');
     setProductId('');
+    setProcessProductName('');
     setPreviewImage(null);
     setImage(null);
     setImageIsDefined(false);
     setIsModalOpen(false);
-    setSubProductsAdded([{ process_sub_product_id: '', name: '', quantity: 0 }])
+    setIsEdit(false);
+    setSubProductsAdded([{
+      id: '',
+      name: '',
+      quantity: 0,
+      isEditable: true,
+      showSaveAndCancelButton: false,
+      toCreateOnModalEdit: false,
+      process_product_id: '',
+      process_sub_product_id: '',
+      process_sub_product_quantity: 0,
+    }])
   }
 
   async function handleRegister(e) {
@@ -159,7 +197,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
         console.log('AAAAAAA: ', response.data);
 
 
-        const filterProcessProduct = product.filter((iten) => {
+        const filterProcessProduct = products.filter((iten) => {
           if (iten.id == id) {
             return iten;
           }
@@ -185,7 +223,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
       }
     } else {
       try {
-        if (false) {
+        if (processProductName === '' || productId === '') {
           setLoading(false);
           return Notification({
             type: 'error',
@@ -196,53 +234,54 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
 
         const data = {
           product_id: productId,
-          process_sub_product: subProductsAdded
+          name: processProductName,
         };
-        setLoading(true);
-        const response = await api.post(`/chronoanalysis/product-process-sub-product`, data);
-        console.log('AAAAAAA: ', response.data);
 
+        console.log(data);
+
+        setLoading(true);
+        const response = await api.post(`/chronoanalysis/process-product`, data);
+
+        await api.post(`/chronoanalysis/product-process-sub-product`, {
+          process_product_id: response.data.id,
+          process_sub_product: subProductsAdded
+
+        });
+
+        console.log('Foi 0');
         const dataForm = new FormData();
         dataForm.append('image', image);
+        console.log(dataForm);
 
+        // const responseImage = await api.post(`/product/image/${response.data.id}`, dataForm, {
+        //   headers: {
+        //     "Content-Type": `multipart/form-data`,
+        //   },
+        // });
 
-        const responseImage = await api.post(`/product/image/${response.data.id}`, dataForm, {
-          headers: {
-            "Content-Type": `multipart/form-data`,
-          },
-        });
+        processProduct.push(response.data);
 
-        console.log('bbbbb: ', responseImage.data);
-
-
-        const filterProcessProduct = product.filter((iten) => {
-          if (iten.id == id) {
-            return iten;
-          }
-        });
-
-        filterProcessProduct.push(response.data);
-
-        setProducts(products);
+        setProcessProducts(processProduct);
         setLoading(false);
-
-        Notification({
-          type: 'success',
-          title: 'Enviado',
-          description: 'Produto de Processo Cadastrado com sucesso',
-        });
 
         const newProcessProductRegistered = response.data;
 
         processSubProduct.push(newProcessProductRegistered);
-        setIsModalOpen(false);
+        handleClose();
+
+        Notification({
+          type: 'success',
+          title: 'Enviado',
+          description: 'Item Editado Com Sucesso',
+        });
+
+
       } catch (error) {
-        console.log(error);
-        console.error(error);
+        console.error(error.response.data.message);
         Notification({
           type: 'error',
           title: 'Erro',
-          description: 'Não foi possível cadastrar a Produto de Processo',
+          description: 'Não foi possível Editar o Item',
         });
         setLoading(false);
       }
@@ -252,23 +291,24 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
   }
 
   async function handleDelete(id: string) {
+
     try {
       await api.delete(`/chronoanalysis/process-product/${id}`);
 
-      const filterprocessSubProducts = processSubProducts.filter((iten) => {
+      const filterprocessProducts = processProducts.filter((iten) => {
         if (iten.id !== id) {
           return iten;
         }
       });
 
-      setProcessSubProducts(filterprocessSubProducts);
+      setProcessProducts(filterprocessProducts);
       Notification({
         type: 'success',
         title: 'Sucesso',
         description: 'Produto de Processo Deletado com sucesso',
       });
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data.message);
       Notification({
         type: 'error',
         title: 'Erro',
@@ -277,23 +317,21 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
     }
   }
 
-  function handleEdit(data) {
-    setIsModalOpen(true);
-    console.log(data);
-
-    setId(data.id);
-
-  }
-
   function addNewSubProduct(e) {
     e.preventDefault();
 
     const newArray = [
       ...subProductsAdded,
       {
-        process_sub_product_id: '',
+        id: '',
         name: '',
         quantity: 0,
+        isEditable: true,
+        showSaveAndCancelButton: isEdit ? true : false,
+        toCreateOnModalEdit: isEdit ? true : false,
+        process_product_id: '',
+        process_sub_product_id: '',
+        process_sub_product_quantity: 0,
       },
     ];
 
@@ -312,7 +350,8 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
     const values = processSubProducts.find(
       (test) => test.id === id
     );
-    newArray[index].process_sub_product_id = values.id;
+
+    newArray[index].id = values.id;
     newArray[index].name = values.name;
 
     setSubProductsAdded(newArray);
@@ -320,6 +359,11 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
   }
 
   function handleChangeQuantity(index, value) {
+
+    if (Number(value) < 0) {
+      return;
+    }
+
     let newArray = [...subProductsAdded];
 
     newArray[index].quantity = Number(value);
@@ -347,6 +391,162 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
     setPreviewVisible(false)
   };
 
+  async function handleFilterSubProductProcessById(data) {
+
+    const responseResult = await api.get(`/chronoanalysis/product-process-sub-product/${data.id}`);
+
+    responseResult.data.map(item => {
+
+      return Object.assign(item, {
+        name: item.process_sub_product.name,
+        isEditable: false,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+        process_product_id: item.process_product.id,
+        process_sub_product_id: item.process_sub_product.id,
+        process_sub_product_quantity: item.quantity,
+      })
+    })
+
+    setSubProductsAdded(responseResult.data);
+    setProductId(data.product_id);
+    setId(data.id);
+    setProcessProductName(data.name);
+    setIsEdit(true);
+    setIsModalOpen(true);
+
+  }
+  function handleClickEditItemOfArrayOnEdition(index) {
+    let newArray = [...subProductsAdded];
+    let arrayForEdition = [...auxSubProductsAdded];
+
+    newArray[index].showSaveAndCancelButton = true;
+    newArray[index].isEditable = true;
+    arrayForEdition[0].id = newArray[index].id;
+    arrayForEdition[0].id = newArray[index].id;
+    arrayForEdition[0].name = newArray[index].name;
+    arrayForEdition[0].quantity = newArray[index].quantity;
+    arrayForEdition[0].isEditable = newArray[index].isEditable;
+
+    setAuxSubProductsAdded(arrayForEdition);
+    setSubProductsAdded(newArray);
+  }
+
+  function cancelItemEdition(index) {
+    let newArray = [...subProductsAdded];
+    let arrayOfLatestValueOnSpecificIndex = [...auxSubProductsAdded];
+
+    if (isEdit) {
+      removeSubProducts(index);
+      return
+    }
+
+    newArray[index].id = arrayOfLatestValueOnSpecificIndex[0].id;
+    newArray[index].name = arrayOfLatestValueOnSpecificIndex[0].name;
+    newArray[index].quantity = arrayOfLatestValueOnSpecificIndex[0].quantity;
+    newArray[index].isEditable = arrayOfLatestValueOnSpecificIndex[0].isEditable;
+    newArray[index].isEditable = false;
+    newArray[index].showSaveAndCancelButton = false;
+
+    setSubProductsAdded(newArray);
+  }
+
+  async function saveEditedItemOfArrayOnEdition(index) {
+    let newArray = [...subProductsAdded];
+
+    if (
+      newArray[index].id === '' ||
+      newArray[index].quantity === 0
+    ) {
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não podem existir itens vazios',
+      });
+      return;
+    }
+
+    if (newArray[index].toCreateOnModalEdit) {
+      try {
+        const response = await api.post(`/chronoanalysis/product-process-sub-product/`, {
+          process_product_id: id,
+          process_sub_product: [{
+            id: newArray[index].id,
+            quantity: newArray[index].quantity
+          }]
+        });
+        newArray[index].isEditable = false;
+        newArray[index].showSaveAndCancelButton = false;
+        newArray[index].toCreateOnModalEdit = false;
+        newArray[index].id = response.data.id;
+        setSubProductsAdded(newArray);
+        Notification({
+          type: 'success',
+          title: 'Sucesso',
+          description: 'Item Cadastrado com sucesso',
+        });
+        return;
+      } catch (error) {
+        console.error(error.response.data);
+        Notification({
+          type: 'error',
+          title: 'Erro',
+          description: 'Não foi possível Cadastrar o Item',
+        });
+      }
+
+      return;
+    }
+
+
+    try {
+
+      const data = {
+        process_product_id: newArray[index].process_product_id,
+        process_sub_product_id: newArray[index].process_sub_product_id,
+        process_sub_product_quantity: newArray[index].process_sub_product_quantity,
+      }
+      const response = await api.put(`chronoanalysis/product-process-sub-product/${newArray[index].id}`, data);
+      newArray[index].isEditable = false;
+      newArray[index].showSaveAndCancelButton = false;
+      setSubProductsAdded(newArray);
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Item Cadastrado com sucesso',
+      });
+    } catch (error) {
+      console.error(error.response.data);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Cadastrar o Item',
+      });
+    }
+  }
+
+  async function handleDeleteItemOfArrayOnEdition(index) {
+    const newArray = [...subProductsAdded];
+
+    try {
+      const response = await api.delete(`/chronoanalysis/product-process-sub-product/${newArray[index].id}`);
+      removeSubProducts(index);
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Item Deletado com sucesso',
+      });
+    } catch (error) {
+      console.error(error.response.data.message);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Deletar o Item',
+      });
+    }
+
+
+  }
   class SearchTable extends React.Component {
     state = {
       searchText: '',
@@ -466,12 +666,11 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
               <>
                 <EditFilled
                   style={{ cursor: 'pointer', fontSize: '16px' }}
-                  onClick={() => handleEdit(record)}
+                  onClick={() => handleFilterSubProductProcessById(record)}
                 />
-                {/* onClick={() => handleEdit(record)} */}
                 <Popconfirm
                   title="Confirmar remoção?"
-                  onConfirm={() => handleDelete(record.id)}
+                  onConfirm={() => { handleDelete(record.id) }}
                 >
                   <a href="#" style={{ marginLeft: 20 }}>
                     <DeleteOutlined
@@ -486,12 +685,11 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
       ];
       return (
         <>
-          <Table columns={columns} dataSource={products} />
+          <Table columns={columns} dataSource={processProducts} />
         </>
       );
     }
   }
-
 
   return (
     <div>
@@ -523,6 +721,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
       <Modal
         title="Cadastro de Produto de Processo"
         visible={isModalOpen}
+        width={1000}
         onCancel={handleClose}
         footer={[
           <Button key="back" onClick={handleClose} type="default">
@@ -539,7 +738,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
         ]}
       >
         <Row>
-          <Col span={20}>
+          <Col span={22}>
             <Form.Item
               key="productFormName"
               labelCol={{ span: 23 }}
@@ -561,7 +760,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
           </Col>
         </Row>
         <Row>
-          <Col span={20}>
+          <Col span={22}>
             <Form.Item
               key="productFormItem"
               labelCol={{ span: 23 }}
@@ -580,7 +779,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                   setProductId(e.toString());
                 }}
               >
-                {product.map((item) => (
+                {products.map((item) => (
                   <>
                     <Option key={item.id} value={item.id}>
                       {item.name}
@@ -589,16 +788,16 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                 ))}
               </Select>
             </Form.Item>
-            <p>Selecione uma foto do Produto</p>
+            {/* <p>Selecione uma foto do Produto</p>
             {imageIsDefined != true && uploadButton}
-            {imageIsDefined === true && imageUploadSucces}
+            {imageIsDefined === true && imageUploadSucces} */}
           </Col>
         </Row>
         <Divider />
 
         {subProductsAdded.map((selectedIten, index) => (
           <Row gutter={10}>
-            <Col span={12}>
+            <Col span={14}>
               <Form.Item
                 key="subProductFormItem"
                 labelCol={{ span: 23 }}
@@ -612,6 +811,7 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                 <Select
                   key="subProductName"
                   size="large"
+                  disabled={!selectedIten.isEditable}
                   value={selectedIten.name}
                   onChange={(e) => {
                     handleChangeSubProduct(index, e)
@@ -628,42 +828,13 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
               </Form.Item>
 
             </Col>
-            <Col span={12}>
-              <Form.Item
-                key="subProductFormItem"
-                labelCol={{ span: 23 }}
-                label="Sub Linha:"
-                labelAlign={'left'}
-                style={{
-                  backgroundColor: 'white',
-                }}
-                required
-              >
-                <Select
-                  key="subProductName"
-                  size="large"
-                  value={selectedIten.name}
-                  onChange={(e) => {
-                    handleChangeSubProduct(index, e)
-                  }}
-                >
-                  {processSubProduct.map((item) => (
-                    <>
-                      <Option key={item.id} value={item.id}>
-                        {item.name}
-                      </Option>
-                    </>
-                  ))}
-                </Select>
-              </Form.Item>
-
-            </Col>
-            <Col span={6}>
+            <Col span={3}>
               <Form.Item
                 key="removeFormItem"
                 label="Qtd: "
                 labelAlign={'left'}
                 style={{
+
                   backgroundColor: 'white',
                 }}
                 required
@@ -673,20 +844,98 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                   key="totalKey"
                   size="large"
                   placeholder="0"
+                  disabled={!selectedIten.isEditable}
                   value={selectedIten.quantity}
-                  style={{ width: '80%', marginRight: '5%' }}
+                  style={{ marginRight: '5%' }}
                   onChange={(e) => handleChangeQuantity(index, e.target.value)}
                 />
-                {subProductsAdded.length != 1 && (
+                {/* {subProductsAdded.length != 1 && (
                   <MinusCircleOutlined
                     style={{ color: 'red' }}
                     onClick={() => removeSubProducts(index)}
                   />
 
-                )}
+                )} */}
 
               </Form.Item>
             </Col>
+            {(isEdit && selectedIten.showSaveAndCancelButton === false) &&
+              <Col>
+                <Button
+                  style={{ marginTop: 35, color: 'blue', borderColor: 'blue' }}
+                  onClick={() => handleClickEditItemOfArrayOnEdition(index)}
+                >
+                  <FormOutlined />
+                </Button>
+              </Col>
+            }
+
+
+            {(subProductsAdded.length != 1 && selectedIten.showSaveAndCancelButton === false && !isEdit) && (
+              <Col>
+                <Popconfirm
+                  title="Confirmar remoção?"
+                  onConfirm={() => {
+                    removeSubProducts(index)
+                  }}
+                >
+                  <Button danger style={{ marginTop: 35 }}><DeleteOutlined /></Button>
+                </Popconfirm>
+              </Col>
+            )}
+
+
+            {(selectedIten.showSaveAndCancelButton === false && isEdit) && (
+              <Col>
+                <Popconfirm
+                  title="Confirmar remoção?"
+                  onConfirm={() => {
+                    handleDeleteItemOfArrayOnEdition(index)
+                  }}
+                >
+                  <Button danger style={{ marginTop: 35 }}><DeleteOutlined /></Button>
+                </Popconfirm>
+              </Col>
+            )}
+
+
+            {(selectedIten.showSaveAndCancelButton && selectedIten.isEditable) &&
+              (
+                <Col>
+                  <Button
+                    key="primary"
+                    title="Salvar"
+                    style={{
+                      marginTop: 35,
+                      color: 'white',
+                      backgroundColor: 'rgb(5, 155, 50)',
+                    }}
+                    onClick={() => saveEditedItemOfArrayOnEdition(index)}
+                  >
+                    <SaveOutlined />
+                    Salvar
+                  </Button>
+                </Col>
+              )}
+
+
+            {(selectedIten.showSaveAndCancelButton && selectedIten.isEditable) &&
+              (
+                <Col>
+                  <Button
+                    danger
+                    style={{
+                      marginTop: 35,
+                      color: 'white',
+                      backgroundColor: 'rgb(248, 75, 78)'
+                    }}
+                    onClick={() => cancelItemEdition(index)}
+                  >
+                    <DeleteOutlined />
+                    Cancelar
+                  </Button>
+                </Col>
+              )}
 
             {subProductsAdded.length - 1 === index && (
               <Button
@@ -698,7 +947,10 @@ export default function ProcessProduct({ processSubProduct, product }: IProps) {
                   color: 'white',
                   backgroundColor: 'rgb(5, 155, 50)',
                 }}
-                onClick={addNewSubProduct}
+                onClick={(e) => {
+
+                  addNewSubProduct(e)
+                }}
               >
                 <PlusOutlined />
                 Novo Sub Produto
@@ -716,13 +968,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const { data } = await apiClient.get('/chronoanalysis/process-sub-product');
     const product = await apiClient.get('/product/product-mirror');
-    console.log(data);
-
+    const processProduct = await apiClient.get('/chronoanalysis/process-product/')
 
     return {
       props: {
         processSubProduct: data,
         product: product.data,
+        processProduct: processProduct.data
       },
     };
   } catch (error) {

@@ -162,9 +162,12 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                     <Link href="/Chronoanalysis/ProcessProduct">Produto de Processo</Link>
                   </Menu.Item>
                 </SubMenu>
-
+                <Menu.Item key="Chronoanalysis" icon={<RightSquareOutlined />}>
+                  <Link href="/Chronoanalysis/Chronoanalysis">Cronoanálise</Link>
+                </Menu.Item>
 
               </SubMenu>
+
               {/* <SubMenu
                 key="FinancialMenu"
                 title="Financeiro"

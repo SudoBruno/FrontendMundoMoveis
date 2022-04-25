@@ -37,6 +37,7 @@ interface IProductionLine {
 }
 
 interface ISubLine {
+  production_line: IProductionLine;
   id: string;
   name: string;
   production_line_id: string;
@@ -92,11 +93,33 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
 
         const response = await api.put(`/chronoanalysis/sub-production-line/${subProductionLineId}`, data);
 
+
         const filterSubLines = subLine.filter((iten) => {
           if (iten.id !== subProductionLineId) {
             return iten;
           }
         });
+
+
+        subLine.forEach(item => {
+          if (item.id === subProductionLineId) {
+            console.log('if 1');
+            productionLine.forEach(line => {
+              if (line.id === response.data.production_line_id) {
+                console.log('if 2');
+                Object.assign(response.data, {
+                  production_line: {
+                    id: response.data.id,
+                    name: line.name,
+                  },
+                })
+              }
+            })
+          }
+
+        })
+
+
         filterSubLines.push(response.data)
 
         setSubLines(filterSubLines)
@@ -136,17 +159,19 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
         const response = await api.post('chronoanalysis/sub-production-line/', data);
         setLoading(false);
 
+        const newSubLinestRegistered = response.data;
+
+        subLine.push(newSubLinestRegistered);
+        setSubLines(subLine);
+        setIsModalOpen(false);
+
         Notification({
           type: 'success',
           title: 'Enviado',
           description: 'Sub Linha Cadastrado com sucesso',
         });
 
-        const newSubLinestRegistered = response.data;
 
-        subLine.push(newSubLinestRegistered);
-        setSubLines(subLine);
-        setIsModalOpen(false);
       } catch (error) {
         console.error(error);
         Notification({
@@ -399,7 +424,7 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
             key="subProductionLineName"
             size="large"
             style={{ width: 400, marginBottom: '10px' }}
-            placeholder="Nome do Sub Linha"
+            placeholder="Nome da Sub Linha"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -425,13 +450,13 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
               handleChangeProductionLine(e);
             }}
             filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+              option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
               0
             }
             filterSort={(optionA, optionB) =>
-              optionA.children
+              optionA.props.children
                 .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
+                .localeCompare(optionB.props.children.toLowerCase())
             }
           >
             {productionLines.map((item) => (

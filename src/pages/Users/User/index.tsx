@@ -468,12 +468,12 @@ export default function User({ tenant }: IProp) {
               handleChangeTenant(e);
             }}
             filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
             filterSort={(optionA, optionB) =>
-              optionA.children
+              optionA.props.children
                 .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
+                .localeCompare(optionB.props.children.toLowerCase())
             }
           >
             {tenants.map((item) => (
