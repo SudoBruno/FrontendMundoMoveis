@@ -166,7 +166,7 @@ export default function categories({ categorie, notFound }: IProps) {
 
   class SearchTable extends React.Component {
     state = {
-      searchText: '',
+      searchText: 'a',
       searchedColumn: '',
     };
     searchInput: Input;
@@ -220,9 +220,9 @@ export default function categories({ categorie, notFound }: IProps) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {

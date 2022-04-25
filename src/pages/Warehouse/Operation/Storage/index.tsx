@@ -112,7 +112,7 @@ export default function Storage({
 
     if (storageId) {
       try {
-      } catch (error) {}
+      } catch (error) { }
     } else {
       try {
         const storagesForAdd = {
@@ -210,7 +210,7 @@ export default function Storage({
     setRawMaterialsAdded(newArray);
   }
 
-  function handleEdit(data: IStorage) {}
+  function handleEdit(data: IStorage) { }
 
   function handleChangeCargo(value, index) {
     let newArray = [...rawMaterialsAdded];
@@ -322,7 +322,7 @@ export default function Storage({
     rawMaterialsAdded.forEach((item, itemIndex) => {
       if (
         item.raw_material_receipt_id ===
-          newArray[index].raw_material_receipt_id &&
+        newArray[index].raw_material_receipt_id &&
         itemIndex !== index
       ) {
         maxQuantity -= Number(item.quantity);
@@ -400,9 +400,9 @@ export default function Storage({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -586,14 +586,14 @@ export default function Storage({
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (
@@ -635,14 +635,14 @@ export default function Storage({
                       handleChangeReceipt(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {receipts.map((item) => (
@@ -677,14 +677,14 @@ export default function Storage({
                       handleChangeWarehouse(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {warehouses.map((item) => (
@@ -718,14 +718,14 @@ export default function Storage({
                       handleChangePosition(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {positions.map((item) => (

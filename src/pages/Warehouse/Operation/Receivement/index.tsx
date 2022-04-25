@@ -317,9 +317,9 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -528,14 +528,14 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (

@@ -8,6 +8,7 @@ import {
   ExportOutlined,
   ProfileOutlined,
   DollarCircleOutlined,
+  FieldTimeOutlined
 } from '@ant-design/icons';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { Button, Layout, Menu, Result } from 'antd';
@@ -104,7 +105,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
 
                   <Menu.Item
-                    key="Alterar Estoque"
+                    key="Alterar_Estoque"
                     icon={<RightSquareOutlined />}
                   >
                     <Link href="/Warehouse/Operation/AlterStock">
@@ -130,9 +131,45 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
                 </SubMenu>
               </SubMenu>
-
               <SubMenu
-                key="WnsInsumosSearches"
+                key="ChronoanalysisMenu"
+                title="Cronoanálise"
+                icon={<FieldTimeOutlined />}
+              >
+                <SubMenu
+                  key="FinancialRegister"
+                  title="Cadastros"
+                  icon={<PlusOutlined />}
+                >
+                  <Menu.Item
+                    key="SubLineMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/SubLine">Sub Linha</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="WorkElementMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/WorkElement">Elemento de Trabalho</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="subProductProcessMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/SubProductProcess">Sub-Produto de Processo</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="ProductProcessMenuItem"
+                  >
+                    <Link href="/Chronoanalysis/ProcessProduct">Produto de Processo</Link>
+                  </Menu.Item>
+                </SubMenu>
+                <Menu.Item key="Chronoanalysis" icon={<RightSquareOutlined />}>
+                  <Link href="/Chronoanalysis/Chronoanalysis">Cronoanálise</Link>
+                </Menu.Item>
+
+              </SubMenu>
+
+              {/* <SubMenu
+                key="FinancialMenu"
                 title="Financeiro"
                 icon={<DollarCircleOutlined />}
               >
@@ -180,7 +217,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                 <Menu.Item key="approvatMenuItem" icon={<ProfileOutlined />}>
                   <Link href="/Financial/Approve/">Aprovação</Link>
                 </Menu.Item>
-              </SubMenu>
+              </SubMenu> */}
 
               <Menu.Item key="Exit" icon={<ExportOutlined />}>
                 <Link href="/">Sair</Link>

@@ -382,9 +382,9 @@ export default function AlterSotock({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -515,13 +515,13 @@ export default function AlterSotock({
                   clearInputsWhenSelectdRawMaterial();
                 }}
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
                   0
                 }
                 filterSort={(optionA, optionB) =>
-                  optionA.children
+                  optionA.props.children
                     .toLowerCase()
-                    .localeCompare(optionB.children.toLowerCase())
+                    .localeCompare(optionB.props.children.toLowerCase())
                 }
               >
                 {rawMaterials.map((item) => (
@@ -560,13 +560,13 @@ export default function AlterSotock({
                   setCargo(e);
                 }}
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
                   0
                 }
                 filterSort={(optionA, optionB) =>
-                  optionA.children
+                  optionA.props.children
                     .toLowerCase()
-                    .localeCompare(optionB.children.toLowerCase())
+                    .localeCompare(optionB.props.children.toLowerCase())
                 }
               >
                 {cargos.map((item, index) => (
@@ -607,13 +607,13 @@ export default function AlterSotock({
                   setMaxQuantity(0);
                 }}
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
                   0
                 }
                 filterSort={(optionA, optionB) =>
-                  optionA.children
+                  optionA.props.children
                     .toLowerCase()
-                    .localeCompare(optionB.children.toLowerCase())
+                    .localeCompare(optionB.props.children.toLowerCase())
                 }
               >
                 {warehouses.map((item) => (
@@ -653,13 +653,13 @@ export default function AlterSotock({
                   handleChangeOldPosition(e);
                 }}
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
                   0
                 }
                 filterSort={(optionA, optionB) =>
-                  optionA.children
+                  optionA.props.children
                     .toLowerCase()
-                    .localeCompare(optionB.children.toLowerCase())
+                    .localeCompare(optionB.props.children.toLowerCase())
                 }
               >
                 {positions.map((item) => (
@@ -737,13 +737,13 @@ export default function AlterSotock({
                   setNewPositionName('');
                 }}
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
                   0
                 }
                 filterSort={(optionA, optionB) =>
-                  optionA.children
+                  optionA.props.children
                     .toLowerCase()
-                    .localeCompare(optionB.children.toLowerCase())
+                    .localeCompare(optionB.props.children.toLowerCase())
                 }
               >
                 {warehouses.map((item) => (
@@ -784,13 +784,13 @@ export default function AlterSotock({
                   handleChangeNewPosition(e);
                 }}
                 filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
                   0
                 }
                 filterSort={(optionA, optionB) =>
-                  optionA.children
+                  optionA.props.children
                     .toLowerCase()
-                    .localeCompare(optionB.children.toLowerCase())
+                    .localeCompare(optionB.props.children.toLowerCase())
                 }
               >
                 {positions.map((item) => (

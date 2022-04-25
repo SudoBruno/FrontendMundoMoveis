@@ -454,9 +454,9 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -625,14 +625,14 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (
@@ -673,14 +673,14 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangeWarehouse(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {warehouses.map((item) => (
@@ -714,14 +714,14 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangePosition(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {positions.map((item) => (
@@ -755,14 +755,14 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangeCargo(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.children
+                      option.props.children
                         .toLowerCase()
                         .indexOf(input.toLowerCase()) >= 0
                     }
                     filterSort={(optionA, optionB) =>
-                      optionA.children
+                      optionA.props.children
                         .toLowerCase()
-                        .localeCompare(optionB.children.toLowerCase())
+                        .localeCompare(optionB.props.children.toLowerCase())
                     }
                   >
                     {cargo.map((item) => (
