@@ -450,13 +450,10 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
               handleChangeProductionLine(e);
             }}
             filterOption={(input, option) =>
-              option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-              0
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.props.children
+              option.children
+                .toString()
                 .toLowerCase()
-                .localeCompare(optionB.props.children.toLowerCase())
+                .includes(input.toLowerCase())
             }
           >
             {productionLines.map((item) => (

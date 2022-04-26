@@ -648,7 +648,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,

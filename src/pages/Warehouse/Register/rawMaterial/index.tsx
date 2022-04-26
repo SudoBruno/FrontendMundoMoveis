@@ -228,7 +228,7 @@ export default function rawMaterial({
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -485,13 +485,10 @@ export default function rawMaterial({
                   setIdCategory(e.toString());
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {categories.map((categorie) => (
@@ -524,13 +521,10 @@ export default function rawMaterial({
                   setIdUnitMeasure(e.toString());
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {unitMeasures.map((unit) => (

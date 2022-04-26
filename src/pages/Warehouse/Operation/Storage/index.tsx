@@ -349,7 +349,7 @@ export default function Storage({
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -586,14 +586,10 @@ export default function Storage({
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (
@@ -635,14 +631,10 @@ export default function Storage({
                       handleChangeReceipt(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {receipts.map((item) => (
@@ -677,14 +669,10 @@ export default function Storage({
                       handleChangeWarehouse(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {warehouses.map((item) => (
@@ -718,14 +706,10 @@ export default function Storage({
                       handleChangePosition(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {positions.map((item) => (

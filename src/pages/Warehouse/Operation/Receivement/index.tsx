@@ -266,7 +266,7 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -528,14 +528,10 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (

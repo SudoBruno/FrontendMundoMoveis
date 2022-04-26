@@ -325,7 +325,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -603,13 +603,10 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                     handleChangeToleranceClassification(index, e)
                   }}
                   filterOption={(input, option) =>
-                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                    0
-                  }
-                  filterSort={(optionA, optionB) =>
-                    optionA.props.children
+                    option.children
+                      .toString()
                       .toLowerCase()
-                      .localeCompare(optionB.props.children.toLowerCase())
+                      .includes(input.toLowerCase())
                   }
                 >
                   {tolerancesClassification.map((item) => (

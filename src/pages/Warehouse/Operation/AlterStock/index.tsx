@@ -331,7 +331,7 @@ export default function AlterSotock({
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -515,13 +515,10 @@ export default function AlterSotock({
                   clearInputsWhenSelectdRawMaterial();
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {rawMaterials.map((item) => (
@@ -560,13 +557,10 @@ export default function AlterSotock({
                   setCargo(e);
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {cargos.map((item, index) => (
@@ -607,13 +601,10 @@ export default function AlterSotock({
                   setMaxQuantity(0);
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {warehouses.map((item) => (
@@ -653,13 +644,10 @@ export default function AlterSotock({
                   handleChangeOldPosition(e);
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {positions.map((item) => (
@@ -737,13 +725,10 @@ export default function AlterSotock({
                   setNewPositionName('');
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {warehouses.map((item) => (
@@ -784,13 +769,10 @@ export default function AlterSotock({
                   handleChangeNewPosition(e);
                 }}
                 filterOption={(input, option) =>
-                  option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-                filterSort={(optionA, optionB) =>
-                  optionA.props.children
+                  option.children
+                    .toString()
                     .toLowerCase()
-                    .localeCompare(optionB.props.children.toLowerCase())
+                    .includes(input.toLowerCase())
                 }
               >
                 {positions.map((item) => (

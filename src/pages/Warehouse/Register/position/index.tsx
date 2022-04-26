@@ -186,7 +186,7 @@ export default function position({
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -399,12 +399,10 @@ export default function position({
               setWarehouseId(e.toString());
             }}
             filterOption={(input, option) =>
-              option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.props.children
+              option.children
+                .toString()
                 .toLowerCase()
-                .localeCompare(optionB.props.children.toLowerCase())
+                .includes(input.toLowerCase())
             }
           >
             {warehouses.map((warehouse) => (
