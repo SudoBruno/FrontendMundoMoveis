@@ -680,7 +680,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error(error.response);
     return {
       props: {
-        workelement: [],
+        workElement: [],
       },
     };
   }
