@@ -65,7 +65,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
       { id: '', type: '', classification: '', factor: 0, },
       { id: '', type: '', classification: '', factor: 0, },
       { id: '', type: '', classification: '', factor: 0, },
-    ])
+    ]);
   const [workElements, setWorkElements] = useState(workElement);
   const [workElementName, setWorkElementName] = useState<string>('');
   const [tolerancesTypes, setTolerancesTypes] = useState(
@@ -80,7 +80,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
     ]);
   const [tolerancesClassification, setTolerancesClassification] = useState([]);
   const [workElementId, setWorkElementId] = useState('');
-  const [workElementFactor, setWorkElementFactor] = useState([])
+  const [workElementFactor, setWorkElementFactor] = useState([]);
   const [factorCalculated, setFactorCalculated] = useState(0);
   const [numberPeopleNeeded, setNumberPeopleNeeded] = useState<number>(0);
 
@@ -126,8 +126,6 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           return;
         }
 
-
-
         workElementFactor.map(async (factor, index) => {
           try {
             const responseTolerance = await api.put(`/chronoanalysis/work-element-factor/${factor.id}`, { factor: [toleranceAdded[index]] });
@@ -141,7 +139,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
             setLoading(false);
             return;
           }
-        })
+        });
 
         const filterWorkElements = workElements.filter((iten) => {
           if (iten.id != workElementId) {
@@ -189,6 +187,9 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           }
         );
 
+        console.log('sadasasds:', response);
+
+
         const data = {
           work_element_id: response.data.id,
           factor: toleranceAdded,
@@ -200,8 +201,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
         workElements.push(newWorkElementRegistered);
 
-        console.log(responseResult.data);
-
+        console.log(response);
 
         setWorkElements(workElements);
         handleClose();
@@ -229,6 +229,16 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
     setLoading(false);
     setWorkElementId('');
     setWorkElementName('');
+    setNumberPeopleNeeded(0);
+    setTolerancesTypes([
+      'Esforço físico em kg',
+      'Esforço mental',
+      'Monotonia',
+      'Necessidades pessoais',
+      'Recuperação de fadiga',
+      'Ruídos',
+      'Temperatura ambiente'
+    ]);
     setToleranceAdded([
       { id: '', type: '', classification: '', factor: 0, },
       { id: '', type: '', classification: '', factor: 0, },
@@ -546,7 +556,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                 placeholder="0"
                 value={numberPeopleNeeded}
                 onChange={(e) => {
-                  setNumberPeopleNeeded(Number(e.target.value));
+                  setNumberPeopleNeeded(Number(e.target.value) > 0 ? Number(e.target.value) : 1);
                 }}
               />
             </Form.Item>

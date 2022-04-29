@@ -139,8 +139,6 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
       setLoading(true);
       const response = await api.post('/chronoanalysis/chronoanalysis/', data);
 
-
-
       await api.post(`/chronoanalysis/chronoanalysis-time/`, {
         chronoanalysis_id: response.data.id,
         time: timesAdded
@@ -192,28 +190,31 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
       setLoading(true);
       const response = await api.put(`/chronoanalysis/chronoanalysis/${chronoanalysisId}`, data);
 
-      const filterSubProducts = timesAdded.filter((iten) => {
+      const filterChronoanalisys = chronoanalysis.filter((iten) => {
         if (iten.id !== chronoanalysisId) {
           return iten;
         }
       });
 
-      filterSubProducts.push(response.data)
+      console.log(response.data);
 
-      setChronoanalysis(filterSubProducts)
+
+      filterChronoanalisys.push(response.data);
+
+      setChronoanalysis(filterChronoanalisys);
       setLoading(false);
       setIsModalOpen(false);
       Notification({
         type: 'success',
         title: 'Enviado',
-        description: 'Sub-Produto Editado com sucesso',
+        description: 'Cronoanálise Editada com sucesso',
       });
     } catch (error) {
       console.error(error);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível Editar o Sub-Produto',
+        description: 'Não foi possível Editar a Cronoanálise',
       });
       setLoading(false);
     }
@@ -296,8 +297,8 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
 
     setTimesAdded(responseResult.data);
     setChronoanalysisId(data.id);
-    setWorkElementId(responseResult.data[0].chronoanalysis.work_element.id);
-    setIsEdit(!isEdit);
+    setWorkElementId(responseResult.data[0].chronoanalysis.work_element_id);
+    setIsEdit(true);
     setIsModalOpen(true);
   }
 
@@ -362,8 +363,8 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
     let newArray = [...timesAdded];
 
     if (
-      newArray[index].time == '_:_:_' ||
-      newArray[index].time == '00:00:00' ||
+      newArray[index].time === '_:_:_' ||
+      newArray[index].time === '00:00:00' ||
       newArray[index].rate === 0
     ) {
       Notification({
@@ -376,6 +377,7 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
 
     if (newArray[index].toCreateOnModalEdit) {
       try {
+        console.log(chronoanalysisId);
 
         const response = await api.post(`chronoanalysis/chronoanalysis-time/`, {
           chronoanalysis_id: chronoanalysisId,
@@ -394,7 +396,7 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
         return;
 
       } catch (error) {
-        console.error(error);
+        console.error(error.response.data.message);
         Notification({
           type: 'error',
           title: 'Erro',
@@ -452,6 +454,44 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
         description: 'Não foi possível Deletar a Cronoanálise',
       });
     }
+  }
+
+  function handleClose() {
+    setIsEdit(false);
+    setIsModalOpen(false);
+    setWorkElementId('');
+    setLoading(false);
+    console.log('CHAMOUUU');
+
+    setTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ])
   }
   class SearchTable extends React.Component {
     state = {
@@ -565,6 +605,7 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
         },
 
         {
+
           title: 'Operação',
           key: 'aaa',
           render: (record) => {
@@ -620,16 +661,16 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
         title="Cadastro de Cronoanálise"
         visible={isModalOpen}
         width={600}
-        onCancel={() => { }}
+        onCancel={() => { handleClose() }}
         footer={[
-          <Button key="back" onClick={() => { setIsEdit(false); setIsModalOpen(false) }} type="default">
+          <Button key="back" onClick={() => { handleClose() }} type="default">
             Cancelar
           </Button>,
           <Button
             key="submit"
             type="primary"
             loading={false}
-            onClick={isEdit ? handleEdit : handleRegister}
+            onClick={isEdit === true ? handleEdit : handleRegister}
           >
             Salvar
           </Button>,
@@ -844,8 +885,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error(error);
     return {
       props: {
-        product: [],
-        time: []
+        workElement: [],
+        chronoanalysisList: []
       },
     };
   }
