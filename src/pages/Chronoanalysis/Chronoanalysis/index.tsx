@@ -20,7 +20,7 @@ import {
   Select,
   Space,
   Table,
-  Upload,
+  TimePicker
 } from 'antd';
 
 import Highlighter from 'react-highlight-words';
@@ -37,6 +37,7 @@ import { getAPIClient } from '../../../services/axios';
 import { Divider } from 'antd';
 import FormData from 'form-data'
 import { MaskedInput } from 'antd-mask-input';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -88,6 +89,7 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
       toCreateOnModalEdit: false,
     }
   ]);
+
   const [auxtimesAdded, setAuxTimesAdded] = useState([
     {
       id: '',
@@ -120,7 +122,7 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
 
   const [chronoanalysis, setChronoanalysis] = useState<any[]>(chronoanalysisList);
 
-  async function handleRegister() {
+  async function handleRegister(e) {
 
     try {
       if (workElementId === '') {
@@ -151,7 +153,7 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
       chronoanalysisList.push(newChronoanalysisRegistered);
 
       setChronoanalysis(chronoanalysisList);
-      setIsModalOpen(false);
+      handleClose(e);
       setWorkElementId("");
 
       Notification({
@@ -268,7 +270,9 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
 
   function verifyTimes() {
     const newArray = [...timesAdded];
-    let totalSum = 0;
+    let totalSum: number = 0;
+    const quantityOfNumbersOnArray: number = newArray.length;
+    let average: number = 0;
 
     newArray.map((item, index) => {
       let time = item.time.split(':');
@@ -276,11 +280,11 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
         Number(time[1]) * 60 +
         Number(time[0]) * 3600
       totalSum += secondsOfItem;
-      console.log(item);
 
-      console.log(secondsOfItem);
+      console.log('Soma Total: ', totalSum);
+    });
 
-    })
+
   }
 
   async function handleFilterSubProductProcessById(data) {
@@ -377,16 +381,18 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
 
     if (newArray[index].toCreateOnModalEdit) {
       try {
-        console.log(chronoanalysisId);
+
 
         const response = await api.post(`chronoanalysis/chronoanalysis-time/`, {
           chronoanalysis_id: chronoanalysisId,
           time: [newArray[index]]
         });
+
         newArray[index].isEditable = false;
         newArray[index].showSaveAndCancelButton = false;
-        newArray[index].id = response.data.id;
+        newArray[index].id = response.data[0].id;
         newArray[index].toCreateOnModalEdit = false;
+
         setTimesAdded(newArray);
         Notification({
           type: 'success',
@@ -409,7 +415,13 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
 
 
     try {
-      const response = await api.put(`chronoanalysis/chronoanalysis-time/${newArray[index].id}`, newArray[index]);
+      console.log(newArray[index].id);
+
+      const response = await api.put(`chronoanalysis/chronoanalysis-time/${newArray[index].id}`, {
+        chronoanalysis_id: chronoanalysisId,
+        time: newArray[index].time,
+        rate: newArray[index].rate
+      });
 
       newArray[index].isEditable = false;
       newArray[index].showSaveAndCancelButton = false;
@@ -456,14 +468,115 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
     }
   }
 
-  function handleClose() {
+  function handleOpenModal(e) {
+    e.preventDefault();
+
+    setChronoanalysisId('');
+    setIsModalOpen(true);
+    setIsEdit(false);
+    setWorkElementId('');
+    setLoading(false);
+
+    setTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ]);
+
+    setAuxTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ])
+  }
+
+  function handleClose(e) {
+    e.preventDefault();
     setIsEdit(false);
     setIsModalOpen(false);
     setWorkElementId('');
     setLoading(false);
-    console.log('CHAMOUUU');
+    setChronoanalysisId('');
 
     setTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ])
+
+    setAuxTimesAdded([
       {
         id: '',
         time: '',
@@ -647,8 +760,8 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
               size={'large'}
               className={styles.button}
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
-              onClick={() => {
-                setIsModalOpen(true);
+              onClick={(e) => {
+                handleOpenModal(e)
               }}
             >
               Cadastrar Cronoanálise
@@ -661,16 +774,16 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
         title="Cadastro de Cronoanálise"
         visible={isModalOpen}
         width={600}
-        onCancel={() => { handleClose() }}
+        onCancel={(e) => { handleClose(e) }}
         footer={[
-          <Button key="back" onClick={() => { handleClose() }} type="default">
+          <Button key="back" onClick={(e) => { handleClose(e) }} type="default">
             Cancelar
           </Button>,
           <Button
             key="submit"
             type="primary"
             loading={false}
-            onClick={isEdit === true ? handleEdit : handleRegister}
+            onClick={(e) => isEdit === true ? handleEdit : handleRegister(e)}
           >
             Salvar
           </Button>,
@@ -711,7 +824,12 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
           </Col>
         </Row>
         <Divider />
-        <h2>Tempos</h2>
+        <Row gutter={5}>
+          <Col>
+            <h2>Tempos</h2>
+          </Col>
+          {/* <Col><Button onClick={() => { verifyTimes() }}>Verificar Tempos</Button></Col> */}
+        </Row>
         <br></br>
         {timesAdded.map((item, index) => (
           <>
@@ -727,11 +845,8 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
                   }}
                   required
                 >
-                  <MaskedInput
+                  <Input
                     key="totalKey"
-                    mask={
-                      '00:00:00'
-                    }
                     disabled={!item.isEditable}
                     size="large"
                     value={item.time}

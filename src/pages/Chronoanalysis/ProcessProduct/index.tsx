@@ -194,8 +194,6 @@ export default function ProcessProduct({ processSubProduct, product, processProd
         };
         setLoading(true);
         const response = await api.put(`/chronoanalysis/product-process-sub-product`, data);
-        console.log('AAAAAAA: ', response.data);
-
 
         const filterProcessProduct = products.filter((iten) => {
           if (iten.id == id) {
@@ -237,8 +235,6 @@ export default function ProcessProduct({ processSubProduct, product, processProd
           name: processProductName,
         };
 
-        console.log(data);
-
         setLoading(true);
         const response = await api.post(`/chronoanalysis/process-product`, data);
 
@@ -248,10 +244,9 @@ export default function ProcessProduct({ processSubProduct, product, processProd
 
         });
 
-        console.log('Foi 0');
         const dataForm = new FormData();
         dataForm.append('image', image);
-        console.log(dataForm);
+
 
         // const responseImage = await api.post(`/product/image/${response.data.id}`, dataForm, {
         //   headers: {
@@ -351,7 +346,7 @@ export default function ProcessProduct({ processSubProduct, product, processProd
       (test) => test.id === id
     );
 
-    newArray[index].id = values.id;
+    newArray[index].process_sub_product_id = values.id;
     newArray[index].name = values.name;
 
     setSubProductsAdded(newArray);
@@ -367,8 +362,6 @@ export default function ProcessProduct({ processSubProduct, product, processProd
     let newArray = [...subProductsAdded];
 
     newArray[index].quantity = Number(value);
-
-    console.log(newArray);
 
     setSubProductsAdded(newArray);
   }
@@ -402,11 +395,12 @@ export default function ProcessProduct({ processSubProduct, product, processProd
         isEditable: false,
         showSaveAndCancelButton: false,
         toCreateOnModalEdit: false,
+        id: item.id,
         process_product_id: item.process_product.id,
         process_sub_product_id: item.process_sub_product.id,
         process_sub_product_quantity: item.quantity,
       })
-    })
+    });
 
     setSubProductsAdded(responseResult.data);
     setProductId(data.product_id);
@@ -423,7 +417,6 @@ export default function ProcessProduct({ processSubProduct, product, processProd
     newArray[index].showSaveAndCancelButton = true;
     newArray[index].isEditable = true;
     arrayForEdition[0].id = newArray[index].id;
-    arrayForEdition[0].id = newArray[index].id;
     arrayForEdition[0].name = newArray[index].name;
     arrayForEdition[0].quantity = newArray[index].quantity;
     arrayForEdition[0].isEditable = newArray[index].isEditable;
@@ -436,7 +429,7 @@ export default function ProcessProduct({ processSubProduct, product, processProd
     let newArray = [...subProductsAdded];
     let arrayOfLatestValueOnSpecificIndex = [...auxSubProductsAdded];
 
-    if (isEdit) {
+    if (newArray[index].id === '') {
       removeSubProducts(index);
       return
     }
@@ -455,7 +448,7 @@ export default function ProcessProduct({ processSubProduct, product, processProd
     let newArray = [...subProductsAdded];
 
     if (
-      newArray[index].id === '' ||
+      newArray[index].process_sub_product_id === '' ||
       newArray[index].quantity === 0
     ) {
       Notification({
@@ -468,10 +461,11 @@ export default function ProcessProduct({ processSubProduct, product, processProd
 
     if (newArray[index].toCreateOnModalEdit) {
       try {
+
         const response = await api.post(`/chronoanalysis/product-process-sub-product/`, {
           process_product_id: id,
           process_sub_product: [{
-            id: newArray[index].id,
+            id: newArray[index].process_sub_product_id,
             quantity: newArray[index].quantity
           }]
         });
@@ -479,6 +473,8 @@ export default function ProcessProduct({ processSubProduct, product, processProd
         newArray[index].showSaveAndCancelButton = false;
         newArray[index].toCreateOnModalEdit = false;
         newArray[index].id = response.data.id;
+
+
         setSubProductsAdded(newArray);
         Notification({
           type: 'success',
@@ -502,10 +498,11 @@ export default function ProcessProduct({ processSubProduct, product, processProd
     try {
 
       const data = {
-        process_product_id: newArray[index].process_product_id,
+        process_product_id: id,
         process_sub_product_id: newArray[index].process_sub_product_id,
         process_sub_product_quantity: newArray[index].process_sub_product_quantity,
       }
+
       const response = await api.put(`chronoanalysis/product-process-sub-product/${newArray[index].id}`, data);
       newArray[index].isEditable = false;
       newArray[index].showSaveAndCancelButton = false;
@@ -513,14 +510,14 @@ export default function ProcessProduct({ processSubProduct, product, processProd
       Notification({
         type: 'success',
         title: 'Sucesso',
-        description: 'Item Cadastrado com sucesso',
+        description: 'Item Editado com sucesso',
       });
     } catch (error) {
       console.error(error.response.data);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível Cadastrar o Item',
+        description: 'Não foi possível Editar o Item',
       });
     }
   }
@@ -529,7 +526,7 @@ export default function ProcessProduct({ processSubProduct, product, processProd
     const newArray = [...subProductsAdded];
 
     try {
-      const response = await api.delete(`/chronoanalysis/product-process-sub-product/${newArray[index].id}`);
+      const response = await api.delete(`/chronoanalysis/product-process-sub-product/${newArray[index].process_sub_product_id}`);
       removeSubProducts(index);
       Notification({
         type: 'success',
