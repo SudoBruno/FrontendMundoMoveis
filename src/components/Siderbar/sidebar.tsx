@@ -8,7 +8,8 @@ import {
   ExportOutlined,
   ProfileOutlined,
   DollarCircleOutlined,
-  FieldTimeOutlined
+  FieldTimeOutlined,
+  BulbOutlined
 } from '@ant-design/icons';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { Button, Layout, Menu, Result } from 'antd';
@@ -164,6 +165,9 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                 </SubMenu>
                 <Menu.Item key="Chronoanalysis" icon={<RightSquareOutlined />}>
                   <Link href="/Chronoanalysis/Chronoanalysis">Cronoanálise</Link>
+                </Menu.Item>
+                <Menu.Item key="TaskDistribution" icon={<BulbOutlined />}>
+                  <Link href="/Chronoanalysis/TaskDistribution">Balanceamento</Link>
                 </Menu.Item>
 
               </SubMenu>

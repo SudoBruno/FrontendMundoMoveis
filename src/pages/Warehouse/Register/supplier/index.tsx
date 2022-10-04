@@ -171,7 +171,7 @@ export default function supplier({ supplier }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -222,9 +222,9 @@ export default function supplier({ supplier }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -264,32 +264,32 @@ export default function supplier({ supplier }: IProp) {
           dataIndex: 'name',
           key: 'name',
           width: '30%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
         {
           title: 'Email',
           dataIndex: 'email',
           key: 'email',
           width: '30%',
-          ...this.getColumnSearchProps('email'),
-          sorter: (a, b) => a.email.length - b.email.length,
+          // ...this.getColumnSearchProps('email'),
+          // sorter: (a, b) => a.email.length - b.email.length,
         },
         {
           title: 'Telefone',
           dataIndex: 'phone',
           key: 'phone',
           width: '20%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.phone.length - b.phone.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.phone.length - b.phone.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',

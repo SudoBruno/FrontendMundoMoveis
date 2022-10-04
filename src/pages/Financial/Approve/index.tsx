@@ -156,7 +156,7 @@ export default function Approve({
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -207,9 +207,9 @@ export default function Approve({
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -249,16 +249,16 @@ export default function Approve({
           dataIndex: 'user_name',
           key: 'user_name',
           width: '20%',
-          ...this.getColumnSearchProps('user_name'),
-          sorter: (a, b) => a.user_name.length - b.user_name.length,
+          // ...this.getColumnSearchProps('user_name'),
+          // sorter: (a, b) => a.user_name.length - b.user_name.length,
         },
         {
           title: 'Descrição',
           dataIndex: 'description',
           key: 'description',
           width: '80%',
-          ...this.getColumnSearchProps('description'),
-          sorter: (a, b) => a.description.length - b.description.length,
+          // ...this.getColumnSearchProps('description'),
+          // sorter: (a, b) => a.description.length - b.description.length,
         },
         {
           title: 'Visualizar',

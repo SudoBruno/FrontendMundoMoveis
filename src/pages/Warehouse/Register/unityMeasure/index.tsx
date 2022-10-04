@@ -173,7 +173,7 @@ export default function index({ itens }: props) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -224,9 +224,9 @@ export default function index({ itens }: props) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -266,16 +266,16 @@ export default function index({ itens }: props) {
           dataIndex: 'name',
           key: 'name',
           width: '20%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
         {
           title: 'Unidade',
           dataIndex: 'abbreviation',
 
           key: 'abbreviation',
-          ...this.getColumnSearchProps('abbreviation'),
-          sorter: (a, b) => a.abbreviation.length - b.abbreviation.length,
+          // ...this.getColumnSearchProps('abbreviation'),
+          // sorter: (a, b) => a.abbreviation.length - b.abbreviation.length,
         },
         {
           title: 'Operação',

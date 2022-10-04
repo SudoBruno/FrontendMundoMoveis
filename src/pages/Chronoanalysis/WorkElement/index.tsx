@@ -65,7 +65,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
       { id: '', type: '', classification: '', factor: 0, },
       { id: '', type: '', classification: '', factor: 0, },
       { id: '', type: '', classification: '', factor: 0, },
-    ])
+    ]);
   const [workElements, setWorkElements] = useState(workElement);
   const [workElementName, setWorkElementName] = useState<string>('');
   const [tolerancesTypes, setTolerancesTypes] = useState(
@@ -80,7 +80,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
     ]);
   const [tolerancesClassification, setTolerancesClassification] = useState([]);
   const [workElementId, setWorkElementId] = useState('');
-  const [workElementFactor, setWorkElementFactor] = useState([])
+  const [workElementFactor, setWorkElementFactor] = useState([]);
   const [factorCalculated, setFactorCalculated] = useState(0);
   const [numberPeopleNeeded, setNumberPeopleNeeded] = useState<number>(0);
 
@@ -126,8 +126,6 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           return;
         }
 
-
-
         workElementFactor.map(async (factor, index) => {
           try {
             const responseTolerance = await api.put(`/chronoanalysis/work-element-factor/${factor.id}`, { factor: [toleranceAdded[index]] });
@@ -141,7 +139,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
             setLoading(false);
             return;
           }
-        })
+        });
 
         const filterWorkElements = workElements.filter((iten) => {
           if (iten.id != workElementId) {
@@ -189,6 +187,9 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           }
         );
 
+        console.log('sadasasds:', response);
+
+
         const data = {
           work_element_id: response.data.id,
           factor: toleranceAdded,
@@ -200,8 +201,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
 
         workElements.push(newWorkElementRegistered);
 
-        console.log(responseResult.data);
-
+        console.log(response);
 
         setWorkElements(workElements);
         handleClose();
@@ -229,6 +229,16 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
     setLoading(false);
     setWorkElementId('');
     setWorkElementName('');
+    setNumberPeopleNeeded(0);
+    setTolerancesTypes([
+      'Esforço físico em kg',
+      'Esforço mental',
+      'Monotonia',
+      'Necessidades pessoais',
+      'Recuperação de fadiga',
+      'Ruídos',
+      'Temperatura ambiente'
+    ]);
     setToleranceAdded([
       { id: '', type: '', classification: '', factor: 0, },
       { id: '', type: '', classification: '', factor: 0, },
@@ -325,7 +335,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -418,16 +428,16 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           dataIndex: 'name',
           key: 'name',
           width: '40%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
         {
           title: 'Número de pessoas',
           dataIndex: 'number_people_needed',
           key: 'number_people_needed',
           width: '40%',
-          ...this.getColumnSearchProps('number_people_needed'),
-          sorter: (a, b) => a.number_people_needed.length - b.number_people_needed.length,
+          // ...this.getColumnSearchProps('number_people_needed'),
+          // sorter: (a, b) => a.number_people_needed.length - b.number_people_needed.length,
         },
 
         {
@@ -435,8 +445,8 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
 
         {
@@ -546,7 +556,7 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                 placeholder="0"
                 value={numberPeopleNeeded}
                 onChange={(e) => {
-                  setNumberPeopleNeeded(Number(e.target.value));
+                  setNumberPeopleNeeded(Number(e.target.value) > 0 ? Number(e.target.value) : 1);
                 }}
               />
             </Form.Item>
@@ -603,13 +613,10 @@ export default function WorkElement({ tolerance, workElement }: IProps) {
                     handleChangeToleranceClassification(index, e)
                   }}
                   filterOption={(input, option) =>
-                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                    0
-                  }
-                  filterSort={(optionA, optionB) =>
-                    optionA.props.children
+                    option.children
+                      .toString()
                       .toLowerCase()
-                      .localeCompare(optionB.props.children.toLowerCase())
+                      .includes(input.toLowerCase())
                   }
                 >
                   {tolerancesClassification.map((item) => (
@@ -683,7 +690,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error(error.response);
     return {
       props: {
-        workelement: [],
+        workElement: [],
       },
     };
   }

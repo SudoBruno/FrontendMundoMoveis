@@ -266,7 +266,7 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -359,32 +359,32 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
           dataIndex: 'description',
           key: 'description',
           width: '30%',
-          ...this.getColumnSearchProps('description'),
-          sorter: (a, b) => a.description.length - b.description.length,
+          // ...this.getColumnSearchProps('description'),
+          // sorter: (a, b) => a.description.length - b.description.length,
         },
         {
           title: 'Número da Nota',
           dataIndex: 'fiscal_number',
           key: 'fiscal_number',
           width: '30%',
-          ...this.getColumnSearchProps('fiscal_number'),
-          sorter: (a, b) => a.fiscal_number.length - b.fiscal_number.length,
+          // ...this.getColumnSearchProps('fiscal_number'),
+          // sorter: (a, b) => a.fiscal_number.length - b.fiscal_number.length,
         },
         {
           title: 'Chave da Nota',
           dataIndex: 'fiscal_key',
           key: 'fiscal_key',
           width: '30%',
-          ...this.getColumnSearchProps('fiscal_key'),
-          sorter: (a, b) => a.fiscal_key.length - b.fiscal_key.length,
+          // ...this.getColumnSearchProps('fiscal_key'),
+          // sorter: (a, b) => a.fiscal_key.length - b.fiscal_key.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',
@@ -528,14 +528,10 @@ export default function Receivement({ rawMaterial, receivement }: IProp) {
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (

@@ -186,7 +186,7 @@ export default function position({
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -279,24 +279,24 @@ export default function position({
           dataIndex: 'name',
           key: 'name',
           width: '30%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
         {
           title: 'Almoxarifado',
           dataIndex: 'warehouse_name',
           key: 'warehouse_name',
           width: '30%',
-          ...this.getColumnSearchProps('warehouse_name'),
-          sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
+          // ...this.getColumnSearchProps('warehouse_name'),
+          // sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',
@@ -399,12 +399,10 @@ export default function position({
               setWarehouseId(e.toString());
             }}
             filterOption={(input, option) =>
-              option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.props.children
+              option.children
+                .toString()
                 .toLowerCase()
-                .localeCompare(optionB.props.children.toLowerCase())
+                .includes(input.toLowerCase())
             }
           >
             {warehouses.map((warehouse) => (

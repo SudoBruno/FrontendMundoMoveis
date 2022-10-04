@@ -349,7 +349,7 @@ export default function Storage({
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -442,49 +442,49 @@ export default function Storage({
           dataIndex: 'user_name',
           key: 'user_name',
           width: '30%',
-          ...this.getColumnSearchProps('user_name'),
-          sorter: (a, b) => a.user_name.length - b.user_name.length,
+          // ...this.getColumnSearchProps('user_name'),
+          // sorter: (a, b) => a.user_name.length - b.user_name.length,
         },
         {
           title: 'Insumo',
           dataIndex: 'raw_material_name',
           key: 'raw_material_name',
           width: '30%',
-          ...this.getColumnSearchProps('raw_material_name'),
-          sorter: (a, b) =>
-            a.raw_material_name.length - b.raw_material_name.length,
+          // ...this.getColumnSearchProps('raw_material_name'),
+          // sorter: (a, b) =>
+          //   a.raw_material_name.length - b.raw_material_name.length,
         },
         {
           title: 'Almoxarifado',
           dataIndex: 'warehouse_name',
           key: 'warehouse_name',
           width: '30%',
-          ...this.getColumnSearchProps('warehouse_name'),
-          sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
+          // ...this.getColumnSearchProps('warehouse_name'),
+          // sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
         },
         {
           title: 'Posição',
           dataIndex: 'position_name',
           key: 'position_name',
           width: '30%',
-          ...this.getColumnSearchProps('position_name'),
-          sorter: (a, b) => a.position_name.length - b.position_name.length,
+          // ...this.getColumnSearchProps('position_name'),
+          // sorter: (a, b) => a.position_name.length - b.position_name.length,
         },
         {
           title: 'Quantidade',
           dataIndex: 'quantity',
           key: 'quantity',
           width: '30%',
-          ...this.getColumnSearchProps('quantity'),
-          sorter: (a, b) => a.quantity.length - b.quantity.length,
+          // ...this.getColumnSearchProps('quantity'),
+          // sorter: (a, b) => a.quantity.length - b.quantity.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',
@@ -586,14 +586,10 @@ export default function Storage({
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (
@@ -635,14 +631,10 @@ export default function Storage({
                       handleChangeReceipt(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {receipts.map((item) => (
@@ -677,14 +669,10 @@ export default function Storage({
                       handleChangeWarehouse(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {warehouses.map((item) => (
@@ -718,14 +706,10 @@ export default function Storage({
                       handleChangePosition(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {positions.map((item) => (

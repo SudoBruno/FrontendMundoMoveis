@@ -20,7 +20,7 @@ import {
   Select,
   Space,
   Table,
-  Upload,
+  TimePicker
 } from 'antd';
 
 import Highlighter from 'react-highlight-words';
@@ -37,6 +37,7 @@ import { getAPIClient } from '../../../services/axios';
 import { Divider } from 'antd';
 import FormData from 'form-data'
 import { MaskedInput } from 'antd-mask-input';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -47,18 +48,17 @@ interface IWorkElement {
 
 interface IProps {
   workElement: IWorkElement[];
-  time: Array<any>;
+  chronoanalysisList: Array<any>;
   notFound: boolean;
 }
 
-export default function Chronoanalysis({ workElement, time }: IProps) {
+export default function Chronoanalysis({ workElement, chronoanalysisList }: IProps) {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [chronoanalysisId, setChronoanalysisId] = useState<string>('');
   const [workElements, setWorkElements] = useState<IWorkElement[]>(workElement);
-  // const [productName, setProductName] = useState('');
   const [workElementId, setWorkElementId] = useState('');
   const [timesAdded, setTimesAdded] = useState([
     {
@@ -89,6 +89,7 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
       toCreateOnModalEdit: false,
     }
   ]);
+
   const [auxtimesAdded, setAuxTimesAdded] = useState([
     {
       id: '',
@@ -119,9 +120,9 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
     }
   ]);
 
-  const [times, setTimes] = useState<any[]>(time);
+  const [chronoanalysis, setChronoanalysis] = useState<any[]>(chronoanalysisList);
 
-  async function handleRegister() {
+  async function handleRegister(e) {
 
     try {
       if (workElementId === '') {
@@ -140,24 +141,19 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
       setLoading(true);
       const response = await api.post('/chronoanalysis/chronoanalysis/', data);
 
-
-
       await api.post(`/chronoanalysis/chronoanalysis-time/`, {
         chronoanalysis_id: response.data.id,
         time: timesAdded
       });
 
       setLoading(false);
-      console.log('dsaadasdasd');
 
-      console.log(typeof times);
+      const newChronoanalysisRegistered = response.data;
 
-      const newTimeRegistered = response.data;
+      chronoanalysisList.push(newChronoanalysisRegistered);
 
-      time.push(newTimeRegistered);
-
-      setTimes(time);
-      setIsModalOpen(false);
+      setChronoanalysis(chronoanalysisList);
+      handleClose(e);
       setWorkElementId("");
 
       Notification({
@@ -190,34 +186,37 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
         });
       }
       const data = {
-        name: name,
-        sub_production_line_id: subLineId,
+        work_element_id: workElementId,
       };
 
       setLoading(true);
-      const response = await api.put(`/chronoanalysis/process-sub-product/${subProductId}`, data);
+      const response = await api.put(`/chronoanalysis/chronoanalysis/${chronoanalysisId}`, data);
 
-      const filterSubProducts = subProduct.filter((iten) => {
-        if (iten.id !== subProductId) {
+      const filterChronoanalisys = chronoanalysis.filter((iten) => {
+        if (iten.id !== chronoanalysisId) {
           return iten;
         }
       });
-      filterSubProducts.push(response.data)
 
-      setSubProducts(filterSubProducts)
+      console.log(response.data);
+
+
+      filterChronoanalisys.push(response.data);
+
+      setChronoanalysis(filterChronoanalisys);
       setLoading(false);
       setIsModalOpen(false);
       Notification({
         type: 'success',
         title: 'Enviado',
-        description: 'Sub-Produto Editado com sucesso',
+        description: 'Cronoanálise Editada com sucesso',
       });
     } catch (error) {
       console.error(error);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível Editar o Sub-Produto',
+        description: 'Não foi possível Editar a Cronoanálise',
       });
       setLoading(false);
     }
@@ -271,7 +270,9 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
 
   function verifyTimes() {
     const newArray = [...timesAdded];
-    let totalSum = 0;
+    let totalSum: number = 0;
+    const quantityOfNumbersOnArray: number = newArray.length;
+    let average: number = 0;
 
     newArray.map((item, index) => {
       let time = item.time.split(':');
@@ -279,11 +280,11 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
         Number(time[1]) * 60 +
         Number(time[0]) * 3600
       totalSum += secondsOfItem;
-      console.log(item);
 
-      console.log(secondsOfItem);
+      console.log('Soma Total: ', totalSum);
+    });
 
-    })
+
   }
 
   async function handleFilterSubProductProcessById(data) {
@@ -300,8 +301,8 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
 
     setTimesAdded(responseResult.data);
     setChronoanalysisId(data.id);
-    setWorkElementId(responseResult.data[0].chronoanalysis.work_element.id);
-    setIsEdit(!isEdit);
+    setWorkElementId(responseResult.data[0].chronoanalysis.work_element_id);
+    setIsEdit(true);
     setIsModalOpen(true);
   }
 
@@ -366,7 +367,8 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
     let newArray = [...timesAdded];
 
     if (
-      newArray[index].id === '' ||
+      newArray[index].time === '_:_:_' ||
+      newArray[index].time === '00:00:00' ||
       newArray[index].rate === 0
     ) {
       Notification({
@@ -379,23 +381,28 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
 
     if (newArray[index].toCreateOnModalEdit) {
       try {
-        workElementsAdded.map(async (item) => {
-          return item.process_sub_product_id = subProductId;
-        })
-        const response = await api.post(`chronoanalysis/process-sub-product-work-element/`, newArray[index]);
+
+
+        const response = await api.post(`chronoanalysis/chronoanalysis-time/`, {
+          chronoanalysis_id: chronoanalysisId,
+          time: [newArray[index]]
+        });
+
         newArray[index].isEditable = false;
         newArray[index].showSaveAndCancelButton = false;
-        newArray[index].id = response.data.id;
+        newArray[index].id = response.data[0].id;
         newArray[index].toCreateOnModalEdit = false;
-        setWorkElementsAdded(newArray);
+
+        setTimesAdded(newArray);
         Notification({
           type: 'success',
           title: 'Sucesso',
           description: 'Item Cadastrado com sucesso',
         });
         return;
+
       } catch (error) {
-        console.error(error.response.data);
+        console.error(error.response.data.message);
         Notification({
           type: 'error',
           title: 'Erro',
@@ -408,24 +415,196 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
 
 
     try {
-      const response = await api.put(`chronoanalysis/process-sub-product-work-element/${newArray[index].id}`, newArray[index]);
+      console.log(newArray[index].id);
+
+      const response = await api.put(`chronoanalysis/chronoanalysis-time/${newArray[index].id}`, {
+        chronoanalysis_id: chronoanalysisId,
+        time: newArray[index].time,
+        rate: newArray[index].rate
+      });
+
       newArray[index].isEditable = false;
       newArray[index].showSaveAndCancelButton = false;
-      newArray[index].id = response.data.id;
-      setWorkElementsAdded(newArray);
+
+      setTimesAdded(newArray);
       Notification({
         type: 'success',
         title: 'Sucesso',
-        description: 'Item Cadastrado com sucesso',
+        description: 'Item Editado com sucesso',
       });
     } catch (error) {
-      console.error(error.response.data);
+      console.error(newArray[index]);
       Notification({
         type: 'error',
         title: 'Erro',
-        description: 'Não foi possível Cadastrar o Item',
+        description: 'Não foi possível Editado o Item',
       });
     }
+  }
+
+  async function handleDelete(id) {
+    try {
+      await api.delete(`/chronoanalysis/chronoanalysis/${id}`);
+
+      const filterChronoanalisys = chronoanalysisList.filter((iten) => {
+        if (iten.id !== id) {
+          return iten;
+        }
+      });
+
+      setChronoanalysis(filterChronoanalisys);
+      Notification({
+        type: 'success',
+        title: 'Sucesso',
+        description: 'Cronoanálise Deletada com sucesso',
+      });
+    } catch (error) {
+      console.error(error.response.data.message);
+      Notification({
+        type: 'error',
+        title: 'Erro',
+        description: 'Não foi possível Deletar a Cronoanálise',
+      });
+    }
+  }
+
+  function handleOpenModal(e) {
+    e.preventDefault();
+
+    setChronoanalysisId('');
+    setIsModalOpen(true);
+    setIsEdit(false);
+    setWorkElementId('');
+    setLoading(false);
+
+    setTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ]);
+
+    setAuxTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ])
+  }
+
+  function handleClose(e) {
+    e.preventDefault();
+    setIsEdit(false);
+    setIsModalOpen(false);
+    setWorkElementId('');
+    setLoading(false);
+    setChronoanalysisId('');
+
+    setTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ])
+
+    setAuxTimesAdded([
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      },
+      {
+        id: '',
+        time: '',
+        rate: 0,
+        ratePercentual: 0,
+        isEditable: true,
+        showSaveAndCancelButton: false,
+        toCreateOnModalEdit: false,
+      }
+    ])
   }
   class SearchTable extends React.Component {
     state = {
@@ -525,8 +704,8 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
           dataIndex: ["work_element", "name"],
           key: 'name',
           width: '40%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
 
         {
@@ -534,11 +713,12 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
 
         {
+
           title: 'Operação',
           key: 'aaa',
           render: (record) => {
@@ -565,7 +745,7 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
       ];
       return (
         <>
-          <Table columns={columns} dataSource={times} />
+          <Table columns={columns} dataSource={chronoanalysis} />
         </>
       );
     }
@@ -580,7 +760,9 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
               size={'large'}
               className={styles.button}
               icon={<PlusOutlined style={{ fontSize: '16px' }} />}
-              onClick={() => setIsModalOpen(true)}
+              onClick={(e) => {
+                handleOpenModal(e)
+              }}
             >
               Cadastrar Cronoanálise
             </Button>
@@ -592,16 +774,16 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
         title="Cadastro de Cronoanálise"
         visible={isModalOpen}
         width={600}
-        onCancel={() => { }}
+        onCancel={(e) => { handleClose(e) }}
         footer={[
-          <Button key="back" onClick={() => { setIsModalOpen(false) }} type="default">
+          <Button key="back" onClick={(e) => { handleClose(e) }} type="default">
             Cancelar
           </Button>,
           <Button
             key="submit"
             type="primary"
             loading={false}
-            onClick={isEdit ? handleEdit : handleRegister}
+            onClick={(e) => isEdit === true ? handleEdit : handleRegister(e)}
           >
             Salvar
           </Button>,
@@ -642,7 +824,12 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
           </Col>
         </Row>
         <Divider />
-        <h2>Tempos</h2>
+        <Row gutter={5}>
+          <Col>
+            <h2>Tempos</h2>
+          </Col>
+          {/* <Col><Button onClick={() => { verifyTimes() }}>Verificar Tempos</Button></Col> */}
+        </Row>
         <br></br>
         {timesAdded.map((item, index) => (
           <>
@@ -658,11 +845,8 @@ export default function Chronoanalysis({ workElement, time }: IProps) {
                   }}
                   required
                 >
-                  <MaskedInput
+                  <Input
                     key="totalKey"
-                    mask={
-                      '00:00:00'
-                    }
                     disabled={!item.isEditable}
                     size="large"
                     value={item.time}
@@ -804,20 +988,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const apiClient = getAPIClient(context);
   try {
     const workElement = await apiClient.get('/chronoanalysis/work-element');
-    const time = await apiClient.get('/chronoanalysis/chronoanalysis');
+    const chronoanalysisList = await apiClient.get('/chronoanalysis/chronoanalysis');
 
     return {
       props: {
         workElement: workElement.data,
-        time: time.data,
+        chronoanalysisList: chronoanalysisList.data,
       },
     };
   } catch (error) {
     console.error(error);
     return {
       props: {
-        product: [],
-        time: []
+        workElement: [],
+        chronoanalysisList: []
       },
     };
   }

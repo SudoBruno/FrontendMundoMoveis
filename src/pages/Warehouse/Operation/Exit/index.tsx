@@ -403,7 +403,7 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -496,24 +496,24 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
           dataIndex: 'users_name',
           key: 'users_name',
           width: '30%',
-          ...this.getColumnSearchProps('users_name'),
-          sorter: (a, b) => a.users_name.length - b.users_name.length,
+          // ...this.getColumnSearchProps('users_name'),
+          // sorter: (a, b) => a.users_name.length - b.users_name.length,
         },
         {
           title: 'Descrição',
           dataIndex: 'description',
           key: 'description',
           width: '30%',
-          ...this.getColumnSearchProps('description'),
-          sorter: (a, b) => a.description.length - b.description.length,
+          // ...this.getColumnSearchProps('description'),
+          // sorter: (a, b) => a.description.length - b.description.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',
@@ -625,14 +625,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangeRawMaterial(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {rawMaterials.map((item) => (
@@ -673,14 +669,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangeWarehouse(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {warehouses.map((item) => (
@@ -714,14 +706,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangePosition(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {positions.map((item) => (
@@ -755,14 +743,10 @@ export default function Receivement({ rawMaterial, exit, warehouse }: IProp) {
                       handleChangeCargo(e, index);
                     }}
                     filterOption={(input, option) =>
-                      option.props.children
+                      option.children
+                        .toString()
                         .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    filterSort={(optionA, optionB) =>
-                      optionA.props.children
-                        .toLowerCase()
-                        .localeCompare(optionB.props.children.toLowerCase())
+                        .includes(input.toLowerCase())
                     }
                   >
                     {cargo.map((item) => (

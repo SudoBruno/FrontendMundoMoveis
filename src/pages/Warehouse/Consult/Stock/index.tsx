@@ -57,7 +57,7 @@ export default function Stock({ stock }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -108,9 +108,9 @@ export default function Stock({ stock }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -149,60 +149,60 @@ export default function Stock({ stock }: IProp) {
           dataIndex: 'raw_material_code',
           key: 'raw_material_code',
           width: '15%',
-          ...this.getColumnSearchProps('raw_material_code'),
-          sorter: (a, b) =>
-            a.raw_material_code.length - b.raw_material_code.length,
+          // ...this.getColumnSearchProps('raw_material_code'),
+          // sorter: (a, b) =>
+          //   a.raw_material_code.length - b.raw_material_code.length,
         },
         {
           title: 'Insumo',
           dataIndex: 'raw_material_name',
           key: 'raw_material_name',
           width: '20%',
-          ...this.getColumnSearchProps('raw_material_name'),
-          sorter: (a, b) =>
-            a.raw_material_name.length - b.raw_material_name.length,
+          // ...this.getColumnSearchProps('raw_material_name'),
+          // sorter: (a, b) =>
+          //   a.raw_material_name.length - b.raw_material_name.length,
         },
         {
           title: 'Un.Med',
           dataIndex: 'unit_of_measurement_name',
           key: 'unit_of_measurement_name',
           width: '10%',
-          ...this.getColumnSearchProps('unit_of_measurement_name'),
-          sorter: (a, b) =>
-            a.unit_of_measurement_name.length -
-            b.unit_of_measurement_name.length,
+          // ...this.getColumnSearchProps('unit_of_measurement_name'),
+          // sorter: (a, b) =>
+          //   a.unit_of_measurement_name.length -
+          //   b.unit_of_measurement_name.length,
         },
         {
           title: 'Almoxarifado',
           dataIndex: 'warehouse_name',
           key: ' warehouse_name',
           width: '40%',
-          ...this.getColumnSearchProps('warehouse_name'),
-          sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
+          // ...this.getColumnSearchProps('warehouse_name'),
+          // sorter: (a, b) => a.warehouse_name.length - b.warehouse_name.length,
         },
         {
           title: 'Posição',
           dataIndex: 'position_name',
           key: ' position_name',
           width: '10%',
-          ...this.getColumnSearchProps('position_name'),
-          sorter: (a, b) => a.position_name.length - b.position_name.length,
+          // ...this.getColumnSearchProps('position_name'),
+          // sorter: (a, b) => a.position_name.length - b.position_name.length,
         },
         {
           title: 'Lote',
           dataIndex: 'cargo',
           key: 'cargo',
           width: '10%',
-          ...this.getColumnSearchProps('cargo'),
-          sorter: (a, b) => a.cargo.length - b.cargo.length,
+          // ...this.getColumnSearchProps('cargo'),
+          // sorter: (a, b) => a.cargo.length - b.cargo.length,
         },
         {
           title: 'Quantidade',
           dataIndex: 'quantity',
           key: 'quantity',
           width: '10%',
-          ...this.getColumnSearchProps('quantity'),
-          sorter: (a, b) => a.quantity.length - b.quantity.length,
+          // ...this.getColumnSearchProps('quantity'),
+          // sorter: (a, b) => a.quantity.length - b.quantity.length,
         },
         {
           title: 'Operação',

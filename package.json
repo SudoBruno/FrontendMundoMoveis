@@ -19,7 +19,7 @@
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
     "material-ui": "^0.20.2",
-    "next": "10.1.3",
+    "next": "^12.3.1",
     "nookies": "^2.5.2",
     "react": "17.0.2",
     "react-barcode": "^1.4.0",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/date-fns": "^2.6.0",
     "@types/node": "^14.14.41",
-    "@types/react": "^17.0.3",
+    "@types/react": "^18.0.20",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
     "eslint": "^7.23.0",

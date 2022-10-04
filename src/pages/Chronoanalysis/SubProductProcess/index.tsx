@@ -648,7 +648,7 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -741,8 +741,8 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
           dataIndex: 'name',
           key: 'name',
           width: '40%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
 
         {
@@ -750,8 +750,8 @@ export default function SubProductProcess({ subProduct, subLine, workElement }: 
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
 
         {

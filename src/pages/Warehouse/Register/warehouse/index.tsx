@@ -180,7 +180,7 @@ export default function warehouse({ warehouse }: IProp) {
       searchText: '',
       searchedColumn: '',
     };
-    searchInput: Input;
+    searchInput;
     getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({
         setSelectedKeys,
@@ -231,9 +231,9 @@ export default function warehouse({ warehouse }: IProp) {
       onFilter: (value, record) =>
         record[dataIndex]
           ? record[dataIndex]
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase())
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
           : '',
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
@@ -273,24 +273,24 @@ export default function warehouse({ warehouse }: IProp) {
           dataIndex: 'name',
           key: 'name',
           width: '30%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
         {
           title: 'Localizado em:',
           dataIndex: 'place',
           key: 'place',
           width: '30%',
-          ...this.getColumnSearchProps('place'),
-          sorter: (a, b) => a.place.length - b.place.length,
+          // ...this.getColumnSearchProps('place'),
+          // sorter: (a, b) => a.place.length - b.place.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '30%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',
