@@ -704,8 +704,8 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
           dataIndex: ["work_element", "name"],
           key: 'name',
           width: '40%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
 
         {
@@ -713,8 +713,8 @@ export default function Chronoanalysis({ workElement, chronoanalysisList }: IPro
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
 
         {
