@@ -424,33 +424,33 @@ export default function AlterSotock({
           dataIndex: 'user_name',
           key: 'user_name',
           width: '30%',
-          ...this.getColumnSearchProps('user_name'),
-          sorter: (a, b) => a.user_name.length - b.user_name.length,
+          // ...this.getColumnSearchProps('user_name'),
+          // sorter: (a, b) => a.user_name.length - b.user_name.length,
         },
         {
           title: 'Insumo',
           dataIndex: 'raw_material_name',
           key: 'raw_material_name',
           width: '30%',
-          ...this.getColumnSearchProps('raw_material_name'),
-          sorter: (a, b) =>
-            a.raw_material_name.length - b.raw_material_name.length,
+          // ...this.getColumnSearchProps('raw_material_name'),
+          // sorter: (a, b) =>
+          //   a.raw_material_name.length - b.raw_material_name.length,
         },
         {
           title: 'Quantidade Movida',
           dataIndex: 'moved_quantity',
           key: 'moved_quantity',
           width: '20%',
-          ...this.getColumnSearchProps('moved_quantity'),
-          sorter: (a, b) => a.moved_quantity.length - b.moved_quantity.length,
+          // ...this.getColumnSearchProps('moved_quantity'),
+          // sorter: (a, b) => a.moved_quantity.length - b.moved_quantity.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
       ];
       return <Table columns={columns} dataSource={alteredItens} />;

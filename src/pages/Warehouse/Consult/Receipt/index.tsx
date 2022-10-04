@@ -152,32 +152,32 @@ export default function categories({ receipt }: IProps) {
           dataIndex: 'description',
           key: 'description',
           width: '30%',
-          ...this.getColumnSearchProps('description'),
-          sorter: (a, b) => a.description.length - b.description.length,
+          // ...this.getColumnSearchProps('description'),
+          // sorter: (a, b) => a.description.length - b.description.length,
         },
         {
           title: 'Chave Fiscal',
           dataIndex: 'fiscal_key',
           key: 'fiscal_key',
           width: '20%',
-          ...this.getColumnSearchProps('fiscal_key'),
-          sorter: (a, b) => a.fiscal_key.length - b.fiscal_key.length,
+          // ...this.getColumnSearchProps('fiscal_key'),
+          // sorter: (a, b) => a.fiscal_key.length - b.fiscal_key.length,
         },
         {
           title: 'Número da Nota',
           dataIndex: 'fiscal_number',
           key: 'fiscal_number',
           width: '20%',
-          ...this.getColumnSearchProps('fiscal_number'),
-          sorter: (a, b) => a.fiscal_number.length - b.fiscal_number.length,
+          // ...this.getColumnSearchProps('fiscal_number'),
+          // sorter: (a, b) => a.fiscal_number.length - b.fiscal_number.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',
@@ -312,44 +312,44 @@ export default function categories({ receipt }: IProps) {
           dataIndex: 'warehouse_receipt_description',
           key: 'warehouse_receipt_description',
           width: '30%',
-          ...this.getColumnSearchProps('warehouse_receipt_description'),
-          sorter: (a, b) =>
-            a.warehouse_receipt_description.length -
-            b.warehouse_receipt_description.length,
+          // ...this.getColumnSearchProps('warehouse_receipt_description'),
+          // sorter: (a, b) =>
+          //   a.warehouse_receipt_description.length -
+          //   b.warehouse_receipt_description.length,
         },
         {
           title: 'Insumo',
           dataIndex: 'warehouse_raw_material_name',
           key: 'warehouse_raw_material_name',
           width: '20%',
-          ...this.getColumnSearchProps('warehouse_raw_material_name'),
-          sorter: (a, b) =>
-            a.warehouse_raw_material_name.length -
-            b.warehouse_raw_material_name.length,
+          // ...this.getColumnSearchProps('warehouse_raw_material_name'),
+          // sorter: (a, b) =>
+          //   a.warehouse_raw_material_name.length -
+          //   b.warehouse_raw_material_name.length,
         },
         {
           title: 'Quantidade',
           dataIndex: 'quantity',
           key: 'quantity',
           width: '20%',
-          ...this.getColumnSearchProps('quantity'),
-          sorter: (a, b) => a.quantity.length - b.quantity.length,
+          // ...this.getColumnSearchProps('quantity'),
+          // sorter: (a, b) => a.quantity.length - b.quantity.length,
         },
         {
           title: 'Valor Total',
           dataIndex: 'grade_value',
           key: 'grade_value',
           width: '20%',
-          ...this.getColumnSearchProps('grade_value'),
-          sorter: (a, b) => a.grade_value.length - b.grade_value.length,
+          // ...this.getColumnSearchProps('grade_value'),
+          // sorter: (a, b) => a.grade_value.length - b.grade_value.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
       ];
       return (

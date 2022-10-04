@@ -323,16 +323,16 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
           dataIndex: 'name',
           key: 'name',
           width: '40%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
         {
           title: 'Linha de Produção',
           dataIndex: ['production_line', 'name'],
           key: 'name',
           width: '40%',
-          ...this.getColumnSearchProps(['production_line', 'name']),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps(['production_line', 'name']),
+          // sorter: (a, b) => a.name.length - b.name.length,
 
         },
         {
@@ -340,8 +340,8 @@ export default function SubProductProcess({ productionLine, subLine }: IProps) {
           dataIndex: 'created_at',
           key: 'created_at',
           width: '40%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
         {
           title: 'Operação',

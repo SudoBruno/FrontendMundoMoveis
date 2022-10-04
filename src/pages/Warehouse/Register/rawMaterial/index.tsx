@@ -321,16 +321,16 @@ export default function rawMaterial({
           dataIndex: 'code',
           key: 'code',
           width: '20%',
-          ...this.getColumnSearchProps('code'),
-          sorter: (a, b) => a.code.length - b.code.length,
+          // ...this.getColumnSearchProps('code'),
+          // sorter: (a, b) => a.code.length - b.code.length,
         },
         {
           title: 'Descrição',
           dataIndex: 'name',
           key: 'name',
           width: '30%',
-          ...this.getColumnSearchProps('ins'),
-          sorter: (a, b) => a.ins.length - b.ins.length,
+          // ...this.getColumnSearchProps('ins'),
+          // sorter: (a, b) => a.ins.length - b.ins.length,
         },
 
         {
@@ -338,17 +338,17 @@ export default function rawMaterial({
           dataIndex: 'unit_of_measurement_id',
           key: 'unit_of_measurement_id',
           width: '20%',
-          ...this.getColumnSearchProps('unit_of_measurement_id'),
-          sorter: (a, b) =>
-            a.unit_of_measurement_id.length - b.unit_of_measurement_id.length,
+          // ...this.getColumnSearchProps('unit_of_measurement_id'),
+          // sorter: (a, b) =>
+          //   a.unit_of_measurement_id.length - b.unit_of_measurement_id.length,
         },
         {
           title: 'Criado Em',
           dataIndex: 'created_at',
           key: 'created_at',
           width: '30%',
-          ...this.getColumnSearchProps('created_at'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
+          // ...this.getColumnSearchProps('created_at'),
+          // sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
 
         {

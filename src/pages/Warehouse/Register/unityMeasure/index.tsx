@@ -266,16 +266,16 @@ export default function index({ itens }: props) {
           dataIndex: 'name',
           key: 'name',
           width: '20%',
-          ...this.getColumnSearchProps('name'),
-          sorter: (a, b) => a.name.length - b.name.length,
+          // ...this.getColumnSearchProps('name'),
+          // sorter: (a, b) => a.name.length - b.name.length,
         },
         {
           title: 'Unidade',
           dataIndex: 'abbreviation',
 
           key: 'abbreviation',
-          ...this.getColumnSearchProps('abbreviation'),
-          sorter: (a, b) => a.abbreviation.length - b.abbreviation.length,
+          // ...this.getColumnSearchProps('abbreviation'),
+          // sorter: (a, b) => a.abbreviation.length - b.abbreviation.length,
         },
         {
           title: 'Operação',
