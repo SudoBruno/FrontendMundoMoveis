@@ -190,10 +190,12 @@ export default function ProcessProduct({ processSubProduct, product, processProd
         }
         const data = {
           product_id: productId,
-          process_sub_product: subProductsAdded
+          process_sub_product: subProductsAdded,
         };
+
         setLoading(true);
-        const response = await api.put(`/chronoanalysis/product-process-sub-product`, data);
+
+        const response = await api.put(`/chronoanalysis/product-process-sub-product/${id}`, data);
 
         const filterProcessProduct = products.filter((iten) => {
           if (iten.id == id) {
@@ -238,15 +240,21 @@ export default function ProcessProduct({ processSubProduct, product, processProd
         setLoading(true);
         const response = await api.post(`/chronoanalysis/process-product`, data);
 
+        const newSubProductsAdded = subProductsAdded.map((subProduct) => {
+          return {
+            id: subProduct.process_sub_product_id,
+            quantity: subProduct.quantity
+          }
+        })
+
         await api.post(`/chronoanalysis/product-process-sub-product`, {
           process_product_id: response.data.id,
-          process_sub_product: subProductsAdded
+          process_sub_product: newSubProductsAdded
 
         });
 
         const dataForm = new FormData();
         dataForm.append('image', image);
-
 
         // const responseImage = await api.post(`/product/image/${response.data.id}`, dataForm, {
         //   headers: {
