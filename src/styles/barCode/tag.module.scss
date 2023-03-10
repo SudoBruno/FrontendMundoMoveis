@@ -1,0 +1,25 @@
+.container {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  height: 90%;
+  overflow: hidden;
+  margin-top: 30px;
+}
+
+.tag {
+  width: 33.33%;
+  border: solid 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.item_description {
+  text-align: center;
+}
+
+.item_code {
+  margin-top: 5px;
+}

@@ -2,14 +2,15 @@ import { notification } from 'antd';
 
 interface notificationType {
   type: 'success' | 'error';
-  title:string;
+  title: string;
   description: string;
+  element?: Element;
 }
 
-export function Notification(notificationBody:notificationType) {
+export function Notification(notificationBody: notificationType) {
   notification[notificationBody.type]({
     message: notificationBody.title,
     description:
-        notificationBody.description,
+      notificationBody.description,
   });
 }

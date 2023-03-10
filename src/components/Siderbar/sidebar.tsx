@@ -9,7 +9,9 @@ import {
   ProfileOutlined,
   DollarCircleOutlined,
   FieldTimeOutlined,
-  BulbOutlined
+  BulbOutlined,
+  FundProjectionScreenOutlined,
+  BarcodeOutlined
 } from '@ant-design/icons';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { Button, Layout, Menu, Result } from 'antd';
@@ -132,6 +134,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   </Menu.Item>
                 </SubMenu>
               </SubMenu>
+
               <SubMenu
                 key="ChronoanalysisMenu"
                 title="Cronoanálise"
@@ -170,6 +173,38 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   <Link href="/Chronoanalysis/TaskDistribution">Balanceamento</Link>
                 </Menu.Item>
 
+              </SubMenu>
+
+              <SubMenu
+                key="SAPMenu"
+                title="Produção"
+                icon={<FundProjectionScreenOutlined />}
+              >
+                <SubMenu
+                  key="ProductionOrderMenu"
+                  title="Ordens de Produção"
+                  icon={<FundProjectionScreenOutlined />}
+                >
+                  <Menu.Item
+                    key="ProductionOrderItem"
+                    icon={<FundProjectionScreenOutlined />}
+                  >
+                    <Link href="/SAP/ProductionOrder">Ordem de Produção</Link>
+                  </Menu.Item>
+                </SubMenu>
+
+                <SubMenu
+                  key="BarCodeMenu"
+                  title="Operação"
+                  icon={<FundProjectionScreenOutlined />}
+                >
+                  <Menu.Item
+                    key="LaunchItem"
+                    icon={<BarcodeOutlined />}
+                  >
+                    <Link href="/SAP/BarCodeLaunch">Baixa de Produção</Link>
+                  </Menu.Item>
+                </SubMenu>
               </SubMenu>
 
               {/* <SubMenu
