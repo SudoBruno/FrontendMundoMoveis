@@ -445,29 +445,24 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
           dataIndex: ['production_order', 'item_description'],
           key: 'item_description',
           width: '40%',
-          ...this.getColumnSearchProps('item_description'),
         },
         {
           title: 'Código de Barras',
           dataIndex: 'serial_code',
           key: 'serial_code',
           width: '15%',
-          ...this.getColumnSearchProps('serial_code'),
         },
         {
           title: 'OP',
           dataIndex: ['production_order', 'document_id'],
           key: 'document_id',
           width: '15%',
-          ...this.getColumnSearchProps('document_id'),
         },
         {
           title: 'Lançado em',
           dataIndex: 'release_date',
           key: 'release_date',
           width: '30%',
-          ...this.getColumnSearchProps('release_date'),
-          sorter: (a, b) => a.created_at.length - b.created_at.length,
         },
       ];
 
@@ -585,7 +580,7 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
             </Button>,
           ]}
         >
-          {responseDataLaunched.bar_codes_already_released}
+          { }
         </Modal>
       </Modal>
     </div >
