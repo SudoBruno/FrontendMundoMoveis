@@ -35,7 +35,7 @@ interface IBarCode {
 }
 
 interface IProps {
-  barCodes: IBarCode[];
+  barCodes: any[];
   isEstilo1: boolean;
 }
 
@@ -117,9 +117,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
       data = sequentials;
     }
-
-    console.log(data);
-
 
     return {
       props: {
