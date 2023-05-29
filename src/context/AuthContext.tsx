@@ -34,6 +34,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       api.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
 
+      api.defaults.headers['Access-Control-Allow-Origin'] = `*`;
+
       setCookie(undefined, 'token', response.data.token, {
         maxAge: 60 * 60 * 24, //24 horas
         path: '/',
