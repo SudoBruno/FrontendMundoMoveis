@@ -12,7 +12,7 @@ import {
   MinusCircleOutlined,
 } from '@ant-design/icons';
 
-import styles from '../../../styles/app.module.scss';
+import styles from '../../../../styles/app.module.scss';
 import React, { useState } from "react";
 import { TableHead } from "@material-ui/core";
 import { format } from "date-fns";
@@ -22,7 +22,6 @@ import { Notification } from "../../../../components/Notification";
 import { api } from "../../../../services/api";
 
 import BarcodeReader from 'react-barcode-reader';
-import { log } from "console";
 
 interface IProductionOrder {
   id: string;
