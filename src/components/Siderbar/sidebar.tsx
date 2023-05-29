@@ -11,7 +11,9 @@ import {
   FieldTimeOutlined,
   BulbOutlined,
   FundProjectionScreenOutlined,
-  BarcodeOutlined
+  BarcodeOutlined,
+  TagsOutlined,
+  CloudDownloadOutlined
 } from '@ant-design/icons';
 import { FaRegMoneyBillAlt } from 'react-icons/fa';
 import { Button, Layout, Menu, Result } from 'antd';
@@ -191,19 +193,31 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                   >
                     <Link href="/SAP/ProductionOrder">Ordem de Produção</Link>
                   </Menu.Item>
+                  <Menu.Item
+                    key="UpdateProductionOrdersBySAPItem"
+                    icon={<CloudDownloadOutlined />}
+                  >
+                    <Link href="/SAP/ProductionOrder/UpdateBySAP">Atualizar novas OPs</Link>
+                  </Menu.Item>
                 </SubMenu>
 
                 <SubMenu
                   key="BarCodeMenu"
                   title="Operação"
-                  icon={<FundProjectionScreenOutlined />}
+                  icon={<TagsOutlined />}
                 >
                   <Menu.Item
                     key="LaunchItem"
                     icon={<BarcodeOutlined />}
                   >
-                    <Link href="/SAP/BarCodeLaunch">Baixa de Produção</Link>
+                    <Link href="/SAP/BarCodeLaunch">Baixa</Link>
                   </Menu.Item>
+                  {/* <Menu.Item
+                    key="LaunchItemByEmployee"
+                    icon={<BarcodeOutlined />}
+                  >
+                    <Link href="/SAP/BarCodeLaunch/LaunchByEmployee">Baixa por Funcionário</Link>
+                  </Menu.Item> */}
                 </SubMenu>
               </SubMenu>
 
@@ -265,7 +279,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
           </Sider>
 
           <Layout>
-            {router.pathname !== '/Warehouse/Consult/Stock/[barcode]' && (
+            {(router.pathname !== '/Warehouse/Consult/Stock/[barcode]' && router.pathname !== '/SAP/ProductionOrder/[productionOrderID]') && (
               <Header />
             )}
             {screen && (

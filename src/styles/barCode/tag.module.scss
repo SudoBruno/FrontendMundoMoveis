@@ -3,23 +3,36 @@
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  height: 90%;
+  height: 100%;
   overflow: hidden;
   margin-top: 30px;
 }
 
 .tag {
-  width: 33.33%;
+  width: 50%;
   border: solid 1px;
   display: flex;
   flex-direction: column;
   align-items: center;
+
 }
 
 .item_description {
   text-align: center;
+  margin-left: 5px;
+  margin-right: 5px;
+  width: 100%;
+  height: 43px;
 }
 
+
 .item_code {
-  margin-top: 5px;
+  margin: 0px;
+}
+
+.item_sector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

@@ -23,8 +23,6 @@ import { api } from "../../../services/api";
 
 import BarcodeReader from 'react-barcode-reader'
 
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-
 interface IProductionOrder {
   id: string;
   document_id: string;
@@ -53,6 +51,7 @@ interface IProps {
 
 export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }: IProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isButtonSaveDisable, setIsButtonSaveDisable] = useState(false);
   const [isModalErrorOpen, setIsModalErrorOpen] = useState(false);
   const [addedSerialCodes, setAddedSerialCodes] = useState([]);
   const [responseDataLaunched, setResponseDataLaunched] = useState([]);
@@ -66,7 +65,7 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
         type: 'error',
         title: 'Erro',
         description: 'O código deve conter 10 caracteres!',
-      })
+      });
     }
 
     const serialCodeAlreadyExists = addedSerialCodes.filter(item => item.serial_code === serialCode.serial_code)
@@ -77,6 +76,14 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
         title: 'Erro',
         description: 'O código já está listado!',
       })
+    }
+
+    if (addedSerialCodes.length == 10) {
+      return Notification({
+        type: 'error',
+        title: 'Limite atingido',
+        description: 'Você só pode enviar até 10 códigos por vez! Conclua a operação',
+      });
     }
 
     const barCodeAlreadyReleased = barCodeHistory.filter(
@@ -141,6 +148,8 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
   }
 
   async function handleClose() {
+    setIsButtonSaveDisable(false);
+
     setIsModalOpen(false);
 
     setSerialCode({ serial_code: '' });
@@ -153,6 +162,8 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
   }
 
   async function handleSave() {
+    setIsButtonSaveDisable(true);
+
     if (addedSerialCodes.length === 0) {
       handleClose();
 
@@ -162,6 +173,8 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
         description: 'Nenhum código bipado!',
       })
     }
+
+
 
     const barCodes = addedSerialCodes.map(item => {
       return item.serial_code;
@@ -237,6 +250,14 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
         title: 'Erro',
         description: 'O código já está listado!',
       })
+    }
+
+    if (addedSerialCodes.length == 10) {
+      return Notification({
+        type: 'error',
+        title: 'Limite atingido',
+        description: 'Você só pode enviar até 10 códigos por vez! Conclua a operação',
+      });
     }
 
     const barCodeAlreadyReleased = barCodeHistory.filter(
@@ -534,6 +555,7 @@ export default function BarCodeLaunch({ barCodesHistory, barCodesReleasedToday }
             key="submit"
             type="primary"
             onClick={handleSave}
+            disabled={isButtonSaveDisable}
           >
             Salvar
           </Button>,

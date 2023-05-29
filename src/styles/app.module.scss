@@ -1,6 +1,7 @@
 .wrapper {
   display: flex;
   height: 100vh;
+
   main {
     flex: 1;
   }
@@ -57,21 +58,22 @@
     color: #fff;
   }
 }
-.custom_file_upload{
+
+.custom_file_upload {
   input[type="file"] {
     display: none;
   }
 
-  p{
+  p {
     padding: 1em;
     transition: 3s;
   }
+
   width: 9em;
   height: 5em;
   border: 1px solid #ccc;
   display: inline-block;
   padding: 6px 12px;
   cursor: pointer;
-  
-}
 
+}
