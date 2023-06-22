@@ -197,7 +197,7 @@ export default function Sidebar({ screen, display }: SidebarProps) {
                     key="UpdateProductionOrdersBySAPItem"
                     icon={<CloudDownloadOutlined />}
                   >
-                    <Link href="/SAP/ProductionOrder/UpdateBySAP">Atualizar novas OPs</Link>
+                    <Link href="/SAP/ProductionOrder/UpdateBySAP">Atualizar OPs</Link>
                   </Menu.Item>
                 </SubMenu>
 
